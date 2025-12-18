@@ -10,6 +10,7 @@
  * @param {Function} onFilterChange - Callback when filters change
  */
 import { useState } from 'react';
+import { ChevronDown } from 'react-bootstrap-icons';
 
 export default function FilterSidebar({ filters, onFilterChange }) {
   // Track which sections are expanded
@@ -73,19 +74,9 @@ export default function FilterSidebar({ filters, onFilterChange }) {
                 <h3 className="text-base font-serif font-bold text-gray-900">
                   {section.title}
                 </h3>
-                <svg
+                <ChevronDown
                   className={`w-4 h-4 text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                />
               </button>
 
               {isExpanded && (

@@ -49,16 +49,11 @@ export default function SoftwareTile({ software, appCount = 0 }) {
         {/* App count badge */}
         <div className="mt-auto pt-4 flex items-center justify-center">
           <span className="inline-flex items-center gap-1.5 text-blue-600 text-sm font-medium">
-            <svg
-              className="w-4 h-4"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <circle cx="10" cy="10" r="8" fill="currentColor" />
-              <text x="10" y="14" fontSize="10" fill="white" textAnchor="middle" fontWeight="bold">
+            <span className="relative inline-flex items-center justify-center w-5 h-5 bg-blue-600 rounded-full">
+              <span className="text-[10px] font-bold text-white leading-none">
                 {appCount}
-              </text>
-            </svg>
+              </span>
+            </span>
             {appCountText}
           </span>
         </div>

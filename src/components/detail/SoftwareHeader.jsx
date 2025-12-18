@@ -6,6 +6,7 @@
  * @param {Object} software - Software object from API
  */
 import { Link } from 'react-router-dom';
+import { ChevronLeft, Globe, Book } from 'react-bootstrap-icons';
 
 export default function SoftwareHeader({ software }) {
   const title = software.attributes?.title || 'Untitled Software';
@@ -26,19 +27,7 @@ export default function SoftwareHeader({ software }) {
         to="/appverse/"
         className="inline-flex items-center text-appverse-blue hover:text-appverse-red transition-colors mb-6 font-sans"
       >
-        <svg
-          className="w-5 h-5 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
+        <ChevronLeft className="w-5 h-5 mr-2" />
         Back to Software Grid
       </Link>
 
@@ -91,19 +80,7 @@ export default function SoftwareHeader({ software }) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-4 py-2 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:opacity-90 transition-opacity"
               >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-                  />
-                </svg>
+                <Globe className="w-5 h-5 mr-2" />
                 Website
               </a>
             )}
@@ -115,19 +92,7 @@ export default function SoftwareHeader({ software }) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-4 py-2 border-2 border-appverse-red text-appverse-red font-sans font-semibold rounded-appverse hover:bg-appverse-pink transition-colors"
               >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
+                <Book className="w-5 h-5 mr-2" />
                 Documentation
               </a>
             )}

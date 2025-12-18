@@ -10,7 +10,7 @@ import SoftwareDetail from './pages/SoftwareDetail'
 export default function App() {
   return (
     <AppverseDataProvider>
-      <div className="appverse-container min-h-screen bg-white">
+      <div className="appverse-container">
         <main>
           <Routes>
             <Route path="/appverse/" element={<SoftwareHome />} />

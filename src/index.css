@@ -6,14 +6,3 @@
 .appverse-container {
   @apply font-sans text-appverse-black;
 }
-
-/* Design tokens reference:
- * Red: #C91235
- * Black: #232323
- * Light Gray: #DDDEDF
- * Pink: #F2E2E5
- * Blue: #0076AF
- * Green: #00857A
- * Fonts: "Serifa Std", "Source Sans 3", sans-serif
- * Border Radius: 8px
- */

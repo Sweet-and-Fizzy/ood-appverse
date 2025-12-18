@@ -10,6 +10,7 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
 import SoftwareGrid from '../components/home/SoftwareGrid';
+import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
 export default function SoftwareHome() {
   // Get data from context
@@ -124,19 +125,11 @@ export default function SoftwareHome() {
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-2 text-white font-sans font-medium hover:opacity-80 transition-opacity"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={showFilters ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"}
-              />
-            </svg>
+            {showFilters ? (
+              <ChevronLeft className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
 
