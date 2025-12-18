@@ -13,6 +13,14 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       open: true,
+      proxy: {
+        '/api': {
+          target: 'https://md-2622-accessmatch.pantheonsite.io',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '/jsonapi'),
+          secure: false,
+        }
+      }
     },
 
     // Build configuration
