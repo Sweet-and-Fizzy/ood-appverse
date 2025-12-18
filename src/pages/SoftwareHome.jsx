@@ -120,7 +120,7 @@ export default function SoftwareHome() {
     <div className="min-h-screen bg-white">
       {/* Header section */}
       <header className="border-b-2 border-appverse-gray bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mx-auto px-6 py-8">
           <div className="flex items-start justify-between mb-6">
             <div className="flex-1">
               <h1 className="text-4xl font-serif font-bold text-appverse-black mb-2">
@@ -150,7 +150,7 @@ export default function SoftwareHome() {
       </header>
 
       {/* Main content: Sidebar + Grid */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="mx-auto px-6 py-8">
         <div className="flex gap-8">
           {/* Filter sidebar */}
           <FilterSidebar
