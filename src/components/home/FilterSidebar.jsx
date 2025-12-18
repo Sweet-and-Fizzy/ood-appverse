@@ -2,54 +2,23 @@
  * FilterSidebar Component
  * Displays filter options for software browsing
  *
- * NOTE: These filters are UI-only placeholders. The backend doesn't
- * currently provide the necessary fields (topics, tags, institution).
- * This component is structured to be URL-param ready for future functionality.
+ * NOTE: Only shows filters that are actually available in the API.
+ * Currently only software type (open source vs licensed) is available.
  *
  * Props:
  * @param {Object} filters - Current filter values
  * @param {Function} onFilterChange - Callback when filters change
  */
 export default function FilterSidebar({ filters, onFilterChange }) {
-  // Placeholder data - these will eventually come from API
+  // Only show filters that actually exist in the API
   const filterSections = [
-    {
-      title: 'Topics',
-      key: 'topics',
-      options: [
-        { label: 'All', value: 'all' },
-        { label: 'Bioinformatics (20)', value: 'bioinformatics' },
-        { label: 'Biological Sciences (18)', value: 'biological-sciences' },
-        { label: 'Biology (12)', value: 'biology' },
-        { label: 'Computer Science (10)', value: 'computer-science' },
-        { label: 'Earth & Environmental (10)', value: 'earth-environmental' },
-        { label: 'Engineering & Technology (10)', value: 'engineering-technology' },
-        { label: 'Mathematics (8)', value: 'mathematics' },
-        { label: 'Physical Sciences', value: 'physical-sciences' }
-      ]
-    },
     {
       title: 'Type',
       key: 'type',
       options: [
         { label: 'All', value: 'all' },
-        { label: 'Batch Connect', value: 'batch-connect' },
-        { label: 'Passenger App', value: 'passenger-app' },
-        { label: 'Licensed Software', value: 'licensed_software' },
-        { label: 'Open-source Software', value: 'open_source_software' },
-        { label: 'Widget', value: 'widget' },
-        { label: 'Dashboard', value: 'dashboard' }
-      ]
-    },
-    {
-      title: 'Tags',
-      key: 'tags',
-      options: [
-        { label: 'All', value: 'all' },
-        { label: 'parallel-computing', value: 'parallel-computing' },
-        { label: 'cloud-computing', value: 'cloud-computing' },
-        { label: 'workflow-management', value: 'workflow-management' },
-        { label: 'data-analysis', value: 'data-analysis' }
+        { label: 'Open Source', value: 'open_source_software' },
+        { label: 'Licensed Software', value: 'licensed_software' }
       ]
     }
   ];
@@ -85,16 +54,14 @@ export default function FilterSidebar({ filters, onFilterChange }) {
     <aside className="w-64 pr-8 flex-shrink-0">
       <div className="sticky top-4">
         <h2 className="text-xl font-serif font-bold text-appverse-black mb-6">
-          Topics
+          Filters
         </h2>
 
         {filterSections.map((section) => (
           <div key={section.key} className="mb-8">
-            {section.key !== 'topics' && (
-              <h3 className="text-sm font-sans font-semibold text-appverse-black mb-3 uppercase tracking-wide">
-                {section.title}
-              </h3>
-            )}
+            <h3 className="text-sm font-sans font-semibold text-appverse-black mb-3 uppercase tracking-wide">
+              {section.title}
+            </h3>
 
             <div className="space-y-2">
               {section.options.map((option) => {
@@ -122,12 +89,6 @@ export default function FilterSidebar({ filters, onFilterChange }) {
                 );
               })}
             </div>
-
-            {section.key === 'topics' && (
-              <button className="mt-3 text-sm font-sans text-appverse-blue hover:text-appverse-red transition-colors">
-                See 10 More
-              </button>
-            )}
           </div>
         ))}
 
