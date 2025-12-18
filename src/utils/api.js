@@ -112,6 +112,85 @@ export async function fetchAllApps() {
 }
 
 /**
+ * Fetch a single software item by ID with logo
+ * @param {string} id - Software UUID
+ * @returns {Promise<Object>} Software object with logo URL
+ */
+export async function fetchSoftwareById(id) {
+  try {
+    // Fetch software with logo relationship included
+    const response = await fetch(
+      `${BASE_API_URL}/node/appverse_software/${id}?include=field_appverse_logo`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch software: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const software = data.data;
+    const includedMedia = data.included || [];
+
+    // Find the logo media if it exists
+    const logoMediaId = software.relationships?.field_appverse_logo?.data?.id;
+    let logoUrl = null;
+
+    if (logoMediaId) {
+      const logoMedia = includedMedia.find(item => item.id === logoMediaId);
+      const fileRelationshipId = logoMedia?.relationships?.field_media_image_1?.data?.id;
+
+      if (fileRelationshipId) {
+        try {
+          const fileResponse = await fetch(
+            `${BASE_API_URL}/file/file/${fileRelationshipId}`
+          );
+          const fileData = await fileResponse.json();
+          const fileUrl = fileData.data?.attributes?.uri?.url;
+          if (fileUrl) {
+            logoUrl = `${BASE_SITE_URL}${fileUrl}`;
+          }
+        } catch (err) {
+          console.error(`Failed to fetch logo file:`, err);
+        }
+      }
+    }
+
+    return {
+      ...software,
+      logoUrl
+    };
+
+  } catch (error) {
+    console.error('Error fetching software by ID:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch apps for a specific software
+ * @param {string} softwareId - Software UUID
+ * @returns {Promise<Array>} Array of app objects for this software
+ */
+export async function fetchAppsBySoftware(softwareId) {
+  try {
+    const response = await fetch(
+      `${BASE_API_URL}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch apps: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data || [];
+
+  } catch (error) {
+    console.error('Error fetching apps by software:', error);
+    throw error;
+  }
+}
+
+/**
  * Group apps by their software relationship ID
  * @param {Array} apps - Array of app objects
  * @returns {Object} Object keyed by software UUID, values are arrays of apps
