@@ -23,6 +23,9 @@ export default function SoftwareHome() {
     searchParams.get('search') || ''
   );
 
+  // Local state for filter visibility
+  const [showFilters, setShowFilters] = useState(true);
+
   // Parse filters from URL params
   const filters = useMemo(() => {
     const parsed = {};
@@ -111,52 +114,53 @@ export default function SoftwareHome() {
     return <ErrorMessage error={error} onRetry={refetch} />;
   }
 
-  // Handle "ADD AN APP" button click
-  const handleAddApp = () => {
-    alert('Add an app functionality coming soon!');
-  };
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Header section */}
-      <header className="border-b-2 border-appverse-gray bg-white">
-        <div className="mx-auto px-6 py-8">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex-1">
-              <h1 className="text-4xl font-serif font-bold text-appverse-black mb-2">
-                Welcome to the Appverse
-              </h1>
-              <p className="text-lg font-sans text-gray-600">
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.
-              </p>
-            </div>
-
-            {/* ADD AN APP button */}
-            <button
-              onClick={handleAddApp}
-              className="ml-6 px-6 py-3 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:opacity-90 transition-opacity shadow-md whitespace-nowrap"
+      {/* Search and filter toggle section */}
+      <div className="mx-6 my-6 bg-appverse-black px-6 py-3 rounded-lg">
+        <div className="flex items-center justify-between gap-4">
+          {/* Toggle filters button */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 text-white font-sans font-medium hover:opacity-80 transition-opacity"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              ADD AN APP
-            </button>
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d={showFilters ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"}
+              />
+            </svg>
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
 
           {/* Search bar */}
-          <SearchBar
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Search"
-          />
+          <div className="w-80">
+            <SearchBar
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search for apps"
+            />
+          </div>
         </div>
-      </header>
+      </div>
 
       {/* Main content: Sidebar + Grid */}
-      <div className="mx-auto px-6 py-8">
+      <div className="mx-6 mb-6">
         <div className="flex gap-8">
           {/* Filter sidebar */}
-          <FilterSidebar
-            filters={filters}
-            onFilterChange={handleFilterChange}
-          />
+          {showFilters && (
+            <FilterSidebar
+              filters={filters}
+              onFilterChange={handleFilterChange}
+            />
+          )}
 
           {/* Software grid */}
           <main className="flex-1 min-w-0">

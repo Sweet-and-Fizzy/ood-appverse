@@ -21,10 +21,10 @@ export default function SoftwareTile({ software, appCount = 0 }) {
       to={`/appverse/software/${software.id}`}
       className="block group"
     >
-      <div className="border-2 border-appverse-gray rounded-appverse p-6 hover:border-appverse-red hover:shadow-lg transition-all duration-200 bg-white h-full flex flex-col">
+      <div className="relative flex flex-col items-center border-gray-500 border-2 rounded-lg p-6 bg-white h-full hover:border-red-500 transition-all duration-200">
 
         {/* Logo section */}
-        <div className="flex items-center justify-center h-32 mb-4">
+        <div className="flex items-center justify-center h-32 w-full mb-4">
           {logoUrl ? (
             <img
               src={logoUrl}
@@ -33,8 +33,8 @@ export default function SoftwareTile({ software, appCount = 0 }) {
             />
           ) : (
             // Placeholder if no logo
-            <div className="w-24 h-24 rounded-appverse bg-appverse-gray flex items-center justify-center">
-              <span className="text-3xl font-serif font-bold text-white">
+            <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center">
+              <span className="text-7xl font-bold text-gray-600">
                 {softwareTitle.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -42,23 +42,22 @@ export default function SoftwareTile({ software, appCount = 0 }) {
         </div>
 
         {/* Software name */}
-        <h3 className="text-xl font-serif font-bold text-appverse-black mb-2 group-hover:text-appverse-red transition-colors text-center">
+        <h3 className="text-base whitespace-nowrap overflow-hidden text-ellipsis max-w-full font-semibold text-center text-gray-900">
           {softwareTitle}
         </h3>
 
         {/* App count badge */}
         <div className="mt-auto pt-4 flex items-center justify-center">
-          <span className="inline-flex items-center px-3 py-1 rounded-full bg-appverse-black text-white text-sm font-sans font-semibold">
+          <span className="inline-flex items-center gap-1.5 text-blue-600 text-sm font-medium">
             <svg
-              className="w-4 h-4 mr-1.5"
+              className="w-4 h-4"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
-              <path
-                fillRule="evenodd"
-                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                clipRule="evenodd"
-              />
+              <circle cx="10" cy="10" r="8" fill="currentColor" />
+              <text x="10" y="14" fontSize="10" fill="white" textAnchor="middle" fontWeight="bold">
+                {appCount}
+              </text>
             </svg>
             {appCountText}
           </span>
