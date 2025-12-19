@@ -3,10 +3,19 @@
  * Handles JSON:API interactions with Drupal backend
  */
 
+import { logApiResponse } from './apiLogger';
+
 // Use proxy in development, direct URL in production
 const isDevelopment = import.meta.env.DEV;
 const BASE_API_URL = isDevelopment ? '/api' : 'https://md-2622-accessmatch.pantheonsite.io/jsonapi';
 const BASE_SITE_URL = 'https://md-2622-accessmatch.pantheonsite.io';
+
+// Endpoint constants
+const ALL_SOFTWARE_WITH_LOGOS = `${BASE_API_URL}/node/appverse_software?include=field_appverse_logo`;
+const ALL_APPS_WITH_SOFTWARE = `${BASE_API_URL}/node/appverse_app?include=field_appverse_software_implemen`;
+const SOFTWARE_BY_ID_WITH_LOGO = (id) => `${BASE_API_URL}/node/appverse_software/${id}?include=field_appverse_logo`;
+const APPS_BY_SOFTWARE_ID = (softwareId) => `${BASE_API_URL}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}`;
+const FILE_BY_ID = (fileId) => `${BASE_API_URL}/file/file/${fileId}`;
 
 /**
  * Fetch all software items with their logo relationships
@@ -15,15 +24,14 @@ const BASE_SITE_URL = 'https://md-2622-accessmatch.pantheonsite.io';
 export async function fetchAllSoftware() {
   try {
     // Fetch software with logo relationship included
-    const response = await fetch(
-      `${BASE_API_URL}/node/appverse_software?include=field_appverse_logo`
-    );
+    const response = await fetch(ALL_SOFTWARE_WITH_LOGOS);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch software: ${response.statusText}`);
     }
 
     const data = await response.json();
+    logApiResponse('ALL_SOFTWARE_WITH_LOGOS', ALL_SOFTWARE_WITH_LOGOS, data);
 
     // Extract software and included media resources
     const softwareList = data.data || [];
@@ -45,10 +53,10 @@ export async function fetchAllSoftware() {
       if (!fileRelationshipId) return null;
 
       try {
-        const fileResponse = await fetch(
-          `${BASE_API_URL}/file/file/${fileRelationshipId}`
-        );
+        const fileUrl = FILE_BY_ID(fileRelationshipId);
+        const fileResponse = await fetch(fileUrl);
         const fileData = await fileResponse.json();
+        logApiResponse('FILE_BY_ID', fileUrl, fileData);
         return {
           mediaId,
           fileUrl: fileData.data?.attributes?.uri?.url || null
@@ -94,15 +102,14 @@ export async function fetchAllSoftware() {
  */
 export async function fetchAllApps() {
   try {
-    const response = await fetch(
-      `${BASE_API_URL}/node/appverse_app?include=field_appverse_software_implemen`
-    );
+    const response = await fetch(ALL_APPS_WITH_SOFTWARE);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch apps: ${response.statusText}`);
     }
 
     const data = await response.json();
+    logApiResponse('ALL_APPS_WITH_SOFTWARE', ALL_APPS_WITH_SOFTWARE, data);
     return data.data || [];
 
   } catch (error) {
@@ -119,15 +126,15 @@ export async function fetchAllApps() {
 export async function fetchSoftwareById(id) {
   try {
     // Fetch software with logo relationship included
-    const response = await fetch(
-      `${BASE_API_URL}/node/appverse_software/${id}?include=field_appverse_logo`
-    );
+    const url = SOFTWARE_BY_ID_WITH_LOGO(id);
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch software: ${response.statusText}`);
     }
 
     const data = await response.json();
+    logApiResponse('SOFTWARE_BY_ID_WITH_LOGO', url, data);
     const software = data.data;
     const includedMedia = data.included || [];
 
@@ -141,10 +148,10 @@ export async function fetchSoftwareById(id) {
 
       if (fileRelationshipId) {
         try {
-          const fileResponse = await fetch(
-            `${BASE_API_URL}/file/file/${fileRelationshipId}`
-          );
+          const fileEndpoint = FILE_BY_ID(fileRelationshipId);
+          const fileResponse = await fetch(fileEndpoint);
           const fileData = await fileResponse.json();
+          logApiResponse('FILE_BY_ID', fileEndpoint, fileData);
           const fileUrl = fileData.data?.attributes?.uri?.url;
           if (fileUrl) {
             logoUrl = `${BASE_SITE_URL}${fileUrl}`;
@@ -173,15 +180,15 @@ export async function fetchSoftwareById(id) {
  */
 export async function fetchAppsBySoftware(softwareId) {
   try {
-    const response = await fetch(
-      `${BASE_API_URL}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}`
-    );
+    const url = APPS_BY_SOFTWARE_ID(softwareId);
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch apps: ${response.statusText}`);
     }
 
     const data = await response.json();
+    logApiResponse('APPS_BY_SOFTWARE_ID', url, data);
     return data.data || [];
 
   } catch (error) {
