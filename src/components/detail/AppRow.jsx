@@ -90,7 +90,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
       {/* README panel (expanded) */}
       {isExpanded && readme && (
-        <div className="bg-appverse-pink border-t-2 border-appverse-gray p-6">
+        <div className="bg-white border-t-2 border-appverse-gray p-6">
           <div
             className="prose max-w-none font-sans"
             dangerouslySetInnerHTML={{ __html: readme }}
