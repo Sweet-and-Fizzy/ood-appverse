@@ -11,6 +11,10 @@ npm run dev
 
 Visit `http://localhost:3000/appverse/`
 
+## Live Demo
+
+https://ood-appverse-react.netlify.app/appverse/
+
 ## Available Scripts
 
 | Command | Description |

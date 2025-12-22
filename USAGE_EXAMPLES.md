@@ -1,5 +1,9 @@
 # AppVerse Browser - Usage Examples
 
+## Live Demo
+
+https://ood-appverse-react.netlify.app/appverse/
+
 ## Option 1: React Component (for React Apps)
 
 ```bash
