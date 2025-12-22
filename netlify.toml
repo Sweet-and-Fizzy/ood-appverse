@@ -9,9 +9,8 @@
   status = 200
   force = true
 
-# SPA routing - serve index.html for all routes (except /demo)
+# SPA routing for React app (only for /appverse paths)
 [[redirects]]
-  from = "/*"
+  from = "/appverse/*"
   to = "/index.html"
   status = 200
-  conditions = {path = "!/demo/*"}
