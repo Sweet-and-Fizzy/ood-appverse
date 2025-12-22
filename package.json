@@ -33,7 +33,7 @@
     "build": "vite build",
     "build:lib": "vite build --mode lib",
     "preview": "vite preview",
-    "serve:demo": "npm run build && npm run build:lib && cp -r demo dist/ && echo '\n✅ Demo ready! Open: http://localhost:3000/demo/index.html\n' && npx serve dist -l 3000"
+    "serve:demo": "npm run build && npm run build:lib && cp -r demo dist/ && echo '\n✅ Demo ready! Open: http://localhost:3000/demo/pretend-website/\n' && npx serve dist -l 3000"
   },
   "dependencies": {
     "react": ">=18.0.0",

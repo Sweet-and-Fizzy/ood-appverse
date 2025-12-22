@@ -14,7 +14,7 @@ Visit `http://localhost:3000/appverse/`
 ## Live Demos
 
 - **Standard React App:** https://ood-appverse-react.netlify.app/appverse/
-- **CDN Embed Demo:** https://ood-appverse-react.netlify.app/demo/
+- **CDN Embed Demo:** https://ood-appverse-react.netlify.app/demo/pretend-website/
 
 ## Available Scripts
 
@@ -97,8 +97,9 @@ Both entry points use `BrowserRouter`:
 
 **On Netlify:**
 - Standard app: https://ood-appverse-react.netlify.app/appverse/
-- CDN demo: https://ood-appverse-react.netlify.app/demo/
+- CDN demo: https://ood-appverse-react.netlify.app/demo/pretend-website/
 - Both builds deployed together via `npm run build && npm run build:lib`
+- Note: Demo starts at /demo/pretend-website/ but widget redirects to /appverse/
 
 ## Project Structure
 

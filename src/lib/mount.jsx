@@ -4,16 +4,18 @@
  * The embedded widget controls routing for /appverse/* paths
  */
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, HashRouter } from 'react-router-dom'
 import App from '../App'
 import '../index.css'
 
 /**
  * Mount the AppVerse browser to a DOM element
  * @param {string} elementId - The ID of the element to mount to
+ * @param {Object} options - Configuration options
+ * @param {boolean} options.useHash - Use HashRouter instead of BrowserRouter (for demos)
  * @returns {Object} - Object with unmount function
  */
-function mount(elementId) {
+function mount(elementId, options = {}) {
   const container = document.getElementById(elementId)
 
   if (!container) {
@@ -22,11 +24,12 @@ function mount(elementId) {
   }
 
   const root = createRoot(container)
+  const Router = options.useHash ? HashRouter : BrowserRouter
 
   root.render(
-    <BrowserRouter>
+    <Router>
       <App />
-    </BrowserRouter>
+    </Router>
   )
 
   return {
