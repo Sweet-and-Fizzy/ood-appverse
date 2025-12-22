@@ -16,25 +16,31 @@ export default function SoftwareTile({ software, appCount = 0 }) {
   // Format app count text
   const appCountText = appCount === 1 ? '1 repo' : `${appCount} repos`;
 
+  // Debug: Log if logo URL exists but might be broken
+  const handleImageError = (e) => {
+    console.error(`Failed to load logo for ${softwareTitle}:`, logoUrl);
+  };
+
   return (
     <Link
       to={`/appverse/software/${software.id}`}
       className="block group"
     >
-      <div className="relative flex flex-col items-center border-gray-500 border-2 rounded-lg p-6 bg-white h-full hover:border-red-500 transition-all duration-200">
+      <div className="flex flex-col items-center gap-4 border-appverse-black border-2 rounded-lg p-6 bg-white h-[199px] min-w-[199px] hover:border-red-500 transition-all duration-200">
 
-        {/* Logo section */}
-        <div className="flex items-center justify-center h-32 w-full mb-4">
+        {/* Logo section - fixed height container */}
+        <div className="h-[60px] w-full flex items-center justify-center">
           {logoUrl ? (
             <img
               src={logoUrl}
               alt={`${softwareTitle} logo`}
-              className="max-h-full max-w-full object-contain"
+              className="max-h-[60px] max-w-full object-contain"
+              onError={handleImageError}
             />
           ) : (
             // Placeholder if no logo
-            <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center">
-              <span className="text-7xl font-bold text-gray-600">
+            <div className="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center">
+              <span className="text-4xl font-bold text-gray-600">
                 {softwareTitle.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -42,19 +48,19 @@ export default function SoftwareTile({ software, appCount = 0 }) {
         </div>
 
         {/* Software name */}
-        <h3 className="text-base whitespace-nowrap overflow-hidden text-ellipsis max-w-full font-semibold text-center text-gray-900">
+        <h3 className="text-xl font-semibold text-center text-gray-900 line-clamp-2">
           {softwareTitle}
         </h3>
 
         {/* App count badge */}
-        <div className="mt-auto pt-4 flex items-center justify-center">
-          <span className="inline-flex items-center gap-1.5 text-blue-600 text-sm font-medium">
-            <span className="relative inline-flex items-center justify-center w-5 h-5 bg-blue-600 rounded-full">
+        <div className="mt-auto">
+          <span className="inline-flex items-center gap-1.5 text-base font-medium">
+            <span className="relative inline-flex items-center justify-center w-5 h-5 bg-appverse-blue rounded-full">
               <span className="text-[10px] font-bold text-white leading-none">
                 {appCount}
               </span>
             </span>
-            {appCountText}
+            <span className="text-appverse-black">{appCountText}</span>
           </span>
         </div>
       </div>
