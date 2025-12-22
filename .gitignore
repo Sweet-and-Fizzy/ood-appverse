@@ -3,6 +3,8 @@ node_modules/
 
 # Build artifacts - KEEP dist/ for CDN distribution
 # dist/ is intentionally NOT ignored for GitHub releases → CDN
+# But ignore demo folder copy (only for Netlify deployments)
+dist/demo/
 
 # Development
 .DS_Store

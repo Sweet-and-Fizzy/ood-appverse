@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build && npm run build:lib"
+  command = "npm run build && npm run build:lib && cp -r demo dist/"
   publish = "dist"
 
 # Proxy API requests to avoid CORS issues
