@@ -73,18 +73,30 @@ function MyApp() {
 // React Component
 <AppVerseBrowser />
 
-// CDN Mount
+// CDN Mount (production - uses BrowserRouter)
 const instance = AppVerse.mount(elementId)
+
+// CDN Mount (demo - uses HashRouter)
+const instance = AppVerse.mount(elementId, { useHash: true })
+
+// Cleanup
 instance.unmount()
 ```
 
 ## How Routing Works
 
-Both entry points use `BrowserRouter`:
+The widget supports two router modes:
+
+**BrowserRouter (default, for production):**
 - Widget reads current browser URL on mount
 - Navigation updates URL without page reload
 - Filter/README state syncs to URL params
 - Catch-all redirects to `/appverse/`
+
+**HashRouter (for demos, with `useHash: true` option):**
+- Uses hash-based navigation (e.g., `#/appverse/`)
+- Keeps base URL unchanged
+- Useful for testing/demos on any path
 
 **In Development:**
 - `http://localhost:3000/appverse/` → Software grid
@@ -92,14 +104,13 @@ Both entry points use `BrowserRouter`:
 
 **In Production (Drupal):**
 - Drupal loads page at `/appverse/` or `/appverse/software/:id`
-- Widget mounts and reads URL
+- Widget mounts with default BrowserRouter
 - React Router handles all navigation after initial load
 
 **On Netlify:**
-- Standard app: https://ood-appverse-react.netlify.app/appverse/
-- CDN demo: https://ood-appverse-react.netlify.app/demo/pretend-website/
+- Standard app: https://ood-appverse-react.netlify.app/appverse/ (BrowserRouter)
+- CDN demo: https://ood-appverse-react.netlify.app/demo/pretend-website/ (HashRouter)
 - Both builds deployed together via `npm run build && npm run build:lib`
-- Note: Demo starts at /demo/pretend-website/ but widget redirects to /appverse/
 
 ## Project Structure
 

@@ -3,7 +3,23 @@
 ## Live Demos
 
 - **Standard React App:** https://ood-appverse-react.netlify.app/appverse/
-- **CDN Embed Demo:** https://ood-appverse-react.netlify.app/demo/
+- **CDN Embed Demo (with HashRouter):** https://ood-appverse-react.netlify.app/demo/pretend-website/
+
+## Production vs Demo Usage
+
+**Production (Drupal):**
+```javascript
+AppVerse.mount('appverse');
+// Uses BrowserRouter (default) - expects to be at /appverse/ path
+```
+
+**Demo/Testing:**
+```javascript
+AppVerse.mount('appverse', { useHash: true });
+// Uses HashRouter - can be embedded anywhere, uses hash-based navigation
+```
+
+The demo uses `{ useHash: true }` to keep the URL at `/demo/pretend-website/` without redirecting. **For production Drupal deployment, do NOT use this option** - the default BrowserRouter behavior is what you want.
 
 ## Option 1: React Component (for React Apps)
 
@@ -78,10 +94,12 @@ import { AppVerseBrowser } from 'appverse-browser'
 
 ### CDN Mount Function
 ```javascript
-const instance = AppVerse.mount(elementId)
+const instance = AppVerse.mount(elementId, options)
 
 // Parameters:
 // - elementId (string): ID of DOM element
+// - options (object, optional):
+//   - useHash (boolean): Use HashRouter instead of BrowserRouter (default: false)
 
 // Returns:
 // - { unmount: Function }
