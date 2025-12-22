@@ -7,11 +7,6 @@
 
 **Filters apply to APPS, display groups by SOFTWARE**
 
-## Current State
-
-**Software:** 2 items (Abaqus, Matlab)
-**Apps:** 1 item (Abaqus/CAE) - **no tags/license/type assigned yet**
-
 ## Endpoints
 
 **Base:** `https://md-2622-accessmatch.pantheonsite.io/jsonapi`
@@ -45,7 +40,11 @@
 
 **Attributes:**
 - `title` - App name
-- `field_implementation_details` - README/details
+- `body` - Short description
+- `field_implementation_details` - Implementation details/notes
+- `field_appverse_readme` - Full README content (markdown/HTML)
+- `field_appverse_github_url` - GitHub repository URL
+- `field_appverse_lastupdated` - Last updated date
 
 **Relationships (FILTER THESE):**
 - `field_appverse_software_implemen` - Parent software
