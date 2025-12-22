@@ -55,6 +55,8 @@ export default defineConfig(({ mode }) => {
       },
       // Output directory
       outDir: 'dist',
+      // Don't empty dist folder (preserve standard app build)
+      emptyOutDir: false,
       // Generate sourcemaps for debugging
       sourcemap: true,
       // Minify for production

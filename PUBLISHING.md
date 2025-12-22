@@ -166,6 +166,26 @@ npx serve .
 # Verify the widget loads and works correctly
 ```
 
+## Netlify Deployment
+
+The project is deployed to Netlify with both build modes:
+
+**Site:** https://ood-appverse-react.netlify.app/
+
+**Build Configuration:**
+```toml
+# netlify.toml
+[build]
+  command = "npm run build && npm run build:lib"
+  publish = "dist"
+```
+
+**Deployed URLs:**
+- Standard React app: https://ood-appverse-react.netlify.app/appverse/
+- CDN demo: https://ood-appverse-react.netlify.app/demo/
+
+The build runs both commands sequentially. The library build uses `emptyOutDir: false` in `vite.config.js` to preserve the standard app files while adding the UMD bundle.
+
 ## Rollback
 
 If you need to rollback a bad release:

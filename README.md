@@ -11,6 +11,11 @@ npm run dev
 
 Visit `http://localhost:3000/appverse/`
 
+## Live Demos
+
+- **Standard React App:** https://ood-appverse-react.netlify.app/appverse/
+- **CDN Embed Demo:** https://ood-appverse-react.netlify.app/demo/
+
 ## Available Scripts
 
 | Command | Description |
@@ -89,6 +94,11 @@ Both entry points use `BrowserRouter`:
 - Drupal loads page at `/appverse/` or `/appverse/software/:id`
 - Widget mounts and reads URL
 - React Router handles all navigation after initial load
+
+**On Netlify:**
+- Standard app: https://ood-appverse-react.netlify.app/appverse/
+- CDN demo: https://ood-appverse-react.netlify.app/demo/
+- Both builds deployed together via `npm run build && npm run build:lib`
 
 ## Project Structure
 

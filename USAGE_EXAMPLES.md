@@ -1,5 +1,10 @@
 # AppVerse Browser - Usage Examples
 
+## Live Demos
+
+- **Standard React App:** https://ood-appverse-react.netlify.app/appverse/
+- **CDN Embed Demo:** https://ood-appverse-react.netlify.app/demo/
+
 ## Option 1: React Component (for React Apps)
 
 ```bash
