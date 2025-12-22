@@ -21,7 +21,7 @@ export default function SoftwareHeader({ software }) {
   const licenseColor = softwareType === 'open_source_software' ? 'bg-appverse-green' : 'bg-appverse-blue';
 
   return (
-    <div className="border-b-2 border-appverse-gray pb-8 mb-8">
+    <div className="flex flex-col">
       {/* Back button */}
       <Link
         to="/appverse/"
@@ -31,74 +31,69 @@ export default function SoftwareHeader({ software }) {
         Back to Software Grid
       </Link>
 
-      <div className="flex gap-8">
-        {/* Logo section */}
-        <div className="flex-shrink-0">
-          {logoUrl ? (
-            <img
-              src={logoUrl}
-              alt={`${title} logo`}
-              className="w-48 h-48 object-contain"
-            />
-          ) : (
-            <div className="w-48 h-48 rounded-appverse bg-appverse-gray flex items-center justify-center">
-              <span className="text-6xl font-serif font-bold text-white">
-                {title.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Info section */}
-        <div className="flex-1">
-          {/* Title and license badge */}
-          <div className="flex items-start justify-between mb-4">
-            <h1 className="text-4xl font-serif font-bold text-appverse-black">
-              {title}
-            </h1>
-            {softwareType && (
-              <span className={`px-4 py-2 ${licenseColor} text-white rounded-appverse font-sans font-semibold text-sm whitespace-nowrap`}>
-                {licenseLabel}
-              </span>
-            )}
+      {/* Logo section */}
+      <div className="flex items-center justify-center mb-4">
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt={`${title} logo`}
+            className="w-32 h-32 object-contain"
+          />
+        ) : (
+          <div className="w-32 h-32 rounded-appverse bg-appverse-gray flex items-center justify-center">
+            <span className="text-5xl font-serif font-bold text-white">
+              {title.charAt(0).toUpperCase()}
+            </span>
           </div>
-
-          {/* Description */}
-          {description && (
-            <div
-              className="text-lg font-sans text-gray-700 mb-6 prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: description }}
-            />
-          )}
-
-          {/* Links */}
-          <div className="flex gap-4">
-            {websiteUrl && (
-              <a
-                href={websiteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:opacity-90 transition-opacity"
-              >
-                <Globe className="w-5 h-5 mr-2" />
-                Website
-              </a>
-            )}
-
-            {docsUrl && (
-              <a
-                href={docsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 border-2 border-appverse-red text-appverse-red font-sans font-semibold rounded-appverse hover:bg-appverse-pink transition-colors"
-              >
-                <Book className="w-5 h-5 mr-2" />
-                Documentation
-              </a>
-            )}
-          </div>
-        </div>
+        )}
       </div>
+
+      {/* Title */}
+      <h1 className="text-2xl font-serif font-bold text-appverse-black text-center mb-4">
+        {title}
+      </h1>
+
+      {/* Links */}
+      <div className="flex flex-col gap-2 mb-4">
+        {websiteUrl && (
+          <a
+            href={websiteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 text-appverse-blue hover:text-appverse-red transition-colors font-sans text-sm"
+          >
+            <Globe className="w-4 h-4" />
+            WWW
+          </a>
+        )}
+
+        {docsUrl && (
+          <a
+            href={docsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 text-appverse-blue hover:text-appverse-red transition-colors font-sans text-sm"
+          >
+            <Book className="w-4 h-4" />
+            DOCS
+          </a>
+        )}
+
+        {softwareType === 'open_source_software' && (
+          <div className="inline-flex items-center justify-center gap-2 text-appverse-blue font-sans text-sm">
+            <span>📄</span>
+            OPEN-SOURCE
+          </div>
+        )}
+      </div>
+
+      {/* Description */}
+      {description && (
+        <div
+          className="text-sm font-sans text-gray-700 mb-4 prose prose-sm max-w-none"
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
+      )}
     </div>
   );
 }

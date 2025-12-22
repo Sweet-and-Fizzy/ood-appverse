@@ -111,15 +111,22 @@ export default function SoftwareDetail() {
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto px-6 py-8">
-        {/* Software header */}
-        <SoftwareHeader software={software} />
+        {/* Two-column layout */}
+        <div className="flex gap-8">
+          {/* Left column - Software info */}
+          <div className="w-[275px] flex-shrink-0">
+            <SoftwareHeader software={software} />
+          </div>
 
-        {/* App list */}
-        <AppList
-          apps={apps}
-          expandedAppId={expandedAppId}
-          onToggleApp={handleToggleApp}
-        />
+          {/* Right column - App list */}
+          <div className="flex-1 min-w-0">
+            <AppList
+              apps={apps}
+              expandedAppId={expandedAppId}
+              onToggleApp={handleToggleApp}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
