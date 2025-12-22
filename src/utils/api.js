@@ -5,9 +5,8 @@
 
 import { logApiResponse } from './apiLogger';
 
-// Use proxy in development, direct URL in production
-const isDevelopment = import.meta.env.DEV;
-const BASE_API_URL = isDevelopment ? '/api' : 'https://md-2622-accessmatch.pantheonsite.io/jsonapi';
+// Use proxy path for all environments (Vite dev server and Netlify both proxy /api)
+const BASE_API_URL = '/api';
 const BASE_SITE_URL = 'https://md-2622-accessmatch.pantheonsite.io';
 
 // Endpoint constants

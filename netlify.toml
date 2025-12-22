@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Proxy API requests to avoid CORS issues
+[[redirects]]
+  from = "/api/*"
+  to = "https://md-2622-accessmatch.pantheonsite.io/jsonapi/:splat"
+  status = 200
+  force = true
+
+# SPA routing - serve index.html for all routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
