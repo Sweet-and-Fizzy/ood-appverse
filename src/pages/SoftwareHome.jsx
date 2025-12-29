@@ -14,7 +14,7 @@ import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
 export default function SoftwareHome() {
   // Get data from context
-  const { software, appsBySoftwareId, loading, error, refetch } = useAppverseData();
+  const { software, appsBySoftwareId, filterOptions, loading, error, refetch } = useAppverseData();
 
   // URL params for filter persistence
   const [searchParams, setSearchParams] = useSearchParams();
@@ -92,11 +92,38 @@ export default function SoftwareHome() {
       );
     }
 
-    // Note: Type filter removed - field_appverse_software_type doesn't exist in API
-    // License info is in field_license relationship, would need to include it in API call
+    // Apply filters based on apps
+    // If filters are active, only show software that has apps matching ALL selected filters
+    const hasActiveFilters =
+      (filters.tags && filters.tags.length > 0) ||
+      (filters.appType && filters.appType.length > 0);
+
+    if (hasActiveFilters) {
+      filtered = filtered.filter(softwareItem => {
+        const softwareApps = appsBySoftwareId[softwareItem.id] || [];
+
+        // Check if any app matches ALL active filters
+        return softwareApps.some(app => {
+          // Check tags filter
+          if (filters.tags && filters.tags.length > 0) {
+            const appTagIds = app.relationships?.field_add_implementation_tags?.data?.map(t => t.id) || [];
+            const hasMatchingTag = filters.tags.some(tagId => appTagIds.includes(tagId));
+            if (!hasMatchingTag) return false;
+          }
+
+          // Check app type filter
+          if (filters.appType && filters.appType.length > 0) {
+            const appTypeId = app.relationships?.field_appverse_app_type?.data?.id;
+            if (!appTypeId || !filters.appType.includes(appTypeId)) return false;
+          }
+
+          return true;
+        });
+      });
+    }
 
     return filtered;
-  }, [software, searchQuery, filters]);
+  }, [software, searchQuery, filters, appsBySoftwareId]);
 
   // Show loading state
   if (loading) {
@@ -145,6 +172,7 @@ export default function SoftwareHome() {
             <FilterSidebar
               filters={filters}
               onFilterChange={handleFilterChange}
+              filterOptions={filterOptions}
             />
           )}
 

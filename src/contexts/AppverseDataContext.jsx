@@ -9,7 +9,7 @@
  *   const { software, apps, appsBySoftwareId, loading, error } = useAppverseData()
  */
 import { createContext, useState, useEffect } from 'react';
-import { fetchAllSoftware, fetchAllApps, groupAppsBySoftware } from '../utils/api';
+import { fetchAllSoftware, fetchAllApps, groupAppsBySoftware, extractFilterOptions } from '../utils/api';
 
 export const AppverseDataContext = createContext(null);
 
@@ -67,6 +67,7 @@ export function AppverseDataProvider({ children }) {
     software: [],
     apps: [],
     appsBySoftwareId: {},
+    filterOptions: { tags: [], appType: [] },
     loading: true,
     error: null
   });
@@ -79,10 +80,14 @@ export function AppverseDataProvider({ children }) {
 
     try {
       // Fetch both endpoints in parallel
-      const [software, apps] = await Promise.all([
+      const [software, appsResult] = await Promise.all([
         fetchAllSoftware(),
         fetchAllApps()
       ]);
+
+      // Extract apps and filter options from the result
+      const { apps, included } = appsResult;
+      const filterOptions = extractFilterOptions(included);
 
       // Group apps by software ID
       const appsBySoftwareId = groupAppsBySoftware(apps);
@@ -91,6 +96,7 @@ export function AppverseDataProvider({ children }) {
         software,
         apps,
         appsBySoftwareId,
+        filterOptions,
         loading: false,
         error: null
       });

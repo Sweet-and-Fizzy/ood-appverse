@@ -12,20 +12,34 @@ The data lives in Drupal.  You can edit it here: https://md-2622-accessmatch.pan
 
 However, we can still comb through API and gain and understanding of the data.
 
-### Discovery tip
+### Discovery Commands
 
-To see all available relationship fields (which can be `include`d), run:
+**Attributes (scalar fields):**
+```bash
+curl https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_software | jq '.data[0].attributes | keys'
+curl https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_app | jq '.data[0].attributes | keys'
+```
 
+**Relationships (can be `include`d):**
 ```bash
 curl https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_software | jq '.data[0].relationships | keys'
 curl https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_app | jq '.data[0].relationships | keys'
 ```
 
-To see all available attributes:
-
+**All available taxonomies:**
 ```bash
-curl https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_software | jq '.data[0].attributes | keys'
-curl https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_app | jq '.data[0].attributes | keys'
+curl https://md-2622-accessmatch.pantheonsite.io/jsonapi | jq '.links | keys | map(select(startswith("taxonomy")))'
+```
+
+**Check taxonomy values:**
+```bash
+curl https://md-2622-accessmatch.pantheonsite.io/jsonapi/taxonomy_term/appverse_license | jq '.data[] | .attributes.name'
+curl https://md-2622-accessmatch.pantheonsite.io/jsonapi/taxonomy_term/tags | jq '.data[] | .attributes.name'
+```
+
+**Full schema dump for one item:**
+```bash
+curl "https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_software?include=field_appverse_logo,field_license,field_tags,field_appverse_topics" | jq '.data[0] | {title: .attributes.title, relationships: .relationships | keys}'
 ```
 
 ## First Endpoint: https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_software
@@ -186,14 +200,15 @@ curl "https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_app?incl
 
 ## Taxonomies
 
-| Vocabulary | Field | Status | Count | Values |
-|------------|-------|--------|-------|--------|
-| `appverse_license` | `field_license` | ✅ | 2 | Commercial License, Open-Source License |
-| `tags` | `field_add_implementation_tags` | ✅ | 50+ | matlab, big-data, programming, hadoop, aws, etc |
-| `appverse_app_type` | `field_appverse_app_type` | ❌ | - | Vocabulary doesn't exist (404) |
-| `appverse_organization` | `field_appverse_organization` | ✅ | 0 | Empty |
-| `appverse_science_domains` | - | ✅ | 0 | Empty |
-| `appverse_topics` | `field_appverse_topics` | ❌ | - | Vocabulary doesn't exist (404) |
+> ⚠️ **Status as of 2025-12-29** — Drupal DB is actively managed by another person and may change.
+
+| Vocabulary | Field | Entity | Status | Terms |
+|------------|-------|--------|--------|-------|
+| `tags` | `field_add_implementation_tags` | App | ✅ | 50 terms (matlab, big-data, programming, etc) |
+| `appverse_app_type` | `field_appverse_app_type` | App | ✅ | batch_connect, dashboard, passenger_app, widget |
+| `appverse_license` | `field_license` | Both | ✅ | Commercial License, Open-Source License |
+| `appverse_organization` | `field_appverse_organization` | App | ✅ | Penn State, Ohio Supercomputer Center, University of Utah |
+| `appverse_science_domains` | `field_appverse_topics` | Software | ✅ | engineering_and_technology, bioinformatics, biological sciences |
 
 **Test:** `https://md-2622-accessmatch.pantheonsite.io/jsonapi/taxonomy_term/{vocabulary}`
 

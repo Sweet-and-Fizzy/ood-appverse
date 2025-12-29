@@ -11,7 +11,7 @@ const BASE_SITE_URL = 'https://md-2622-accessmatch.pantheonsite.io';
 
 // Endpoint constants
 const ALL_SOFTWARE_WITH_LOGOS = `${BASE_API_URL}/node/appverse_software?include=field_appverse_logo`;
-const ALL_APPS_WITH_SOFTWARE = `${BASE_API_URL}/node/appverse_app?include=field_appverse_software_implemen`;
+const ALL_APPS_WITH_SOFTWARE = `${BASE_API_URL}/node/appverse_app?include=field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type`;
 const SOFTWARE_BY_ID_WITH_LOGO = (id) => `${BASE_API_URL}/node/appverse_software/${id}?include=field_appverse_logo`;
 const APPS_BY_SOFTWARE_ID = (softwareId) => `${BASE_API_URL}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}`;
 const FILE_BY_ID = (fileId) => `${BASE_API_URL}/file/file/${fileId}`;
@@ -96,8 +96,8 @@ export async function fetchAllSoftware() {
 }
 
 /**
- * Fetch all apps with their software relationships
- * @returns {Promise<Array>} Array of app objects
+ * Fetch all apps with their software relationships and taxonomy terms
+ * @returns {Promise<{apps: Array, included: Array}>} Apps and included taxonomy terms
  */
 export async function fetchAllApps() {
   try {
@@ -109,12 +109,48 @@ export async function fetchAllApps() {
 
     const data = await response.json();
     logApiResponse('ALL_APPS_WITH_SOFTWARE', ALL_APPS_WITH_SOFTWARE, data);
-    return data.data || [];
+
+    return {
+      apps: data.data || [],
+      included: data.included || []
+    };
 
   } catch (error) {
     console.error('Error fetching apps:', error);
     throw error;
   }
+}
+
+/**
+ * Extract filter options from included taxonomy terms
+ * @param {Array} included - Included array from JSON:API response
+ * @returns {Object} Filter options keyed by taxonomy type
+ */
+export function extractFilterOptions(included) {
+  const filterOptions = {
+    tags: [],
+    appType: []
+  };
+
+  for (const item of included) {
+    if (item.type === 'taxonomy_term--tags') {
+      filterOptions.tags.push({
+        id: item.id,
+        name: item.attributes.name
+      });
+    } else if (item.type === 'taxonomy_term--appverse_app_type') {
+      filterOptions.appType.push({
+        id: item.id,
+        name: item.attributes.name
+      });
+    }
+  }
+
+  // Sort alphabetically
+  filterOptions.tags.sort((a, b) => a.name.localeCompare(b.name));
+  filterOptions.appType.sort((a, b) => a.name.localeCompare(b.name));
+
+  return filterOptions;
 }
 
 /**

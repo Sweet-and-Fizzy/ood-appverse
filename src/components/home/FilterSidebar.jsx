@@ -2,24 +2,42 @@
  * FilterSidebar Component
  * Displays filter options for software browsing
  *
- * NOTE: Only shows filters that are actually available in the API.
- * Currently only software type (open source vs licensed) is available.
- *
  * Props:
- * @param {Object} filters - Current filter values
+ * @param {Object} filters - Current filter values (keyed by filter type, values are arrays of IDs)
  * @param {Function} onFilterChange - Callback when filters change
+ * @param {Object} filterOptions - Available filter options from API
+ * @param {Array} filterOptions.tags - [{id, name}, ...]
+ * @param {Array} filterOptions.appType - [{id, name}, ...]
  */
 import { useState } from 'react';
 import { ChevronDown } from 'react-bootstrap-icons';
 
-export default function FilterSidebar({ filters, onFilterChange }) {
+export default function FilterSidebar({ filters, onFilterChange, filterOptions = {} }) {
   // Track which sections are expanded
-  const [expandedSections, setExpandedSections] = useState({});
+  const [expandedSections, setExpandedSections] = useState({
+    appType: true,  // Start expanded
+    tags: false
+  });
 
-  // Note: No filters currently functional
-  // field_appverse_software_type doesn't exist - license is a relationship (field_license)
-  // To enable filtering, would need to include field_license in API call and filter by taxonomy term
-  const filterSections = [];
+  // Build filter sections from API data
+  const filterSections = [
+    filterOptions.appType?.length > 0 && {
+      key: 'appType',
+      title: 'Type',
+      options: filterOptions.appType.map(item => ({
+        value: item.id,
+        label: item.name.replace(/_/g, ' ')  // "batch_connect" → "batch connect"
+      }))
+    },
+    filterOptions.tags?.length > 0 && {
+      key: 'tags',
+      title: 'Tags',
+      options: filterOptions.tags.map(item => ({
+        value: item.id,
+        label: item.name
+      }))
+    }
+  ].filter(Boolean);  // Remove falsy entries
 
   const handleCheckboxChange = (sectionKey, optionValue, isChecked) => {
     // Handle "All" selection
