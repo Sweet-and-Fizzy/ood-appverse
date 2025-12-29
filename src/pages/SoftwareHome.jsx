@@ -92,15 +92,8 @@ export default function SoftwareHome() {
       );
     }
 
-    // Apply type filter (only functional filter for now)
-    if (filters.type && filters.type.length > 0) {
-      filtered = filtered.filter(item =>
-        filters.type.includes(item.attributes?.field_appverse_software_type)
-      );
-    }
-
-    // Other filters (topics, tags) are not functional yet
-    // They're in the UI but don't filter results
+    // Note: Type filter removed - field_appverse_software_type doesn't exist in API
+    // License info is in field_license relationship, would need to include it in API call
 
     return filtered;
   }, [software, searchQuery, filters]);

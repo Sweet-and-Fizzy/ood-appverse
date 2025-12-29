@@ -14,11 +14,6 @@ export default function SoftwareHeader({ software }) {
   const logoUrl = software.logoUrl;
   const websiteUrl = software.attributes?.field_appverse_software_website?.uri;
   const docsUrl = software.attributes?.field_appverse_software_doc?.uri;
-  const softwareType = software.attributes?.field_appverse_software_type;
-
-  // Format license type for display
-  const licenseLabel = softwareType === 'open_source_software' ? 'Open Source' : 'Licensed Software';
-  const licenseColor = softwareType === 'open_source_software' ? 'bg-appverse-green' : 'bg-appverse-blue';
 
   return (
     <div className="flex flex-col">
@@ -77,13 +72,6 @@ export default function SoftwareHeader({ software }) {
             <Book className="w-4 h-4" />
             DOCS
           </a>
-        )}
-
-        {softwareType === 'open_source_software' && (
-          <div className="inline-flex items-center justify-center gap-2 text-appverse-blue font-sans text-sm">
-            <span>📄</span>
-            OPEN-SOURCE
-          </div>
         )}
       </div>
 

@@ -48,7 +48,7 @@ export const AppverseDataContext = createContext(null);
  * @property {Object} relationships.field_appverse_software_implemen - Software reference
  * @property {Object|null} relationships.field_appverse_app_type - App type (taxonomy)
  * @property {Array} relationships.field_add_implementation_tags - Tags (taxonomy)
- * @property {Object|null} relationships.field_appvserse_organization - Org (typo in Drupal, taxonomy)
+ * @property {Object|null} relationships.field_appverse_organization - Organization (taxonomy)
  * @property {Object|null} relationships.field_license - License (taxonomy)
  */
 

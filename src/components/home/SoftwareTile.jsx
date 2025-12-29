@@ -11,7 +11,6 @@ import { Link } from 'react-router-dom';
 export default function SoftwareTile({ software, appCount = 0 }) {
   const softwareTitle = software.attributes?.title || 'Untitled Software';
   const logoUrl = software.logoUrl;
-  const softwareType = software.attributes?.field_appverse_software_type;
 
   // Format app count text
   const appCountText = appCount === 1 ? '1 repo' : `${appCount} repos`;

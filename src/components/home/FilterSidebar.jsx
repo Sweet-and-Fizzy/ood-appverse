@@ -14,19 +14,12 @@ import { ChevronDown } from 'react-bootstrap-icons';
 
 export default function FilterSidebar({ filters, onFilterChange }) {
   // Track which sections are expanded
-  const [expandedSections, setExpandedSections] = useState({ type: true });
-  // Only show filters that actually exist in the API
-  const filterSections = [
-    {
-      title: 'Type',
-      key: 'type',
-      options: [
-        { label: 'All', value: 'all' },
-        { label: 'Open Source', value: 'open_source_software' },
-        { label: 'Licensed Software', value: 'licensed_software' }
-      ]
-    }
-  ];
+  const [expandedSections, setExpandedSections] = useState({});
+
+  // Note: No filters currently functional
+  // field_appverse_software_type doesn't exist - license is a relationship (field_license)
+  // To enable filtering, would need to include field_license in API call and filter by taxonomy term
+  const filterSections = [];
 
   const handleCheckboxChange = (sectionKey, optionValue, isChecked) => {
     // Handle "All" selection
