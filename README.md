@@ -28,7 +28,7 @@ https://ood-appverse-react.netlify.app/appverse/
 
 | Route | Component | Purpose |
 |-------|-----------|---------|
-| `/appverse/` | SoftwareGrid | Main grid view with filters. Filter state syncs to URL params. |
+| `/appverse/` | SoftwareHome | Main grid view with search. |
 | `/appverse/software/:id` | SoftwareDetail | Software detail with list of apps. Expanded README state syncs to URL params. |
 
 ## Usage
@@ -82,7 +82,7 @@ instance.unmount()
 Both entry points use `BrowserRouter`:
 - Widget reads current browser URL on mount
 - Navigation updates URL without page reload
-- Filter/README state syncs to URL params
+- README expanded state syncs to URL params
 - Catch-all redirects to `/appverse/`
 
 **In Development:**
@@ -99,8 +99,8 @@ Both entry points use `BrowserRouter`:
 ```
 src/
 ├── pages/
-│   ├── SoftwareGrid.jsx      # /appverse/
-│   └── SoftwareDetail.jsx    # /appverse/software/:id
+│   ├── SoftwareHome.jsx       # /appverse/
+│   └── SoftwareDetail.jsx     # /appverse/software/:id
 ├── lib/
 │   └── mount.jsx              # CDN entry point
 ├── App.jsx                    # Routes
@@ -121,9 +121,10 @@ src/
 
 ## Data Source
 
-Drupal JSON:API endpoint:
+Drupal JSON:API endpoints:
 ```
 https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_software
+https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_app
 ```
 
 ## Tech Stack
