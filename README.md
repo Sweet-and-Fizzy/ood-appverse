@@ -66,6 +66,19 @@ function MyApp() {
 - Production: `@1.0.0`
 - Development: `@latest`
 
+#### Drupal Example
+
+```twig
+{# templates/page--appverse.html.twig #}
+<div id="appverse"></div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@1.0.0/dist/appverse.css">
+<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@1.0.0/dist/appverse.umd.js"></script>
+<script>
+  AppVerse.mount('appverse');
+</script>
+```
+
 ### API
 
 ```javascript
@@ -118,14 +131,6 @@ src/
 | Blue | `#0076AF` | `appverse-blue` |
 | Green | `#00857A` | `appverse-green` |
 | Border Radius | 8px | `rounded-appverse` |
-
-## Data Source
-
-Drupal JSON:API endpoints:
-```
-https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_software
-https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_app
-```
 
 ## Tech Stack
 

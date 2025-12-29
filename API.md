@@ -1,6 +1,4 @@
-# Human API
-
-I need to be able to understand the API as a human being.  All these AI notes are great, but I need good old human understanding como si fuera 2018.
+# API Reference
 
 ## The Big Picture
 
@@ -109,7 +107,13 @@ This will return all apps that have the software with the ID of 123 as the paren
 
 ## Drupal `page` parameter
 
-The `page` parameter is used to paginate the results.  For example:
+The `page` parameter is used to paginate the results. For example:
+
+```
+https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/appverse_app?page[limit]=10&page[offset]=20
+```
+
+This will return 10 apps, starting from the 21st result. Default limit is 50.
 
 ## Endpoints Reference
 
