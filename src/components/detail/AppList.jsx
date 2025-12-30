@@ -29,26 +29,15 @@ export default function AppList({ apps, expandedAppId, onToggleApp }) {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-serif font-bold text-appverse-black">
-          Applications
-        </h2>
-        <span className="text-sm font-sans text-gray-600">
-          {apps.length} {apps.length === 1 ? 'app' : 'apps'}
-        </span>
-      </div>
-
-      <div className="space-y-4">
-        {apps.map((app) => (
-          <AppRow
-            key={app.id}
-            app={app}
-            isExpanded={expandedAppId === app.id}
-            onToggle={() => onToggleApp(app.id)}
-          />
-        ))}
-      </div>
+    <div className="space-y-4">
+      {apps.map((app) => (
+        <AppRow
+          key={app.id}
+          app={app}
+          isExpanded={expandedAppId === app.id}
+          onToggle={() => onToggleApp(app.id)}
+        />
+      ))}
     </div>
   );
 }

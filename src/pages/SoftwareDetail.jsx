@@ -110,11 +110,11 @@ export default function SoftwareDetail() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto px-6 py-8">
-        {/* Two-column layout */}
-        <div className="flex gap-8">
-          {/* Left column - Software info */}
-          <div className="w-[275px] flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Two-column layout per mockup */}
+        <div className="flex gap-12">
+          {/* Left column - Software info sidebar */}
+          <div className="w-[280px] flex-shrink-0">
             <SoftwareHeader software={software} />
           </div>
 

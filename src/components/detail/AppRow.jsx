@@ -1,87 +1,98 @@
 /**
  * AppRow Component
- * Individual app row with README toggle
+ * Individual app row with README toggle - matches mockup design
  *
  * Props:
- * @param {Object} app - App object from API
+ * @param {Object} app - App object from API with resolved taxonomy terms
  * @param {boolean} isExpanded - Whether README is expanded
  * @param {Function} onToggle - Callback when toggle is clicked
  */
-import { Calendar3, Github, ChevronUp, ChevronDown } from 'react-bootstrap-icons';
+import { StarFill, ChevronRight } from 'react-bootstrap-icons';
 
 export default function AppRow({ app, isExpanded, onToggle }) {
   const title = app.attributes?.title || 'Untitled App';
-  const description = app.attributes?.body?.processed || app.attributes?.body?.value || '';
   const githubUrl = app.attributes?.field_appverse_github_url?.uri;
   const readme = app.attributes?.field_appverse_readme?.processed || app.attributes?.field_appverse_readme?.value;
   const lastUpdated = app.attributes?.field_appverse_lastupdated;
 
-  // Format date
+  // Resolved taxonomy terms from API
+  const organization = app.organization;
+  const tags = app.tags || [];
+
+  // Format date as M/DD/YY per mockup style
   const formattedDate = lastUpdated
     ? new Date(lastUpdated).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
+        year: '2-digit',
+        month: 'numeric',
         day: 'numeric'
       })
-    : 'Not available';
+    : null;
 
   return (
-    <div className="border-2 border-appverse-gray rounded-appverse overflow-hidden">
+    <div className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
       {/* App header row */}
-      <div className="p-6 bg-white">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <h3 className="text-2xl font-serif font-bold text-appverse-black mb-2">
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-6">
+          {/* Left side: title, org, date */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl font-serif font-bold text-appverse-black mb-1">
               {title}
             </h3>
 
-            {description && (
-              <div
-                className="text-gray-700 font-sans mb-4 prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: description }}
-              />
+            {organization && (
+              <p className="text-sm font-sans text-appverse-black mb-2">
+                {organization.name}
+              </p>
             )}
 
-            <div className="flex items-center gap-6 text-sm font-sans text-gray-600">
-              {lastUpdated && (
-                <div className="flex items-center">
-                  <Calendar3 className="w-4 h-4 mr-1.5" />
-                  Last updated: {formattedDate}
-                </div>
-              )}
-            </div>
+            {formattedDate && (
+              <p className="text-sm font-sans text-appverse-black">
+                <span className="font-semibold">LAST COMMIT:</span> {formattedDate}
+              </p>
+            )}
           </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-3 flex-shrink-0">
+          {/* Middle: tags */}
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-end max-w-[200px]">
+              {tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded"
+                >
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Right side: action buttons */}
+          <div className="flex flex-col gap-2 flex-shrink-0">
             {githubUrl && (
               <a
                 href={githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 bg-appverse-black text-white font-sans font-semibold rounded-appverse hover:opacity-90 transition-opacity whitespace-nowrap"
+                className="inline-flex items-center gap-2 text-appverse-red hover:text-red-700 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
               >
-                <Github className="w-5 h-5 mr-2" />
-                View Repository
+                <StarFill className="w-4 h-4" />
+                VIEW REPO
               </a>
             )}
 
             {readme && (
               <button
                 onClick={onToggle}
-                className="inline-flex items-center px-4 py-2 border-2 border-appverse-red text-appverse-red font-sans font-semibold rounded-appverse hover:bg-appverse-pink transition-colors whitespace-nowrap"
+                className="inline-flex items-center gap-2 text-appverse-red hover:text-red-700 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
               >
-                {isExpanded ? (
-                  <>
-                    <ChevronUp className="w-5 h-5 mr-2" />
-                    Hide README
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="w-5 h-5 mr-2" />
-                    Show README
-                  </>
-                )}
+                <span
+                  className={`w-5 h-5 rounded-full border-2 border-appverse-red flex items-center justify-center transition-transform ${
+                    isExpanded ? 'rotate-90' : ''
+                  }`}
+                >
+                  <ChevronRight className="w-3 h-3" />
+                </span>
+                {isExpanded ? 'HIDE README' : 'SHOW README'}
               </button>
             )}
           </div>
@@ -90,9 +101,9 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
       {/* README panel (expanded) */}
       {isExpanded && readme && (
-        <div className="bg-white border-t-2 border-appverse-gray p-6">
+        <div className="border-t border-appverse-gray p-5 bg-gray-50">
           <div
-            className="prose max-w-none font-sans"
+            className="prose prose-sm max-w-none font-sans"
             dangerouslySetInnerHTML={{ __html: readme }}
           />
         </div>

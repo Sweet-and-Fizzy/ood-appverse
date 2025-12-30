@@ -12,8 +12,8 @@ const BASE_SITE_URL = 'https://md-2622-accessmatch.pantheonsite.io';
 // Endpoint constants
 const ALL_SOFTWARE_WITH_LOGOS = `${BASE_API_URL}/node/appverse_software?include=field_appverse_logo`;
 const ALL_APPS_WITH_SOFTWARE = `${BASE_API_URL}/node/appverse_app?include=field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type`;
-const SOFTWARE_BY_ID_WITH_LOGO = (id) => `${BASE_API_URL}/node/appverse_software/${id}?include=field_appverse_logo`;
-const APPS_BY_SOFTWARE_ID = (softwareId) => `${BASE_API_URL}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}`;
+const SOFTWARE_BY_ID_WITH_INCLUDES = (id) => `${BASE_API_URL}/node/appverse_software/${id}?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`;
+const APPS_BY_SOFTWARE_ID_WITH_INCLUDES = (softwareId) => `${BASE_API_URL}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license`;
 const FILE_BY_ID = (fileId) => `${BASE_API_URL}/file/file/${fileId}`;
 
 /**
@@ -154,14 +154,13 @@ export function extractFilterOptions(included) {
 }
 
 /**
- * Fetch a single software item by ID with logo
+ * Fetch a single software item by ID with logo and taxonomy terms
  * @param {string} id - Software UUID
- * @returns {Promise<Object>} Software object with logo URL
+ * @returns {Promise<Object>} Software object with logo URL and resolved taxonomy terms
  */
 export async function fetchSoftwareById(id) {
   try {
-    // Fetch software with logo relationship included
-    const url = SOFTWARE_BY_ID_WITH_LOGO(id);
+    const url = SOFTWARE_BY_ID_WITH_INCLUDES(id);
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -169,16 +168,21 @@ export async function fetchSoftwareById(id) {
     }
 
     const data = await response.json();
-    logApiResponse('SOFTWARE_BY_ID_WITH_LOGO', url, data);
+    logApiResponse('SOFTWARE_BY_ID_WITH_INCLUDES', url, data);
     const software = data.data;
-    const includedMedia = data.included || [];
+    const included = data.included || [];
 
-    // Find the logo media if it exists
-    const logoMediaId = software.relationships?.field_appverse_logo?.data?.id;
+    // Build a lookup map of included items by ID
+    const includedMap = {};
+    for (const item of included) {
+      includedMap[item.id] = item;
+    }
+
+    // Resolve logo URL
     let logoUrl = null;
-
+    const logoMediaId = software.relationships?.field_appverse_logo?.data?.id;
     if (logoMediaId) {
-      const logoMedia = includedMedia.find(item => item.id === logoMediaId);
+      const logoMedia = includedMap[logoMediaId];
       const fileRelationshipId = logoMedia?.relationships?.field_media_image_1?.data?.id;
 
       if (fileRelationshipId) {
@@ -197,9 +201,32 @@ export async function fetchSoftwareById(id) {
       }
     }
 
+    // Resolve taxonomy terms: topics (science domains)
+    const topicsData = software.relationships?.field_appverse_topics?.data || [];
+    const topics = topicsData
+      .map(ref => includedMap[ref.id])
+      .filter(Boolean)
+      .map(term => ({ id: term.id, name: term.attributes.name }));
+
+    // Resolve taxonomy terms: license
+    const licenseRef = software.relationships?.field_license?.data;
+    const license = licenseRef && includedMap[licenseRef.id]
+      ? { id: licenseRef.id, name: includedMap[licenseRef.id].attributes.name }
+      : null;
+
+    // Resolve taxonomy terms: tags
+    const tagsData = software.relationships?.field_tags?.data || [];
+    const tags = tagsData
+      .map(ref => includedMap[ref.id])
+      .filter(Boolean)
+      .map(term => ({ id: term.id, name: term.attributes.name }));
+
     return {
       ...software,
-      logoUrl
+      logoUrl,
+      topics,
+      license,
+      tags
     };
 
   } catch (error) {
@@ -209,13 +236,13 @@ export async function fetchSoftwareById(id) {
 }
 
 /**
- * Fetch apps for a specific software
+ * Fetch apps for a specific software with taxonomy terms resolved
  * @param {string} softwareId - Software UUID
- * @returns {Promise<Array>} Array of app objects for this software
+ * @returns {Promise<Array>} Array of app objects with resolved taxonomy terms
  */
 export async function fetchAppsBySoftware(softwareId) {
   try {
-    const url = APPS_BY_SOFTWARE_ID(softwareId);
+    const url = APPS_BY_SOFTWARE_ID_WITH_INCLUDES(softwareId);
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -223,8 +250,54 @@ export async function fetchAppsBySoftware(softwareId) {
     }
 
     const data = await response.json();
-    logApiResponse('APPS_BY_SOFTWARE_ID', url, data);
-    return data.data || [];
+    logApiResponse('APPS_BY_SOFTWARE_ID_WITH_INCLUDES', url, data);
+
+    const apps = data.data || [];
+    const included = data.included || [];
+
+    // Build a lookup map of included items by ID
+    const includedMap = {};
+    for (const item of included) {
+      includedMap[item.id] = item;
+    }
+
+    // Resolve taxonomy terms for each app
+    const appsWithTerms = apps.map(app => {
+      // Resolve app type
+      const appTypeRef = app.relationships?.field_appverse_app_type?.data;
+      const appType = appTypeRef && includedMap[appTypeRef.id]
+        ? { id: appTypeRef.id, name: includedMap[appTypeRef.id].attributes.name }
+        : null;
+
+      // Resolve organization
+      const orgRef = app.relationships?.field_appverse_organization?.data;
+      const organization = orgRef && includedMap[orgRef.id]
+        ? { id: orgRef.id, name: includedMap[orgRef.id].attributes.name }
+        : null;
+
+      // Resolve license
+      const licenseRef = app.relationships?.field_license?.data;
+      const license = licenseRef && includedMap[licenseRef.id]
+        ? { id: licenseRef.id, name: includedMap[licenseRef.id].attributes.name }
+        : null;
+
+      // Resolve implementation tags
+      const tagsData = app.relationships?.field_add_implementation_tags?.data || [];
+      const tags = tagsData
+        .map(ref => includedMap[ref.id])
+        .filter(Boolean)
+        .map(term => ({ id: term.id, name: term.attributes.name }));
+
+      return {
+        ...app,
+        appType,
+        organization,
+        license,
+        tags
+      };
+    });
+
+    return appsWithTerms;
 
   } catch (error) {
     console.error('Error fetching apps by software:', error);
