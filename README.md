@@ -28,8 +28,21 @@ https://ood-appverse-react.netlify.app/appverse/
 
 | Route | Component | Purpose |
 |-------|-----------|---------|
-| `/appverse/` | SoftwareHome | Main grid view with search. |
-| `/appverse/software/:id` | SoftwareDetail | Software detail with list of apps. Expanded README state syncs to URL params. |
+| `/appverse/` | SoftwareHome | Main grid view with search and filters. |
+| `/appverse/software/:uuid` | SoftwareDetail | Software detail with list of apps. |
+
+**Note:** The `:uuid` is the Drupal node UUID (e.g., `097bde81-ab50-4be0-800e-d425d78d0817`).
+
+### URL Parameters
+
+| Page | Param | Purpose | Example |
+|------|-------|---------|---------|
+| Grid | `?topics=` | Filter by science domain | `?topics=Materials+Science` |
+| Grid | `?type=` | Filter by app type | `?type=Interactive+Apps` |
+| Grid | `?tags=` | Filter by tag | `?tags=singularity` |
+| Detail | `?app=` | Expand README for specific app | `?app=469ded75-2b1f-...` |
+
+Filter values use term **names** (not UUIDs). Multiple values: `?tags=singularity&tags=gpu`.
 
 ## Usage
 
@@ -66,10 +79,22 @@ function MyApp() {
 - Production: `@1.0.0`
 - Development: `@latest`
 
-#### Drupal Example
+#### Drupal Embedding
+
+The widget reads the browser URL to determine what to display. Drupal must serve pages at the expected paths.
+
+**Required Drupal routes:**
+
+| Drupal Path | What Widget Shows |
+|-------------|-------------------|
+| `/appverse/` | Software grid |
+| `/appverse/software/*` | Software detail (wildcard catches any UUID) |
+
+**Twig template example:**
 
 ```twig
 {# templates/page--appverse.html.twig #}
+{# Use for both /appverse/ and /appverse/software/* #}
 <div id="appverse"></div>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@1.0.0/dist/appverse.css">
@@ -78,6 +103,13 @@ function MyApp() {
   AppVerse.mount('appverse');
 </script>
 ```
+
+**How it works:**
+1. User visits `/appverse/` → Drupal serves the template → Widget shows grid
+2. User clicks a tile → URL changes to `/appverse/software/uuid` (no page reload)
+3. User shares link `/appverse/software/uuid` → Drupal serves template → Widget shows detail
+
+**Note:** Client-side navigation (clicking tiles) does NOT reload the page. If you need full page reloads for each navigation, additional configuration would be needed.
 
 ### API
 
@@ -92,20 +124,22 @@ instance.unmount()
 
 ## How Routing Works
 
-Both entry points use `BrowserRouter`:
-- Widget reads current browser URL on mount
-- Navigation updates URL without page reload
-- README expanded state syncs to URL params
-- Catch-all redirects to `/appverse/`
+The widget uses React Router with `BrowserRouter`:
 
-**In Development:**
-- `http://localhost:3000/appverse/` → Software grid
-- `http://localhost:3000/appverse/software/123` → Software detail
+1. **On mount:** Widget reads current browser URL to determine view
+2. **On navigation:** URL updates without page reload (client-side routing)
+3. **On direct visit:** URL is read, correct view is shown
 
-**In Production (Drupal):**
-- Drupal loads page at `/appverse/` or `/appverse/software/:id`
-- Widget mounts and reads URL
-- React Router handles all navigation after initial load
+**Example URLs:**
+
+| URL | What Shows |
+|-----|------------|
+| `/appverse/` | Grid with all software |
+| `/appverse/?topics=Materials+Science` | Grid filtered by topic |
+| `/appverse/software/097bde81-ab50-4be0-800e-d425d78d0817` | Abaqus detail page |
+| `/appverse/software/097bde81-...?app=469ded75-...` | Detail with README expanded |
+
+**Unmatched routes** redirect to `/appverse/`.
 
 ## Project Structure
 

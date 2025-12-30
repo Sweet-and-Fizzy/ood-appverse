@@ -93,38 +93,42 @@ export default function SoftwareHome() {
     }
 
     // Apply Topics filter (directly on Software - only Software has topics)
+    // Filter values are term names, not UUIDs
     if (filters.topics && filters.topics.length > 0) {
       filtered = filtered.filter(softwareItem => {
-        const softwareTopicIds = softwareItem.topics?.map(t => t.id) || [];
-        return filters.topics.some(topicId => softwareTopicIds.includes(topicId));
+        const softwareTopicNames = softwareItem.topics?.map(t => t.name) || [];
+        return filters.topics.some(topicName => softwareTopicNames.includes(topicName));
       });
     }
 
     // Apply Type filter (only Apps have type)
+    // Need to look up app type names from the included data
     if (filters.appType && filters.appType.length > 0) {
       filtered = filtered.filter(softwareItem => {
         const softwareApps = appsBySoftwareId[softwareItem.id] || [];
         return softwareApps.some(app => {
-          const appTypeId = app.relationships?.field_appverse_app_type?.data?.id;
-          return appTypeId && filters.appType.includes(appTypeId);
+          // App type name is resolved in the apps data
+          const appTypeName = app.appType?.name;
+          return appTypeName && filters.appType.includes(appTypeName);
         });
       });
     }
 
     // Apply Tags filter with OR logic:
     // Show software if Software has the tag (field_tags) OR any App has the tag (field_add_implementation_tags)
+    // Filter values are term names, not UUIDs
     if (filters.tags && filters.tags.length > 0) {
       filtered = filtered.filter(softwareItem => {
-        // Check Software's own tags
-        const softwareTagIds = softwareItem.tags?.map(t => t.id) || [];
-        const softwareHasTag = filters.tags.some(tagId => softwareTagIds.includes(tagId));
+        // Check Software's own tags (resolved names)
+        const softwareTagNames = softwareItem.tags?.map(t => t.name) || [];
+        const softwareHasTag = filters.tags.some(tagName => softwareTagNames.includes(tagName));
         if (softwareHasTag) return true;
 
-        // Check Apps' tags
+        // Check Apps' tags (resolved names)
         const softwareApps = appsBySoftwareId[softwareItem.id] || [];
         const appHasTag = softwareApps.some(app => {
-          const appTagIds = app.relationships?.field_add_implementation_tags?.data?.map(t => t.id) || [];
-          return filters.tags.some(tagId => appTagIds.includes(tagId));
+          const appTagNames = app.tags?.map(t => t.name) || [];
+          return filters.tags.some(tagName => appTagNames.includes(tagName));
         });
 
         return appHasTag;

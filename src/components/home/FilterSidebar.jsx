@@ -3,7 +3,7 @@
  * Displays filter options for software browsing
  *
  * Props:
- * @param {Object} filters - Current filter values (keyed by filter type, values are arrays of IDs)
+ * @param {Object} filters - Current filter values (keyed by filter type, values are arrays of term names)
  * @param {Function} onFilterChange - Callback when filters change
  * @param {Object} filterOptions - Available filter options from API
  * @param {Array} filterOptions.tags - [{id, name}, ...]
@@ -21,12 +21,13 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
   });
 
   // Build filter sections from API data (per mockup: Topics, Type, Tags)
+  // Use term name as value for URL-friendly params (not UUIDs)
   const filterSections = [
     filterOptions.topics?.length > 0 && {
       key: 'topics',
       title: 'Topics',
       options: filterOptions.topics.map(item => ({
-        value: item.id,
+        value: item.name,  // Use name for URL params
         label: item.name.replace(/_/g, ' ')  // "engineering_and_technology" → "engineering and technology"
       }))
     },
@@ -34,7 +35,7 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
       key: 'appType',
       title: 'Type',
       options: filterOptions.appType.map(item => ({
-        value: item.id,
+        value: item.name,  // Use name for URL params
         label: item.name.replace(/_/g, ' ')  // "batch_connect" → "batch connect"
       }))
     },
@@ -42,7 +43,7 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
       key: 'tags',
       title: 'Tags',
       options: filterOptions.tags.map(item => ({
-        value: item.id,
+        value: item.name,  // Use name for URL params
         label: item.name
       }))
     }

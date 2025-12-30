@@ -106,12 +106,17 @@ export async function fetchAllSoftware() {
         .filter(Boolean)
         .map(term => ({ id: term.id, name: term.attributes.name }));
 
+      // Extract slug from path.alias (e.g., "/appverse/abaqus" -> "abaqus")
+      const pathAlias = software.attributes?.path?.alias;
+      const slug = pathAlias ? pathAlias.split('/').filter(Boolean).pop() : null;
+
       return {
         ...software,
         logoUrl,
         topics,
         license,
-        tags
+        tags,
+        slug
       };
     });
 
@@ -127,8 +132,8 @@ export async function fetchAllSoftware() {
 }
 
 /**
- * Fetch all apps with their software relationships and taxonomy terms
- * @returns {Promise<{apps: Array, included: Array}>} Apps and included taxonomy terms
+ * Fetch all apps with their software relationships and taxonomy terms resolved
+ * @returns {Promise<{apps: Array, included: Array}>} Apps with resolved terms + included for filter extraction
  */
 export async function fetchAllApps() {
   try {
@@ -141,9 +146,40 @@ export async function fetchAllApps() {
     const data = await response.json();
     logApiResponse('ALL_APPS_WITH_SOFTWARE', ALL_APPS_WITH_SOFTWARE, data);
 
+    const apps = data.data || [];
+    const included = data.included || [];
+
+    // Build a lookup map of included items by ID
+    const includedMap = {};
+    for (const item of included) {
+      includedMap[item.id] = item;
+    }
+
+    // Resolve taxonomy terms for each app
+    const appsWithTerms = apps.map(app => {
+      // Resolve app type
+      const appTypeRef = app.relationships?.field_appverse_app_type?.data;
+      const appType = appTypeRef && includedMap[appTypeRef.id]
+        ? { id: appTypeRef.id, name: includedMap[appTypeRef.id].attributes.name }
+        : null;
+
+      // Resolve implementation tags
+      const tagsData = app.relationships?.field_add_implementation_tags?.data || [];
+      const tags = tagsData
+        .map(ref => includedMap[ref.id])
+        .filter(Boolean)
+        .map(term => ({ id: term.id, name: term.attributes.name }));
+
+      return {
+        ...app,
+        appType,
+        tags
+      };
+    });
+
     return {
-      apps: data.data || [],
-      included: data.included || []
+      apps: appsWithTerms,
+      included
     };
 
   } catch (error) {
@@ -291,12 +327,17 @@ export async function fetchSoftwareById(id) {
       .filter(Boolean)
       .map(term => ({ id: term.id, name: term.attributes.name }));
 
+    // Extract slug from path.alias
+    const pathAlias = software.attributes?.path?.alias;
+    const slug = pathAlias ? pathAlias.split('/').filter(Boolean).pop() : null;
+
     return {
       ...software,
       logoUrl,
       topics,
       license,
-      tags
+      tags,
+      slug
     };
 
   } catch (error) {
