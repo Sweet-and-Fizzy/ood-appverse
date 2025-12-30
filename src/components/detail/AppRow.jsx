@@ -20,8 +20,9 @@ export default function AppRow({ app, isExpanded, onToggle }) {
   const tags = app.tags || [];
 
   // Format date as M/DD/YY per mockup style
+  // field_appverse_lastupdated is a Unix timestamp in SECONDS, JS needs milliseconds
   const formattedDate = lastUpdated
-    ? new Date(lastUpdated).toLocaleDateString('en-US', {
+    ? new Date(lastUpdated * 1000).toLocaleDateString('en-US', {
         year: '2-digit',
         month: 'numeric',
         day: 'numeric'
