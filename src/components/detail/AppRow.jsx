@@ -30,12 +30,12 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
   return (
     <div className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
-      {/* App header row */}
+      {/* App header row - 3 column layout */}
       <div className="p-5">
-        <div className="flex items-start justify-between gap-6">
-          {/* Left side: title, org, date */}
+        <div className="flex gap-6">
+          {/* Left column: title, org, date */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-xl font-serif font-bold text-appverse-black mb-1">
+            <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
               {title}
             </h3>
 
@@ -52,22 +52,24 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             )}
           </div>
 
-          {/* Middle: tags */}
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 justify-end max-w-[200px]">
-              {tags.map((tag) => (
-                <span
-                  key={tag.id}
-                  className="px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded"
-                >
-                  {tag.name}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Middle column: tags (aligned left within column) */}
+          <div className="w-[180px] flex-shrink-0">
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded"
+                  >
+                    {tag.name}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
-          {/* Right side: action buttons */}
-          <div className="flex flex-col gap-2 flex-shrink-0">
+          {/* Right column: action buttons (VIEW REPO top, SHOW README bottom) */}
+          <div className="flex flex-col justify-between flex-shrink-0 min-h-[70px]">
             {githubUrl && (
               <a
                 href={githubUrl}
@@ -83,7 +85,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             {readme && (
               <button
                 onClick={onToggle}
-                className="inline-flex items-center gap-2 text-appverse-red hover:text-red-700 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
+                className="inline-flex items-center gap-2 text-appverse-red hover:text-red-700 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto"
               >
                 <span
                   className={`w-5 h-5 rounded-full border-2 border-appverse-red flex items-center justify-center transition-transform ${

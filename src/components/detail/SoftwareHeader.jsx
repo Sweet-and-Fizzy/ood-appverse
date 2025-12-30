@@ -107,7 +107,7 @@ export default function SoftwareHeader({ software }) {
 
       {/* Add a repo button */}
       <button
-        className="w-full py-3 px-4 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
+        className="w-fit py-3 px-8 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
         onClick={() => {
           // TODO: Implement add repo functionality
           alert('Add a repo functionality coming soon!');
