@@ -14,7 +14,10 @@ export default function App() {
         <main>
           <Routes>
             <Route path="/appverse/" element={<SoftwareHome />} />
+            {/* UUID route (backward compatibility) */}
             <Route path="/appverse/software/:id" element={<SoftwareDetail />} />
+            {/* Slug route: /appverse/abaqus → looks up "abaqus" in slugMap */}
+            <Route path="/appverse/:slug" element={<SoftwareDetail />} />
             {/* Catch-all: redirect any unmatched route to main page */}
             <Route path="*" element={<Navigate to="/appverse/" replace />} />
           </Routes>

@@ -1,26 +1,50 @@
 /**
  * SoftwareDetail Page
  * Displays software details and list of implementing apps
+ *
+ * Supports two URL patterns:
+ * - /appverse/software/:id - UUID-based (backward compatibility)
+ * - /appverse/:slug - Slug-based (e.g., /appverse/abaqus)
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { fetchSoftwareById, fetchAppsBySoftware } from '../utils/api';
+import { useAppverseData } from '../hooks/useAppverseData';
+import { slugify } from '../utils/slugify';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SoftwareHeader from '../components/detail/SoftwareHeader';
 import AppList from '../components/detail/AppList';
 
+/**
+ * Check if a string looks like a UUID
+ */
+function isUUID(str) {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
+
 export default function SoftwareDetail() {
-  const { id } = useParams();
+  // Route can provide either :id (UUID) or :slug
+  const { id, slug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get slugMap from context (for slug → software lookup)
+  const { getSoftwareBySlug, loading: contextLoading } = useAppverseData();
 
   const [software, setSoftware] = useState(null);
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get expanded app ID from URL params
-  const expandedAppId = searchParams.get('app');
+  // Get expanded app param from URL (could be UUID or slug)
+  const expandedAppParam = searchParams.get('app');
+
+  // Determine the software UUID
+  // If we have :id param, use it directly
+  // If we have :slug param and it's not a UUID, look it up in slugMap
+  const identifier = id || slug;
+  const isSlugRoute = slug && !isUUID(slug);
 
   // Fetch software and apps data
   useEffect(() => {
@@ -29,11 +53,32 @@ export default function SoftwareDetail() {
       setError(null);
 
       try {
-        // Fetch both in parallel
-        const [softwareData, appsData] = await Promise.all([
-          fetchSoftwareById(id),
-          fetchAppsBySoftware(id)
-        ]);
+        let softwareId = identifier;
+        let softwareData = null;
+
+        if (isSlugRoute) {
+          // Wait for context to load before looking up slug
+          if (contextLoading) return;
+
+          // Look up software by slug from context
+          const contextSoftware = getSoftwareBySlug(identifier);
+          if (!contextSoftware) {
+            setSoftware(null);
+            setApps([]);
+            setLoading(false);
+            return;
+          }
+          softwareId = contextSoftware.id;
+
+          // Fetch full software data (context has basic data, API has full data with resolved fields)
+          softwareData = await fetchSoftwareById(softwareId);
+        } else {
+          // Direct UUID - fetch from API
+          softwareData = await fetchSoftwareById(softwareId);
+        }
+
+        // Fetch apps
+        const appsData = await fetchAppsBySoftware(softwareId);
 
         setSoftware(softwareData);
         setApps(appsData);
@@ -45,21 +90,57 @@ export default function SoftwareDetail() {
       }
     }
 
-    if (id) {
+    if (identifier) {
       fetchData();
     }
-  }, [id]);
+  }, [identifier, isSlugRoute, contextLoading, getSoftwareBySlug]);
 
-  // Handle app toggle
+  // Build app slug maps for URL-friendly ?app= params
+  // Format: "org-name--app-title" or just "app-title" if no org
+  const { appSlugToId, appIdToSlug } = useMemo(() => {
+    const slugToId = {};
+    const idToSlug = {};
+
+    for (const app of apps) {
+      const title = app.attributes?.title || '';
+      const orgName = app.organization?.name || '';
+
+      // Generate slug: "org--title" or just "title"
+      const slug = orgName
+        ? `${slugify(orgName)}--${slugify(title)}`
+        : slugify(title);
+
+      slugToId[slug] = app.id;
+      idToSlug[app.id] = slug;
+    }
+
+    return { appSlugToId: slugToId, appIdToSlug: idToSlug };
+  }, [apps]);
+
+  // Resolve expandedAppParam to an app ID (handles both UUID and slug)
+  const expandedAppId = useMemo(() => {
+    if (!expandedAppParam) return null;
+
+    // If it's a UUID, use directly
+    if (isUUID(expandedAppParam)) {
+      return expandedAppParam;
+    }
+
+    // Otherwise, look up slug → ID
+    return appSlugToId[expandedAppParam] || null;
+  }, [expandedAppParam, appSlugToId]);
+
+  // Handle app toggle - uses slug in URL
   const handleToggleApp = (appId) => {
     const newParams = new URLSearchParams(searchParams);
+    const appSlug = appIdToSlug[appId];
 
     if (expandedAppId === appId) {
       // Collapse: remove app param
       newParams.delete('app');
     } else {
-      // Expand: set app param
-      newParams.set('app', appId);
+      // Expand: set app param (use slug if available, fallback to UUID)
+      newParams.set('app', appSlug || appId);
     }
 
     setSearchParams(newParams);
@@ -73,13 +154,25 @@ export default function SoftwareDetail() {
     setLoading(true);
     setError(null);
 
+    // Determine software ID (from slug if needed)
+    let softwareId = identifier;
+    if (isSlugRoute) {
+      const contextSoftware = getSoftwareBySlug(identifier);
+      if (!contextSoftware) {
+        setError(new Error('Software not found'));
+        setLoading(false);
+        return;
+      }
+      softwareId = contextSoftware.id;
+    }
+
     // Re-fetch
-    fetchSoftwareById(id)
+    fetchSoftwareById(softwareId)
       .then(data => setSoftware(data))
       .catch(err => setError(err))
       .finally(() => setLoading(false));
 
-    fetchAppsBySoftware(id)
+    fetchAppsBySoftware(softwareId)
       .then(data => setApps(data))
       .catch(err => console.error('Failed to fetch apps:', err));
   };

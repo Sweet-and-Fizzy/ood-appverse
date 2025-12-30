@@ -29,9 +29,10 @@ https://ood-appverse-react.netlify.app/appverse/
 | Route | Component | Purpose |
 |-------|-----------|---------|
 | `/appverse/` | SoftwareHome | Main grid view with search and filters. |
-| `/appverse/software/:uuid` | SoftwareDetail | Software detail with list of apps. |
+| `/appverse/:slug` | SoftwareDetail | Software detail by slug (e.g., `/appverse/abaqus`). |
+| `/appverse/software/:uuid` | SoftwareDetail | Software detail by UUID (backward compatibility). |
 
-**Note:** The `:uuid` is the Drupal node UUID (e.g., `097bde81-ab50-4be0-800e-d425d78d0817`).
+**Slugs** are generated from software titles: `"AlphaFold"` → `alphafold`, `"LAMMPS"` → `lammps`.
 
 ### URL Parameters
 
@@ -40,9 +41,11 @@ https://ood-appverse-react.netlify.app/appverse/
 | Grid | `?topics=` | Filter by science domain | `?topics=Materials+Science` |
 | Grid | `?type=` | Filter by app type | `?type=Interactive+Apps` |
 | Grid | `?tags=` | Filter by tag | `?tags=singularity` |
-| Detail | `?app=` | Expand README for specific app | `?app=469ded75-2b1f-...` |
+| Detail | `?app=` | Expand README for specific app | `?app=icds-roar-ood--bc-osc-alphafold` |
 
 Filter values use term **names** (not UUIDs). Multiple values: `?tags=singularity&tags=gpu`.
+
+App slugs format: `org-name--app-title` (double hyphen separates org from title).
 
 ## Usage
 
@@ -88,7 +91,8 @@ The widget reads the browser URL to determine what to display. Drupal must serve
 | Drupal Path | What Widget Shows |
 |-------------|-------------------|
 | `/appverse/` | Software grid |
-| `/appverse/software/*` | Software detail (wildcard catches any UUID) |
+| `/appverse/*` | Software detail (wildcard catches slugs like `abaqus`) |
+| `/appverse/software/*` | Software detail by UUID (optional, backward compat) |
 
 **Twig template example:**
 
@@ -136,8 +140,9 @@ The widget uses React Router with `BrowserRouter`:
 |-----|------------|
 | `/appverse/` | Grid with all software |
 | `/appverse/?topics=Materials+Science` | Grid filtered by topic |
-| `/appverse/software/097bde81-ab50-4be0-800e-d425d78d0817` | Abaqus detail page |
-| `/appverse/software/097bde81-...?app=469ded75-...` | Detail with README expanded |
+| `/appverse/abaqus` | Abaqus detail page (slug route) |
+| `/appverse/alphafold?app=icds-roar-ood--bc-osc-alphafold` | Detail with README expanded |
+| `/appverse/software/097bde81-...` | Detail by UUID (backward compat) |
 
 **Unmatched routes** redirect to `/appverse/`.
 

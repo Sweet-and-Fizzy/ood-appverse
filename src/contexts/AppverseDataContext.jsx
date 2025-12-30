@@ -8,8 +8,9 @@
  *   import { useAppverseData } from '../hooks/useAppverseData'
  *   const { software, apps, appsBySoftwareId, loading, error } = useAppverseData()
  */
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useMemo } from 'react';
 import { fetchAllSoftware, fetchAllApps, groupAppsBySoftware, extractFilterOptionsFromApps, extractFilterOptionsFromSoftware } from '../utils/api';
+import { slugify } from '../utils/slugify';
 
 export const AppverseDataContext = createContext(null);
 
@@ -139,8 +140,29 @@ export function AppverseDataProvider({ children }) {
     fetchData();
   }, []);
 
+  // Build slug map: slugify(title) → software object
+  // This allows /appverse/abaqus to resolve to the correct software
+  const slugMap = useMemo(() => {
+    const map = {};
+    for (const sw of data.software) {
+      const title = sw.attributes?.title;
+      if (title) {
+        const slug = slugify(title);
+        map[slug] = sw;
+      }
+    }
+    return map;
+  }, [data.software]);
+
+  // Helper to get software by slug
+  const getSoftwareBySlug = (slug) => {
+    return slugMap[slug] || null;
+  };
+
   const contextValue = {
     ...data,
+    slugMap,
+    getSoftwareBySlug,
     refetch: fetchData // Allow manual refetch if needed
   };
 
