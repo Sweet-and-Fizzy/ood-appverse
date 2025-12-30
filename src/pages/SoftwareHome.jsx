@@ -5,6 +5,7 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppverseData } from '../hooks/useAppverseData';
+import { useSoftwareSearch } from '../hooks/useSoftwareSearch';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SearchBar from '../components/home/SearchBar';
@@ -78,19 +79,16 @@ export default function SoftwareHome() {
     setSearchParams(newParams);
   };
 
-  // Filter software based on search and filters
+  // Apply search across software and apps
+  // NOTE: To switch to server-side search, replace useSoftwareSearch with a different hook
+  // that makes API calls with search parameters instead of filtering client-side
+  const searchedSoftware = useSoftwareSearch(software, appsBySoftwareId, searchQuery);
+
+  // Apply taxonomy filters to searched results
   const filteredSoftware = useMemo(() => {
-    if (!software) return [];
+    if (!searchedSoftware) return [];
 
-    let filtered = [...software];
-
-    // Apply search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(item =>
-        item.attributes?.title?.toLowerCase().includes(query)
-      );
-    }
+    let filtered = [...searchedSoftware];
 
     // Apply Topics filter (directly on Software - only Software has topics)
     // Filter values are term names, not UUIDs
@@ -136,7 +134,7 @@ export default function SoftwareHome() {
     }
 
     return filtered;
-  }, [software, searchQuery, filters, appsBySoftwareId]);
+  }, [searchedSoftware, filters, appsBySoftwareId]);
 
   // Show loading state
   if (loading) {
