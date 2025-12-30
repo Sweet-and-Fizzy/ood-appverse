@@ -13,10 +13,8 @@ import MarkdownRenderer from '../common/MarkdownRenderer';
 export default function AppRow({ app, isExpanded, onToggle }) {
   const title = app.attributes?.title || 'Untitled App';
   const githubUrl = app.attributes?.field_appverse_github_url?.uri;
-  // Prefer raw markdown (.value) for proper rendering, fall back to processed HTML
-  const readmeRaw = app.attributes?.field_appverse_readme?.value;
-  const readmeProcessed = app.attributes?.field_appverse_readme?.processed;
-  const hasReadme = readmeRaw || readmeProcessed;
+  // Raw markdown content for README
+  const readme = app.attributes?.field_appverse_readme?.value;
   const lastUpdated = app.attributes?.field_appverse_lastupdated;
 
   // Resolved taxonomy terms from API
@@ -87,7 +85,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
               </a>
             )}
 
-            {hasReadme && (
+            {readme && (
               <button
                 onClick={onToggle}
                 className="inline-flex items-center gap-2 text-appverse-red hover:text-red-700 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto"
@@ -106,18 +104,10 @@ export default function AppRow({ app, isExpanded, onToggle }) {
         </div>
       </div>
 
-      {/* README panel (expanded) - GitHub-style markdown rendering */}
-      {isExpanded && hasReadme && (
-        <div className="border-t border-appverse-gray p-5 bg-gray-50">
-          {readmeRaw ? (
-            <MarkdownRenderer content={readmeRaw} className="font-sans" />
-          ) : (
-            // Fallback to processed HTML if no raw markdown
-            <div
-              className="prose prose-sm max-w-none font-sans"
-              dangerouslySetInnerHTML={{ __html: readmeProcessed }}
-            />
-          )}
+      {/* README panel (expanded) - GitHub-style markdown rendering, dark mode */}
+      {isExpanded && readme && (
+        <div className="border-t border-gray-700 p-5 bg-[#1e1e1e]">
+          <MarkdownRenderer content={readme} className="font-sans" darkMode />
         </div>
       )}
     </div>
