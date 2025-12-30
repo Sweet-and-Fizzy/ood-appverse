@@ -7,7 +7,7 @@
  * @param {boolean} isExpanded - Whether README is expanded
  * @param {Function} onToggle - Callback when toggle is clicked
  */
-import { StarFill, ChevronRight } from 'react-bootstrap-icons';
+import { StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 
 export default function AppRow({ app, isExpanded, onToggle }) {
@@ -78,9 +78,11 @@ export default function AppRow({ app, isExpanded, onToggle }) {
                 href={githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-appverse-red hover:text-red-700 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
+                className="inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
               >
-                <StarFill className="w-4 h-4" />
+                <span className="w-5 h-5 rounded-full bg-appverse-red flex items-center justify-center">
+                  <StarFill className="w-3 h-3 text-white" />
+                </span>
                 VIEW REPO
               </a>
             )}
@@ -88,14 +90,17 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             {readme && (
               <button
                 onClick={onToggle}
-                className="inline-flex items-center gap-2 text-appverse-red hover:text-red-700 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto"
+                className="inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto"
               >
                 <span
-                  className={`w-5 h-5 rounded-full border-2 border-appverse-red flex items-center justify-center transition-transform ${
+                  className={`w-5 h-5 rounded-full bg-appverse-red flex items-center justify-center transition-transform ${
                     isExpanded ? 'rotate-90' : ''
                   }`}
                 >
-                  <ChevronRight className="w-3 h-3" />
+                  {/* Custom CSS chevron - rotated bordered square */}
+                  <span
+                    className="w-1.5 h-1.5 border-r-2 border-b-2 border-white rotate-[-45deg] ml-[-2px]"
+                  />
                 </span>
                 {isExpanded ? 'HIDE README' : 'SHOW README'}
               </button>
