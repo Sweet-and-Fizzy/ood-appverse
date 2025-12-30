@@ -15,18 +15,36 @@ import { ChevronDown } from 'react-bootstrap-icons';
 export default function FilterSidebar({ filters, onFilterChange, filterOptions = {} }) {
   // Track which sections are expanded
   const [expandedSections, setExpandedSections] = useState({
+    topics: true,   // Start expanded
     appType: true,  // Start expanded
+    license: true,  // Start expanded
     tags: false
   });
 
   // Build filter sections from API data
   const filterSections = [
+    filterOptions.topics?.length > 0 && {
+      key: 'topics',
+      title: 'Topics',
+      options: filterOptions.topics.map(item => ({
+        value: item.id,
+        label: item.name.replace(/_/g, ' ')  // "engineering_and_technology" → "engineering and technology"
+      }))
+    },
     filterOptions.appType?.length > 0 && {
       key: 'appType',
       title: 'Type',
       options: filterOptions.appType.map(item => ({
         value: item.id,
         label: item.name.replace(/_/g, ' ')  // "batch_connect" → "batch connect"
+      }))
+    },
+    filterOptions.license?.length > 0 && {
+      key: 'license',
+      title: 'License',
+      options: filterOptions.license.map(item => ({
+        value: item.id,
+        label: item.name
       }))
     },
     filterOptions.tags?.length > 0 && {

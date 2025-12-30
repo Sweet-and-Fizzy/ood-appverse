@@ -10,41 +10,45 @@ const BASE_API_URL = '/api';
 const BASE_SITE_URL = 'https://md-2622-accessmatch.pantheonsite.io';
 
 // Endpoint constants
-const ALL_SOFTWARE_WITH_LOGOS = `${BASE_API_URL}/node/appverse_software?include=field_appverse_logo`;
+const ALL_SOFTWARE_WITH_INCLUDES = `${BASE_API_URL}/node/appverse_software?include=field_appverse_logo,field_appverse_topics,field_license`;
 const ALL_APPS_WITH_SOFTWARE = `${BASE_API_URL}/node/appverse_app?include=field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type`;
 const SOFTWARE_BY_ID_WITH_INCLUDES = (id) => `${BASE_API_URL}/node/appverse_software/${id}?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`;
 const APPS_BY_SOFTWARE_ID_WITH_INCLUDES = (softwareId) => `${BASE_API_URL}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license`;
 const FILE_BY_ID = (fileId) => `${BASE_API_URL}/file/file/${fileId}`;
 
 /**
- * Fetch all software items with their logo relationships
- * @returns {Promise<Array>} Array of software objects with resolved logo URLs
+ * Fetch all software items with logos, topics, and license
+ * @returns {Promise<{software: Array, included: Array}>} Software with resolved data + included for filtering
  */
 export async function fetchAllSoftware() {
   try {
-    // Fetch software with logo relationship included
-    const response = await fetch(ALL_SOFTWARE_WITH_LOGOS);
+    const response = await fetch(ALL_SOFTWARE_WITH_INCLUDES);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch software: ${response.statusText}`);
     }
 
     const data = await response.json();
-    logApiResponse('ALL_SOFTWARE_WITH_LOGOS', ALL_SOFTWARE_WITH_LOGOS, data);
+    logApiResponse('ALL_SOFTWARE_WITH_INCLUDES', ALL_SOFTWARE_WITH_INCLUDES, data);
 
-    // Extract software and included media resources
     const softwareList = data.data || [];
-    const includedMedia = data.included || [];
+    const included = data.included || [];
 
-    // Create a map of media UUIDs to media objects for quick lookup
+    // Build a lookup map of all included items by ID
+    const includedMap = {};
+    for (const item of included) {
+      includedMap[item.id] = item;
+    }
+
+    // Separate media items for logo resolution
     const mediaMap = {};
-    for (const media of includedMedia) {
-      if (media.type === 'media--svg') {
-        mediaMap[media.id] = media;
+    for (const item of included) {
+      if (item.type === 'media--svg') {
+        mediaMap[item.id] = item;
       }
     }
 
-    // Now fetch the actual file URLs for each media item
+    // Fetch actual file URLs for each media item
     const mediaFilePromises = Object.keys(mediaMap).map(async (mediaId) => {
       const media = mediaMap[mediaId];
       const fileRelationshipId = media.relationships?.field_media_image_1?.data?.id;
@@ -76,18 +80,37 @@ export async function fetchAllSoftware() {
       }
     }
 
-    // Attach logo URLs to software objects
-    const softwareWithLogos = softwareList.map(software => {
+    // Attach resolved data to each software item
+    const softwareWithData = softwareList.map(software => {
+      // Resolve logo URL
       const logoMediaId = software.relationships?.field_appverse_logo?.data?.id;
       const logoUrl = logoMediaId ? mediaFileMap[logoMediaId] : null;
 
+      // Resolve topics (science domains)
+      const topicsData = software.relationships?.field_appverse_topics?.data || [];
+      const topics = topicsData
+        .map(ref => includedMap[ref.id])
+        .filter(Boolean)
+        .map(term => ({ id: term.id, name: term.attributes.name }));
+
+      // Resolve license
+      const licenseRef = software.relationships?.field_license?.data;
+      const license = licenseRef && includedMap[licenseRef.id]
+        ? { id: licenseRef.id, name: includedMap[licenseRef.id].attributes.name }
+        : null;
+
       return {
         ...software,
-        logoUrl // Add resolved logo URL directly to software object
+        logoUrl,
+        topics,
+        license
       };
     });
 
-    return softwareWithLogos;
+    return {
+      software: softwareWithData,
+      included
+    };
 
   } catch (error) {
     console.error('Error fetching software:', error);
@@ -122,11 +145,11 @@ export async function fetchAllApps() {
 }
 
 /**
- * Extract filter options from included taxonomy terms
+ * Extract filter options from included taxonomy terms (Apps response)
  * @param {Array} included - Included array from JSON:API response
  * @returns {Object} Filter options keyed by taxonomy type
  */
-export function extractFilterOptions(included) {
+export function extractFilterOptionsFromApps(included) {
   const filterOptions = {
     tags: [],
     appType: []
@@ -149,6 +172,38 @@ export function extractFilterOptions(included) {
   // Sort alphabetically
   filterOptions.tags.sort((a, b) => a.name.localeCompare(b.name));
   filterOptions.appType.sort((a, b) => a.name.localeCompare(b.name));
+
+  return filterOptions;
+}
+
+/**
+ * Extract filter options from included taxonomy terms (Software response)
+ * @param {Array} included - Included array from JSON:API response
+ * @returns {Object} Filter options keyed by taxonomy type
+ */
+export function extractFilterOptionsFromSoftware(included) {
+  const filterOptions = {
+    topics: [],
+    license: []
+  };
+
+  for (const item of included) {
+    if (item.type === 'taxonomy_term--appverse_science_domains') {
+      filterOptions.topics.push({
+        id: item.id,
+        name: item.attributes.name
+      });
+    } else if (item.type === 'taxonomy_term--appverse_license') {
+      filterOptions.license.push({
+        id: item.id,
+        name: item.attributes.name
+      });
+    }
+  }
+
+  // Sort alphabetically
+  filterOptions.topics.sort((a, b) => a.name.localeCompare(b.name));
+  filterOptions.license.sort((a, b) => a.name.localeCompare(b.name));
 
   return filterOptions;
 }

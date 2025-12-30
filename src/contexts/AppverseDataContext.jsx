@@ -9,7 +9,7 @@
  *   const { software, apps, appsBySoftwareId, loading, error } = useAppverseData()
  */
 import { createContext, useState, useEffect } from 'react';
-import { fetchAllSoftware, fetchAllApps, groupAppsBySoftware, extractFilterOptions } from '../utils/api';
+import { fetchAllSoftware, fetchAllApps, groupAppsBySoftware, extractFilterOptionsFromApps, extractFilterOptionsFromSoftware } from '../utils/api';
 
 export const AppverseDataContext = createContext(null);
 
@@ -67,7 +67,7 @@ export function AppverseDataProvider({ children }) {
     software: [],
     apps: [],
     appsBySoftwareId: {},
-    filterOptions: { tags: [], appType: [] },
+    filterOptions: { tags: [], appType: [], topics: [], license: [] },
     loading: true,
     error: null
   });
@@ -80,14 +80,26 @@ export function AppverseDataProvider({ children }) {
 
     try {
       // Fetch both endpoints in parallel
-      const [software, appsResult] = await Promise.all([
+      const [softwareResult, appsResult] = await Promise.all([
         fetchAllSoftware(),
         fetchAllApps()
       ]);
 
+      // Extract software and filter options from the result
+      const { software, included: softwareIncluded } = softwareResult;
+      const softwareFilterOptions = extractFilterOptionsFromSoftware(softwareIncluded);
+
       // Extract apps and filter options from the result
-      const { apps, included } = appsResult;
-      const filterOptions = extractFilterOptions(included);
+      const { apps, included: appsIncluded } = appsResult;
+      const appsFilterOptions = extractFilterOptionsFromApps(appsIncluded);
+
+      // Merge filter options from both sources
+      const filterOptions = {
+        topics: softwareFilterOptions.topics,
+        license: softwareFilterOptions.license,
+        appType: appsFilterOptions.appType,
+        tags: appsFilterOptions.tags
+      };
 
       // Group apps by software ID
       const appsBySoftwareId = groupAppsBySoftware(apps);

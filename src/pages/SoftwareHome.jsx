@@ -92,17 +92,32 @@ export default function SoftwareHome() {
       );
     }
 
-    // Apply filters based on apps
-    // If filters are active, only show software that has apps matching ALL selected filters
-    const hasActiveFilters =
+    // Apply Topics filter (directly on Software)
+    if (filters.topics && filters.topics.length > 0) {
+      filtered = filtered.filter(softwareItem => {
+        const softwareTopicIds = softwareItem.topics?.map(t => t.id) || [];
+        return filters.topics.some(topicId => softwareTopicIds.includes(topicId));
+      });
+    }
+
+    // Apply License filter (directly on Software)
+    if (filters.license && filters.license.length > 0) {
+      filtered = filtered.filter(softwareItem => {
+        const softwareLicenseId = softwareItem.license?.id;
+        return softwareLicenseId && filters.license.includes(softwareLicenseId);
+      });
+    }
+
+    // Apply filters based on apps (tags, appType)
+    const hasAppFilters =
       (filters.tags && filters.tags.length > 0) ||
       (filters.appType && filters.appType.length > 0);
 
-    if (hasActiveFilters) {
+    if (hasAppFilters) {
       filtered = filtered.filter(softwareItem => {
         const softwareApps = appsBySoftwareId[softwareItem.id] || [];
 
-        // Check if any app matches ALL active filters
+        // Check if any app matches the active app-level filters
         return softwareApps.some(app => {
           // Check tags filter
           if (filters.tags && filters.tags.length > 0) {
@@ -137,6 +152,29 @@ export default function SoftwareHome() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Header section */}
+      <div className="mx-6 mt-6 mb-4">
+        <div className="flex items-start justify-between gap-8">
+          <div className="flex-1">
+            <h1 className="text-3xl font-serif font-bold text-appverse-black mb-2">
+              Welcome to the Appverse
+            </h1>
+            <p className="text-base font-sans text-appverse-black max-w-2xl">
+              Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.
+            </p>
+          </div>
+          <button
+            className="flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
+            onClick={() => {
+              // TODO: Implement add app functionality
+              alert('Add an App functionality coming soon!');
+            }}
+          >
+            ADD AN APP
+          </button>
+        </div>
+      </div>
+
       {/* Search and filter toggle section */}
       <div className="mx-6 my-6 bg-appverse-black px-6 py-3">
         <div className="flex items-center justify-between gap-4">
