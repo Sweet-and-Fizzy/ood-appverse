@@ -6,6 +6,7 @@
  * @param {Object} software - Software object from API with resolved taxonomy terms
  */
 import { Globe, Book, FileEarmarkLock } from 'react-bootstrap-icons';
+import { Link } from 'react-router-dom';
 
 export default function SoftwareHeader({ software }) {
   const title = software.attributes?.title || 'Untitled Software';
@@ -20,7 +21,11 @@ export default function SoftwareHeader({ software }) {
   const tags = software.tags || [];
 
   // Combine topics and tags for display (both show as tag pills per mockup)
-  const allTags = [...topics, ...tags];
+  // Mark each with its type so we can link to the correct filter
+  const allTags = [
+    ...topics.map(t => ({ ...t, filterType: 'topics' })),
+    ...tags.map(t => ({ ...t, filterType: 'tags' }))
+  ];
 
   // Determine license display
   const isOpenSource = license?.name?.toLowerCase().includes('open');
@@ -95,12 +100,13 @@ export default function SoftwareHeader({ software }) {
       {allTags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           {allTags.map((tag) => (
-            <span
+            <Link
               key={tag.id}
-              className="px-2.5 py-1 text-xs font-sans text-appverse-black border border-appverse-black rounded"
+              to={`/appverse?${tag.filterType}=${encodeURIComponent(tag.name)}`}
+              className="px-2.5 py-1 text-xs font-sans text-appverse-black border border-appverse-black rounded hover:bg-appverse-gray transition-colors"
             >
               {tag.name}
-            </span>
+            </Link>
           ))}
         </div>
       )}

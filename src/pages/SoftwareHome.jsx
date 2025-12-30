@@ -168,7 +168,7 @@ export default function SoftwareHome() {
               alert('Add an App functionality coming soon!');
             }}
           >
-            ADD AN APP
+            Add an app
           </button>
         </div>
       </div>

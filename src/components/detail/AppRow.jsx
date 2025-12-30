@@ -111,7 +111,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
       {/* README panel (expanded) - GitHub-style markdown rendering, dark mode */}
       {isExpanded && readme && (
-        <div className="border-t border-gray-700 p-5 bg-[#1e1e1e]">
+        <div className="border-t border-gray-700 p-5 bg-[#1e1e1e] max-h-[350px] overflow-y-auto">
           <MarkdownRenderer content={readme} className="font-sans" darkMode />
         </div>
       )}
