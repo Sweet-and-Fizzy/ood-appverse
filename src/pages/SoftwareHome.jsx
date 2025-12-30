@@ -92,7 +92,7 @@ export default function SoftwareHome() {
       );
     }
 
-    // Apply Topics filter (directly on Software)
+    // Apply Topics filter (directly on Software - only Software has topics)
     if (filters.topics && filters.topics.length > 0) {
       filtered = filtered.filter(softwareItem => {
         const softwareTopicIds = softwareItem.topics?.map(t => t.id) || [];
@@ -100,40 +100,34 @@ export default function SoftwareHome() {
       });
     }
 
-    // Apply License filter (directly on Software)
-    if (filters.license && filters.license.length > 0) {
+    // Apply Type filter (only Apps have type)
+    if (filters.appType && filters.appType.length > 0) {
       filtered = filtered.filter(softwareItem => {
-        const softwareLicenseId = softwareItem.license?.id;
-        return softwareLicenseId && filters.license.includes(softwareLicenseId);
+        const softwareApps = appsBySoftwareId[softwareItem.id] || [];
+        return softwareApps.some(app => {
+          const appTypeId = app.relationships?.field_appverse_app_type?.data?.id;
+          return appTypeId && filters.appType.includes(appTypeId);
+        });
       });
     }
 
-    // Apply filters based on apps (tags, appType)
-    const hasAppFilters =
-      (filters.tags && filters.tags.length > 0) ||
-      (filters.appType && filters.appType.length > 0);
-
-    if (hasAppFilters) {
+    // Apply Tags filter with OR logic:
+    // Show software if Software has the tag (field_tags) OR any App has the tag (field_add_implementation_tags)
+    if (filters.tags && filters.tags.length > 0) {
       filtered = filtered.filter(softwareItem => {
+        // Check Software's own tags
+        const softwareTagIds = softwareItem.tags?.map(t => t.id) || [];
+        const softwareHasTag = filters.tags.some(tagId => softwareTagIds.includes(tagId));
+        if (softwareHasTag) return true;
+
+        // Check Apps' tags
         const softwareApps = appsBySoftwareId[softwareItem.id] || [];
-
-        // Check if any app matches the active app-level filters
-        return softwareApps.some(app => {
-          // Check tags filter
-          if (filters.tags && filters.tags.length > 0) {
-            const appTagIds = app.relationships?.field_add_implementation_tags?.data?.map(t => t.id) || [];
-            const hasMatchingTag = filters.tags.some(tagId => appTagIds.includes(tagId));
-            if (!hasMatchingTag) return false;
-          }
-
-          // Check app type filter
-          if (filters.appType && filters.appType.length > 0) {
-            const appTypeId = app.relationships?.field_appverse_app_type?.data?.id;
-            if (!appTypeId || !filters.appType.includes(appTypeId)) return false;
-          }
-
-          return true;
+        const appHasTag = softwareApps.some(app => {
+          const appTagIds = app.relationships?.field_add_implementation_tags?.data?.map(t => t.id) || [];
+          return filters.tags.some(tagId => appTagIds.includes(tagId));
         });
+
+        return appHasTag;
       });
     }
 

@@ -94,11 +94,22 @@ export function AppverseDataProvider({ children }) {
       const appsFilterOptions = extractFilterOptionsFromApps(appsIncluded);
 
       // Merge filter options from both sources
+      // Tags exist on both Software (field_tags) and Apps (field_add_implementation_tags)
+      // Merge and deduplicate by ID
+      const allTagsMap = {};
+      for (const tag of softwareFilterOptions.tags) {
+        allTagsMap[tag.id] = tag;
+      }
+      for (const tag of appsFilterOptions.tags) {
+        allTagsMap[tag.id] = tag;
+      }
+      const mergedTags = Object.values(allTagsMap).sort((a, b) => a.name.localeCompare(b.name));
+
       const filterOptions = {
         topics: softwareFilterOptions.topics,
         license: softwareFilterOptions.license,
         appType: appsFilterOptions.appType,
-        tags: appsFilterOptions.tags
+        tags: mergedTags
       };
 
       // Group apps by software ID

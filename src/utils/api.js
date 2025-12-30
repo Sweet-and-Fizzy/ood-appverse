@@ -10,7 +10,7 @@ const BASE_API_URL = '/api';
 const BASE_SITE_URL = 'https://md-2622-accessmatch.pantheonsite.io';
 
 // Endpoint constants
-const ALL_SOFTWARE_WITH_INCLUDES = `${BASE_API_URL}/node/appverse_software?include=field_appverse_logo,field_appverse_topics,field_license`;
+const ALL_SOFTWARE_WITH_INCLUDES = `${BASE_API_URL}/node/appverse_software?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`;
 const ALL_APPS_WITH_SOFTWARE = `${BASE_API_URL}/node/appverse_app?include=field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type`;
 const SOFTWARE_BY_ID_WITH_INCLUDES = (id) => `${BASE_API_URL}/node/appverse_software/${id}?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`;
 const APPS_BY_SOFTWARE_ID_WITH_INCLUDES = (softwareId) => `${BASE_API_URL}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license`;
@@ -99,11 +99,19 @@ export async function fetchAllSoftware() {
         ? { id: licenseRef.id, name: includedMap[licenseRef.id].attributes.name }
         : null;
 
+      // Resolve tags
+      const tagsData = software.relationships?.field_tags?.data || [];
+      const tags = tagsData
+        .map(ref => includedMap[ref.id])
+        .filter(Boolean)
+        .map(term => ({ id: term.id, name: term.attributes.name }));
+
       return {
         ...software,
         logoUrl,
         topics,
-        license
+        license,
+        tags
       };
     });
 
@@ -184,7 +192,8 @@ export function extractFilterOptionsFromApps(included) {
 export function extractFilterOptionsFromSoftware(included) {
   const filterOptions = {
     topics: [],
-    license: []
+    license: [],
+    tags: []  // Software also has tags (field_tags)
   };
 
   for (const item of included) {
@@ -198,12 +207,18 @@ export function extractFilterOptionsFromSoftware(included) {
         id: item.id,
         name: item.attributes.name
       });
+    } else if (item.type === 'taxonomy_term--tags') {
+      filterOptions.tags.push({
+        id: item.id,
+        name: item.attributes.name
+      });
     }
   }
 
   // Sort alphabetically
   filterOptions.topics.sort((a, b) => a.name.localeCompare(b.name));
   filterOptions.license.sort((a, b) => a.name.localeCompare(b.name));
+  filterOptions.tags.sort((a, b) => a.name.localeCompare(b.name));
 
   return filterOptions;
 }
