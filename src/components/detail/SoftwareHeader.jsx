@@ -5,7 +5,7 @@
  * Props:
  * @param {Object} software - Software object from API with resolved taxonomy terms
  */
-import { Globe, Book, FileEarmarkLock } from 'react-bootstrap-icons';
+import { Globe, Book, FileEarmarkLock, FileEarmarkCode } from 'react-bootstrap-icons';
 import { Link } from 'react-router-dom';
 
 export default function SoftwareHeader({ software }) {
@@ -41,8 +41,8 @@ export default function SoftwareHeader({ software }) {
             className="w-20 h-20 object-contain"
           />
         ) : (
-          <div className="w-20 h-20 rounded-appverse bg-appverse-gray flex items-center justify-center">
-            <span className="text-4xl font-serif font-bold text-white">
+          <div className="w-20 h-20 rounded-appverse bg-gray-200 flex items-center justify-center">
+            <span className="text-4xl font-bold text-gray-600 leading-none">
               {title.charAt(0).toUpperCase()}
             </span>
           </div>
@@ -82,7 +82,11 @@ export default function SoftwareHeader({ software }) {
 
         {license && (
           <span className="inline-flex items-center gap-1.5 text-appverse-black">
-            <FileEarmarkLock className="w-4 h-4" />
+            {isOpenSource ? (
+              <FileEarmarkCode className="w-4 h-4" />
+            ) : (
+              <FileEarmarkLock className="w-4 h-4" />
+            )}
             {isOpenSource ? 'OPEN-SOURCE' : 'COMMERCIAL'}
           </span>
         )}

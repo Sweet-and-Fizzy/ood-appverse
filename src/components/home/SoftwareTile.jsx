@@ -43,7 +43,7 @@ export default function SoftwareTile({ software, appCount = 0 }) {
           ) : (
             // Placeholder if no logo
             <div className="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center">
-              <span className="text-4xl font-bold text-gray-600">
+              <span className="text-4xl font-bold text-gray-600 leading-none">
                 {softwareTitle.charAt(0).toUpperCase()}
               </span>
             </div>
