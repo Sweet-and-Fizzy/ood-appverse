@@ -2,6 +2,10 @@
  * Font definitions for Appverse
  */
 
+/* Google Fonts - Source Sans 3 (primary sans-serif) */
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+
+/* Local font - Serifa Std (decorative serif) */
 @font-face {
   font-family: 'Serifa Std';
   src: url('./fonts/SerifaStd-Black.woff2') format('woff2'),
