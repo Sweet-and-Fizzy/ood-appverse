@@ -10,6 +10,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { fetchSoftwareById, fetchAppsBySoftware } from '../utils/api';
 import { useAppverseData } from '../hooks/useAppverseData';
+import { useConfig } from '../contexts/ConfigContext';
 import { slugify } from '../utils/slugify';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -28,6 +29,9 @@ export default function SoftwareDetail() {
   // Route can provide either :id (UUID) or :slug
   const { id, slug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get config for API calls
+  const config = useConfig();
 
   // Get slugMap from context (for slug → software lookup)
   const { getSoftwareBySlug, loading: contextLoading } = useAppverseData();
@@ -71,14 +75,14 @@ export default function SoftwareDetail() {
           softwareId = contextSoftware.id;
 
           // Fetch full software data (context has basic data, API has full data with resolved fields)
-          softwareData = await fetchSoftwareById(softwareId);
+          softwareData = await fetchSoftwareById(softwareId, config);
         } else {
           // Direct UUID - fetch from API
-          softwareData = await fetchSoftwareById(softwareId);
+          softwareData = await fetchSoftwareById(softwareId, config);
         }
 
         // Fetch apps
-        const appsData = await fetchAppsBySoftware(softwareId);
+        const appsData = await fetchAppsBySoftware(softwareId, config);
 
         setSoftware(softwareData);
         setApps(appsData);
@@ -93,7 +97,7 @@ export default function SoftwareDetail() {
     if (identifier) {
       fetchData();
     }
-  }, [identifier, isSlugRoute, contextLoading, getSoftwareBySlug]);
+  }, [identifier, isSlugRoute, contextLoading, getSoftwareBySlug, config]);
 
   // Build app slug maps for URL-friendly ?app= params
   // Format: "org-name--app-title" or just "app-title" if no org
@@ -167,12 +171,12 @@ export default function SoftwareDetail() {
     }
 
     // Re-fetch
-    fetchSoftwareById(softwareId)
+    fetchSoftwareById(softwareId, config)
       .then(data => setSoftware(data))
       .catch(err => setError(err))
       .finally(() => setLoading(false));
 
-    fetchAppsBySoftware(softwareId)
+    fetchAppsBySoftware(softwareId, config)
       .then(data => setApps(data))
       .catch(err => console.error('Failed to fetch apps:', err));
   };
