@@ -91,7 +91,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             {readme && (
               <button
                 onClick={onToggle}
-                className="inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto"
+                className="inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto focus:outline-none"
               >
                 <span
                   className={`w-5 h-5 rounded-full bg-appverse-red flex items-center justify-center transition-transform ${

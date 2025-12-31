@@ -44340,7 +44340,7 @@ function HD({ app: e, isExpanded: a, onToggle: r }) {
           "button",
           {
             onClick: r,
-            className: "inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto",
+            className: "inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto focus:outline-none",
             children: [
               /* @__PURE__ */ $.jsx(
                 "span",
