@@ -5,31 +5,40 @@
 
 import { logApiResponse } from './apiLogger';
 
-// Use proxy path for all environments (Vite dev server and Netlify both proxy /api)
-const BASE_API_URL = '/api';
-const BASE_SITE_URL = 'https://md-2622-accessmatch.pantheonsite.io';
+// Default configuration (can be overridden via config parameter)
+const DEFAULT_API_BASE_URL = '/api';
+const DEFAULT_SITE_BASE_URL = '';
 
-// Endpoint constants
-const ALL_SOFTWARE_WITH_INCLUDES = `${BASE_API_URL}/node/appverse_software?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`;
-const ALL_APPS_WITH_SOFTWARE = `${BASE_API_URL}/node/appverse_app?include=field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type`;
-const SOFTWARE_BY_ID_WITH_INCLUDES = (id) => `${BASE_API_URL}/node/appverse_software/${id}?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`;
-const APPS_BY_SOFTWARE_ID_WITH_INCLUDES = (softwareId) => `${BASE_API_URL}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license`;
-const FILE_BY_ID = (fileId) => `${BASE_API_URL}/file/file/${fileId}`;
+// Endpoint builders (now accept baseUrl parameter)
+const endpoints = {
+  allSoftware: (baseUrl) => `${baseUrl}/node/appverse_software?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`,
+  allApps: (baseUrl) => `${baseUrl}/node/appverse_app?include=field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type`,
+  softwareById: (baseUrl, id) => `${baseUrl}/node/appverse_software/${id}?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`,
+  appsBySoftwareId: (baseUrl, softwareId) => `${baseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license`,
+  fileById: (baseUrl, fileId) => `${baseUrl}/file/file/${fileId}`
+};
 
 /**
  * Fetch all software items with logos, topics, and license
+ * @param {Object} config - Configuration object
+ * @param {string} config.apiBaseUrl - Base URL for API calls
+ * @param {string} config.siteBaseUrl - Base URL for site assets
  * @returns {Promise<{software: Array, included: Array}>} Software with resolved data + included for filtering
  */
-export async function fetchAllSoftware() {
+export async function fetchAllSoftware(config = {}) {
+  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
+  const siteBaseUrl = config.siteBaseUrl ?? DEFAULT_SITE_BASE_URL;
+  const url = endpoints.allSoftware(apiBaseUrl);
+
   try {
-    const response = await fetch(ALL_SOFTWARE_WITH_INCLUDES);
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch software: ${response.statusText}`);
     }
 
     const data = await response.json();
-    logApiResponse('ALL_SOFTWARE_WITH_INCLUDES', ALL_SOFTWARE_WITH_INCLUDES, data);
+    logApiResponse('ALL_SOFTWARE_WITH_INCLUDES', url, data);
 
     const softwareList = data.data || [];
     const included = data.included || [];
@@ -56,7 +65,7 @@ export async function fetchAllSoftware() {
       if (!fileRelationshipId) return null;
 
       try {
-        const fileUrl = FILE_BY_ID(fileRelationshipId);
+        const fileUrl = endpoints.fileById(apiBaseUrl, fileRelationshipId);
         const fileResponse = await fetch(fileUrl);
         const fileData = await fileResponse.json();
         logApiResponse('FILE_BY_ID', fileUrl, fileData);
@@ -76,7 +85,7 @@ export async function fetchAllSoftware() {
     const mediaFileMap = {};
     for (const result of mediaFiles) {
       if (result && result.fileUrl) {
-        mediaFileMap[result.mediaId] = `${BASE_SITE_URL}${result.fileUrl}`;
+        mediaFileMap[result.mediaId] = `${siteBaseUrl}${result.fileUrl}`;
       }
     }
 
@@ -133,18 +142,23 @@ export async function fetchAllSoftware() {
 
 /**
  * Fetch all apps with their software relationships and taxonomy terms resolved
+ * @param {Object} config - Configuration object
+ * @param {string} config.apiBaseUrl - Base URL for API calls
  * @returns {Promise<{apps: Array, included: Array}>} Apps with resolved terms + included for filter extraction
  */
-export async function fetchAllApps() {
+export async function fetchAllApps(config = {}) {
+  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
+  const url = endpoints.allApps(apiBaseUrl);
+
   try {
-    const response = await fetch(ALL_APPS_WITH_SOFTWARE);
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch apps: ${response.statusText}`);
     }
 
     const data = await response.json();
-    logApiResponse('ALL_APPS_WITH_SOFTWARE', ALL_APPS_WITH_SOFTWARE, data);
+    logApiResponse('ALL_APPS_WITH_SOFTWARE', url, data);
 
     const apps = data.data || [];
     const included = data.included || [];
@@ -262,11 +276,17 @@ export function extractFilterOptionsFromSoftware(included) {
 /**
  * Fetch a single software item by ID with logo and taxonomy terms
  * @param {string} id - Software UUID
+ * @param {Object} config - Configuration object
+ * @param {string} config.apiBaseUrl - Base URL for API calls
+ * @param {string} config.siteBaseUrl - Base URL for site assets
  * @returns {Promise<Object>} Software object with logo URL and resolved taxonomy terms
  */
-export async function fetchSoftwareById(id) {
+export async function fetchSoftwareById(id, config = {}) {
+  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
+  const siteBaseUrl = config.siteBaseUrl ?? DEFAULT_SITE_BASE_URL;
+
   try {
-    const url = SOFTWARE_BY_ID_WITH_INCLUDES(id);
+    const url = endpoints.softwareById(apiBaseUrl, id);
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -293,13 +313,13 @@ export async function fetchSoftwareById(id) {
 
       if (fileRelationshipId) {
         try {
-          const fileEndpoint = FILE_BY_ID(fileRelationshipId);
+          const fileEndpoint = endpoints.fileById(apiBaseUrl, fileRelationshipId);
           const fileResponse = await fetch(fileEndpoint);
           const fileData = await fileResponse.json();
           logApiResponse('FILE_BY_ID', fileEndpoint, fileData);
           const fileUrl = fileData.data?.attributes?.uri?.url;
           if (fileUrl) {
-            logoUrl = `${BASE_SITE_URL}${fileUrl}`;
+            logoUrl = `${siteBaseUrl}${fileUrl}`;
           }
         } catch (err) {
           console.error(`Failed to fetch logo file:`, err);
@@ -349,11 +369,15 @@ export async function fetchSoftwareById(id) {
 /**
  * Fetch apps for a specific software with taxonomy terms resolved
  * @param {string} softwareId - Software UUID
+ * @param {Object} config - Configuration object
+ * @param {string} config.apiBaseUrl - Base URL for API calls
  * @returns {Promise<Array>} Array of app objects with resolved taxonomy terms
  */
-export async function fetchAppsBySoftware(softwareId) {
+export async function fetchAppsBySoftware(softwareId, config = {}) {
+  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
+
   try {
-    const url = APPS_BY_SOFTWARE_ID_WITH_INCLUDES(softwareId);
+    const url = endpoints.appsBySoftwareId(apiBaseUrl, softwareId);
     const response = await fetch(url);
 
     if (!response.ok) {

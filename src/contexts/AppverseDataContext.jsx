@@ -11,6 +11,7 @@
 import { createContext, useState, useEffect, useMemo } from 'react';
 import { fetchAllSoftware, fetchAllApps, groupAppsBySoftware, extractFilterOptionsFromApps, extractFilterOptionsFromSoftware } from '../utils/api';
 import { slugify } from '../utils/slugify';
+import { useConfig } from './ConfigContext';
 
 export const AppverseDataContext = createContext(null);
 
@@ -64,6 +65,7 @@ export const AppverseDataContext = createContext(null);
  */
 
 export function AppverseDataProvider({ children }) {
+  const config = useConfig();
   const [data, setData] = useState({
     software: [],
     apps: [],
@@ -82,8 +84,8 @@ export function AppverseDataProvider({ children }) {
     try {
       // Fetch both endpoints in parallel
       const [softwareResult, appsResult] = await Promise.all([
-        fetchAllSoftware(),
-        fetchAllApps()
+        fetchAllSoftware(config),
+        fetchAllApps(config)
       ]);
 
       // Extract software and filter options from the result

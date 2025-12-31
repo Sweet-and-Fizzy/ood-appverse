@@ -6,14 +6,18 @@
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from '../App'
+import { ConfigProvider } from '../contexts/ConfigContext'
 import '../index.css'
 
 /**
  * Mount the AppVerse browser to a DOM element
  * @param {string} elementId - The ID of the element to mount to
+ * @param {Object} config - Configuration options
+ * @param {string} config.apiBaseUrl - Base URL for API calls (default: '/api')
+ * @param {string} config.siteBaseUrl - Base URL for site assets (default: '')
  * @returns {Object} - Object with unmount function
  */
-function mount(elementId) {
+function mount(elementId, config = {}) {
   const container = document.getElementById(elementId)
 
   if (!container) {
@@ -25,7 +29,9 @@ function mount(elementId) {
 
   root.render(
     <BrowserRouter>
-      <App />
+      <ConfigProvider config={config}>
+        <App />
+      </ConfigProvider>
     </BrowserRouter>
   )
 
