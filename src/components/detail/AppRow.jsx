@@ -34,7 +34,8 @@ export default function AppRow({ app, isExpanded, onToggle }) {
   return (
     <div className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
       {/* App header row - 3 column layout */}
-      <div className="p-5">
+      {/* !p-5: Drupal theme has .p-5 with !important, so we need to override it */}
+      <div className="!p-5">
         <div className="flex gap-6">
           {/* Left column: title, org, date */}
           <div className="flex-1 min-w-0">
@@ -111,7 +112,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
       {/* README panel (expanded) - GitHub-style markdown rendering, dark mode */}
       {isExpanded && readme && (
-        <div className="border-t border-gray-700 p-5 bg-[#1e1e1e] max-h-[350px] overflow-y-auto">
+        <div className="border-t border-gray-700 !p-5 bg-[#1e1e1e] max-h-[350px] overflow-y-auto">
           <MarkdownRenderer content={readme} className="font-sans" darkMode />
         </div>
       )}

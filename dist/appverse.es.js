@@ -44304,7 +44304,7 @@ function HD({ app: e, isExpanded: a, onToggle: r }) {
     day: "numeric"
   }) : null;
   return /* @__PURE__ */ $.jsxs("div", { className: "border border-appverse-gray rounded-appverse overflow-hidden bg-white", children: [
-    /* @__PURE__ */ $.jsx("div", { className: "p-5", children: /* @__PURE__ */ $.jsxs("div", { className: "flex gap-6", children: [
+    /* @__PURE__ */ $.jsx("div", { className: "!p-5", children: /* @__PURE__ */ $.jsxs("div", { className: "flex gap-6", children: [
       /* @__PURE__ */ $.jsxs("div", { className: "flex-1 min-w-0", children: [
         /* @__PURE__ */ $.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: i }),
         p && /* @__PURE__ */ $.jsx("p", { className: "text-sm font-sans text-appverse-black mb-2", children: p.name }),
@@ -44360,7 +44360,7 @@ function HD({ app: e, isExpanded: a, onToggle: r }) {
         )
       ] })
     ] }) }),
-    a && u && /* @__PURE__ */ $.jsx("div", { className: "border-t border-gray-700 p-5 bg-[#1e1e1e] max-h-[350px] overflow-y-auto", children: /* @__PURE__ */ $.jsx(jD, { content: u, className: "font-sans", darkMode: !0 }) })
+    a && u && /* @__PURE__ */ $.jsx("div", { className: "border-t border-gray-700 !p-5 bg-[#1e1e1e] max-h-[350px] overflow-y-auto", children: /* @__PURE__ */ $.jsx(jD, { content: u, className: "font-sans", darkMode: !0 }) })
   ] });
 }
 function PD({ apps: e, expandedAppId: a, onToggleApp: r }) {
