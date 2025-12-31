@@ -94,24 +94,51 @@ The widget reads the browser URL to determine what to display. Drupal must serve
 | `/appverse/*` | Software detail (wildcard catches slugs like `abaqus`) |
 | `/appverse/software/*` | Software detail by UUID (optional, backward compat) |
 
-**Twig template example:**
+**Embed code for Drupal:**
+
+In Drupal, create a Basic Page at `/appverse` with "Full HTML" text format. Click "Source" in the editor and paste:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@558a0d8/dist/appverse.css">
+
+<div id="appverse-root"></div>
+
+<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@558a0d8/dist/appverse.umd.js"></script>
+<script>
+  AppVerse.mount('appverse-root', {
+    apiBaseUrl: '/jsonapi'
+  });
+</script>
+```
+
+**Configuration options:**
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `apiBaseUrl` | `'/api'` | Base URL for JSON:API calls. Use `'/jsonapi'` for Drupal. |
+| `siteBaseUrl` | `''` | Base URL for assets (logos). Only needed if assets are on a different domain. |
+
+**Cache busting:** The `@558a0d8` in the URL is a git commit hash. To get the latest version after updates, change it to the new commit hash or use `@main` (not recommended for production).
+
+**Twig template example (alternative):**
 
 ```twig
 {# templates/page--appverse.html.twig #}
-{# Use for both /appverse/ and /appverse/software/* #}
-<div id="appverse"></div>
+<div id="appverse-root"></div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@1.0.0/dist/appverse.css">
-<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@1.0.0/dist/appverse.umd.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@558a0d8/dist/appverse.css">
+<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@558a0d8/dist/appverse.umd.js"></script>
 <script>
-  AppVerse.mount('appverse');
+  AppVerse.mount('appverse-root', {
+    apiBaseUrl: '/jsonapi'
+  });
 </script>
 ```
 
 **How it works:**
 1. User visits `/appverse/` → Drupal serves the template → Widget shows grid
-2. User clicks a tile → URL changes to `/appverse/software/uuid` (no page reload)
-3. User shares link `/appverse/software/uuid` → Drupal serves template → Widget shows detail
+2. User clicks a tile → URL changes to `/appverse/abaqus` (no page reload)
+3. User shares link `/appverse/abaqus` → Drupal serves template → Widget shows detail
 
 **Note:** Client-side navigation (clicking tiles) does NOT reload the page. If you need full page reloads for each navigation, additional configuration would be needed.
 
