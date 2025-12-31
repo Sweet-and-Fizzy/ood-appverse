@@ -7,7 +7,7 @@
  * @param {Object} appsBySoftwareId - Apps grouped by software ID
  */
 import SoftwareTile from './SoftwareTile';
-import { EmojiNeutral } from 'react-bootstrap-icons';
+import { Search } from 'react-bootstrap-icons';
 
 export default function SoftwareGrid({ software, appsBySoftwareId }) {
   // Handle empty state
@@ -15,7 +15,7 @@ export default function SoftwareGrid({ software, appsBySoftwareId }) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <div className="w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4">
-          <EmojiNeutral className="w-10 h-10 text-gray-400" />
+          <Search className="w-10 h-10 text-gray-400" />
         </div>
         <h3 className="text-xl font-serif font-bold text-appverse-black mb-2">
           No Software Found
