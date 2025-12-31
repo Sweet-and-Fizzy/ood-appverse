@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from '../App'
 import { ConfigProvider } from '../contexts/ConfigContext'
+import '../fonts.css'
 import '../index.css'
 
 /**
