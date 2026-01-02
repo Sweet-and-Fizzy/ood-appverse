@@ -9,28 +9,17 @@
  * @param {Array} filterOptions.tags - [{id, name}, ...]
  * @param {Array} filterOptions.appType - [{id, name}, ...]
  */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ChevronDown } from 'react-bootstrap-icons';
 
 export default function FilterSidebar({ filters, onFilterChange, filterOptions = {} }) {
   // Track which sections are expanded
-  // Initialize based on active filters - expand sections that have active filters
-  const [expandedSections, setExpandedSections] = useState(() => {
-    return {
-      topics: (filters.topics && filters.topics.length > 0) || false,
-      appType: (filters.appType && filters.appType.length > 0) || false,
-      tags: (filters.tags && filters.tags.length > 0) || false
-    };
+  // Default all sections to expanded so users see all filter options
+  const [expandedSections, setExpandedSections] = useState({
+    topics: true,
+    appType: true,
+    tags: true
   });
-
-  // Auto-expand sections when filters are applied from URL or links
-  useEffect(() => {
-    setExpandedSections(prev => ({
-      topics: (filters.topics && filters.topics.length > 0) || prev.topics,
-      appType: (filters.appType && filters.appType.length > 0) || prev.appType,
-      tags: (filters.tags && filters.tags.length > 0) || prev.tags
-    }));
-  }, [filters]);
 
   // Build filter sections from API data (per mockup: Topics, Type, Tags)
   // Use term name as value for URL-friendly params (not UUIDs)

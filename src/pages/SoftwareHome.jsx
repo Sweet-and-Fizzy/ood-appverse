@@ -25,9 +25,6 @@ export default function SoftwareHome() {
     searchParams.get('search') || ''
   );
 
-  // Local state for filter visibility
-  const [showFilters, setShowFilters] = useState(true);
-
   // Parse filters from URL params
   const filters = useMemo(() => {
     const parsed = {};
@@ -43,6 +40,20 @@ export default function SoftwareHome() {
     }
     return parsed;
   }, [searchParams]);
+
+  // Check if any filter params exist in URL (excluding search)
+  const hasFilterParams = useMemo(() => {
+    for (const [key] of searchParams.entries()) {
+      if (key !== 'search') {
+        return true;
+      }
+    }
+    return false;
+  }, [searchParams]);
+
+  // Local state for filter visibility
+  // Default to hidden, but show if URL has filter params
+  const [showFilters, setShowFilters] = useState(hasFilterParams);
 
   // Handle search change
   const handleSearchChange = (query) => {
