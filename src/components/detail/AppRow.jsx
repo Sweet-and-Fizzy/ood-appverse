@@ -7,6 +7,7 @@
  * @param {boolean} isExpanded - Whether README is expanded
  * @param {Function} onToggle - Callback when toggle is clicked
  */
+import { useRef, useEffect, useState } from 'react';
 import { StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 
@@ -20,6 +21,21 @@ export default function AppRow({ app, isExpanded, onToggle }) {
   // Resolved taxonomy terms from API
   const organization = app.organization;
   const tags = app.tags || [];
+
+  // For smooth height animation of README panel
+  const readmeRef = useRef(null);
+  const [readmeHeight, setReadmeHeight] = useState(0);
+
+  // Measure and update height when expanded or content changes
+  // Use 350px max to match the inner panel's max-height
+  useEffect(() => {
+    if (isExpanded && readmeRef.current) {
+      const contentHeight = readmeRef.current.scrollHeight;
+      setReadmeHeight(Math.min(contentHeight, 350));
+    } else {
+      setReadmeHeight(0);
+    }
+  }, [isExpanded, readme]);
 
   // Format date as M/DD/YY per mockup style
   // field_appverse_lastupdated is a Unix timestamp in SECONDS, JS needs milliseconds
@@ -73,7 +89,8 @@ export default function AppRow({ app, isExpanded, onToggle }) {
           </div>
 
           {/* Right column: action buttons (VIEW REPO top, SHOW README bottom) */}
-          <div className="flex flex-col justify-between flex-shrink-0 min-h-[70px]">
+          {/* Fixed width prevents layout shift when button text changes */}
+          <div className="flex flex-col justify-between flex-shrink-0 min-h-[70px] w-[130px]">
             {githubUrl && (
               <a
                 href={githubUrl}
@@ -94,7 +111,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
                 className="inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto focus:outline-none"
               >
                 <span
-                  className={`w-5 h-5 rounded-full bg-appverse-red flex items-center justify-center transition-transform ${
+                  className={`w-5 h-5 rounded-full bg-appverse-red flex items-center justify-center transition-transform duration-200 ${
                     isExpanded ? 'rotate-90' : ''
                   }`}
                 >
@@ -110,10 +127,19 @@ export default function AppRow({ app, isExpanded, onToggle }) {
         </div>
       </div>
 
-      {/* README panel (expanded) - GitHub-style markdown rendering, dark mode */}
-      {isExpanded && readme && (
-        <div className="border-t border-gray-700 !p-5 bg-[#1e1e1e] max-h-[350px] overflow-y-auto">
-          <MarkdownRenderer content={readme} className="font-sans" darkMode />
+      {/* README panel - GitHub-style markdown rendering, dark mode */}
+      {/* Animated height transition for smooth expand/collapse */}
+      {readme && (
+        <div
+          className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
+          style={{ maxHeight: isExpanded ? `${readmeHeight}px` : '0px' }}
+        >
+          <div
+            ref={readmeRef}
+            className="border-t border-gray-700 !p-5 bg-[#1e1e1e] max-h-[350px] overflow-y-auto"
+          >
+            <MarkdownRenderer content={readme} className="font-sans" darkMode />
+          </div>
         </div>
       )}
     </div>
