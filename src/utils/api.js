@@ -9,6 +9,69 @@ import { logApiResponse } from './apiLogger';
 const DEFAULT_API_BASE_URL = '/api';
 const DEFAULT_SITE_BASE_URL = '';
 
+/**
+ * Rewrite an absolute Drupal URL to use the local API proxy
+ * e.g., https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/... -> /api/node/...
+ * @param {string} absoluteUrl - The full URL from links.next.href
+ * @param {string} apiBaseUrl - The local API base URL (e.g., '/api')
+ * @returns {string} The rewritten URL for local proxy
+ */
+function rewriteToProxyUrl(absoluteUrl, apiBaseUrl) {
+  try {
+    const url = new URL(absoluteUrl);
+    // Extract path after /jsonapi (e.g., /jsonapi/node/... -> /node/...)
+    const jsonApiPath = url.pathname.replace('/jsonapi', '');
+    return `${apiBaseUrl}${jsonApiPath}${url.search}`;
+  } catch {
+    // If it's already a relative URL, return as-is
+    return absoluteUrl;
+  }
+}
+
+/**
+ * Fetch all pages from a paginated JSON:API endpoint
+ * Follows links.next until all data is retrieved
+ * @param {string} initialUrl - The starting URL
+ * @param {string} logLabel - Label for logging
+ * @param {string} apiBaseUrl - The API base URL for rewriting pagination links
+ * @returns {Promise<{data: Array, included: Array}>} Merged data and included arrays
+ */
+async function fetchAllPages(initialUrl, logLabel, apiBaseUrl = DEFAULT_API_BASE_URL) {
+  let allData = [];
+  let allIncluded = [];
+  let nextUrl = initialUrl;
+  let pageNum = 1;
+
+  while (nextUrl) {
+    const response = await fetch(nextUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    logApiResponse(`${logLabel}_PAGE_${pageNum}`, nextUrl, result);
+
+    allData = allData.concat(result.data || []);
+    allIncluded = allIncluded.concat(result.included || []);
+
+    // Get next page URL if it exists, rewriting to use local proxy
+    const rawNextUrl = result.links?.next?.href || null;
+    nextUrl = rawNextUrl ? rewriteToProxyUrl(rawNextUrl, apiBaseUrl) : null;
+    pageNum++;
+  }
+
+  // Deduplicate included items by ID (same item may appear on multiple pages)
+  const includedMap = new Map();
+  for (const item of allIncluded) {
+    includedMap.set(item.id, item);
+  }
+
+  return {
+    data: allData,
+    included: Array.from(includedMap.values())
+  };
+}
+
 // Endpoint builders (now accept baseUrl parameter)
 const endpoints = {
   allSoftware: (baseUrl) => `${baseUrl}/node/appverse_software?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`,
@@ -31,17 +94,8 @@ export async function fetchAllSoftware(config = {}) {
   const url = endpoints.allSoftware(apiBaseUrl);
 
   try {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch software: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    logApiResponse('ALL_SOFTWARE_WITH_INCLUDES', url, data);
-
-    const softwareList = data.data || [];
-    const included = data.included || [];
+    // Fetch all pages of software (handles JSON:API pagination)
+    const { data: softwareList, included } = await fetchAllPages(url, 'ALL_SOFTWARE', apiBaseUrl);
 
     // Build a lookup map of all included items by ID
     const includedMap = {};
@@ -151,17 +205,8 @@ export async function fetchAllApps(config = {}) {
   const url = endpoints.allApps(apiBaseUrl);
 
   try {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch apps: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    logApiResponse('ALL_APPS_WITH_SOFTWARE', url, data);
-
-    const apps = data.data || [];
-    const included = data.included || [];
+    // Fetch all pages of apps (handles JSON:API pagination)
+    const { data: apps, included } = await fetchAllPages(url, 'ALL_APPS', apiBaseUrl);
 
     // Build a lookup map of included items by ID
     const includedMap = {};
