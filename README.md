@@ -120,6 +120,44 @@ In Drupal, create a Basic Page at `/appverse` with "Full HTML" text format. Clic
 
 **Cache busting:** The `@558a0d8` in the URL is a git commit hash. To get the latest version after updates, change it to the new commit hash or use `@main` (not recommended for production).
 
+### Deploying Updates to Drupal
+
+After making changes, follow these steps to deploy to the Drupal-embedded version:
+
+1. **Rebuild the dist files** (this is the step most often forgotten!):
+   ```bash
+   npm run build:lib
+   ```
+
+2. **Commit the rebuilt dist files**:
+   ```bash
+   git add dist/
+   git commit -m "chore: rebuild dist for CDN"
+   ```
+
+3. **Push to GitHub**:
+   ```bash
+   git push
+   ```
+
+4. **Get the new commit hash**:
+   ```bash
+   git rev-parse --short HEAD
+   ```
+   This returns a 7-character hash like `6dc82c2`.
+
+5. **Update Drupal embed code**: In Drupal, edit the `/appverse` page and update the commit hash in both the CSS and JS URLs:
+   ```
+   @OLD_HASH  →  @NEW_HASH
+   ```
+
+6. **Clear Drupal cache**: Go to `/admin/config/development/performance` and click "Clear all caches".
+
+**Troubleshooting:** If changes still don't appear:
+- Verify the dist files were included in the commit: `git show HEAD --stat | grep dist`
+- Try purging jsDelivr's cache by visiting: `https://purge.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@YOUR_HASH/dist/appverse.umd.js`
+- Add a query string to bust browser cache: `?v=2`
+
 **Twig template example (alternative):**
 
 ```twig
