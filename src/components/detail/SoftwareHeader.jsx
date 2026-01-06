@@ -116,15 +116,12 @@ export default function SoftwareHeader({ software }) {
       )}
 
       {/* Add a repo button with corner highlight decoration */}
-      <button
+      <a
+        href="/node/add/appverse_app"
         className="corner-highlight w-fit py-3 px-8 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
-        onClick={() => {
-          // TODO: Implement add repo functionality
-          alert('Add a repo functionality coming soon!');
-        }}
       >
         Add a repo
-      </button>
+      </a>
     </div>
   );
 }

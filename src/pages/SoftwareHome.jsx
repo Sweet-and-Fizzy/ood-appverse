@@ -167,18 +167,15 @@ export default function SoftwareHome() {
               Welcome to the Appverse
             </h1>
             <p className="text-base font-sans text-appverse-black max-w-2xl">
-              Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.
+              The Open OnDemand Appverse is a community-driven catalog of scientific software, interactive applications, dashboards, and widgets with shared deployment configurations that HPC centers can use to extend their Open OnDemand portals.
             </p>
           </div>
-          <button
+          <a
+            href="/node/add/appverse_app"
             className="flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
-            onClick={() => {
-              // TODO: Implement add app functionality
-              alert('Add an App functionality coming soon!');
-            }}
           >
             Add an app
-          </button>
+          </a>
         </div>
       </div>
 
