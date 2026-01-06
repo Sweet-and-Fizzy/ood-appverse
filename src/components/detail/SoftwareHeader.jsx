@@ -95,7 +95,7 @@ export default function SoftwareHeader({ software }) {
       {/* Description */}
       {description && (
         <div
-          className="text-sm font-sans text-appverse-black leading-relaxed mb-5 prose prose-sm max-w-none"
+          className="text-sm font-sans text-appverse-black leading-relaxed mb-4 prose prose-sm max-w-none"
           dangerouslySetInnerHTML={{ __html: description }}
         />
       )}
