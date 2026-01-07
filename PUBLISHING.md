@@ -2,6 +2,8 @@
 
 This document describes how to create a new release of the AppVerse Browser for CDN distribution via GitHub releases.
 
+At the moment, we are not even doing this.  We are just using short hashes in the CDN URLs.  See the README.md file for the current process.
+
 ## Overview
 
 AppVerse Browser is distributed via CDN using GitHub releases. The workflow does NOT use npm. Instead:
