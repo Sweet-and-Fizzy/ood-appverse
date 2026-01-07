@@ -13394,11 +13394,11 @@ function vx() {
   ] });
 }
 function Tx({ software: e, appsBySoftwareId: a, loading: r }) {
-  return console.log("[SoftwareGrid] Render - loading:", r, "| software count:", (e == null ? void 0 : e.length) ?? 0), r ? (console.log("[SoftwareGrid] Showing skeleton grid"), /* @__PURE__ */ B.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6", children: Array.from({ length: 8 }).map((i, s) => /* @__PURE__ */ B.jsx(vx, {}, s)) })) : !e || e.length === 0 ? /* @__PURE__ */ B.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
+  return console.log("[SoftwareGrid] Render - loading:", r, "| software count:", (e == null ? void 0 : e.length) ?? 0), r ? (console.log("[SoftwareGrid] Showing skeleton grid"), /* @__PURE__ */ B.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6", children: Array.from({ length: 10 }).map((i, s) => /* @__PURE__ */ B.jsx(vx, {}, s)) })) : !e || e.length === 0 ? /* @__PURE__ */ B.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
     /* @__PURE__ */ B.jsx("div", { className: "w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4", children: /* @__PURE__ */ B.jsx(Kd, { className: "w-10 h-10 text-gray-400" }) }),
     /* @__PURE__ */ B.jsx("h3", { className: "text-xl font-serif font-bold text-appverse-black mb-2", children: "No Software Found" }),
     /* @__PURE__ */ B.jsx("p", { className: "text-gray-600 font-sans text-center max-w-md", children: "No software matches your current filters. Try adjusting your search or clearing filters." })
-  ] }) : /* @__PURE__ */ B.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6", children: e.map((i) => {
+  ] }) : /* @__PURE__ */ B.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6", children: e.map((i) => {
     const s = (a[i.id] || []).length;
     return /* @__PURE__ */ B.jsx(
       Sx,
