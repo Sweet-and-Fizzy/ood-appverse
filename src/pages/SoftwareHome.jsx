@@ -6,7 +6,6 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppverseData } from '../hooks/useAppverseData';
 import { useSoftwareSearch } from '../hooks/useSoftwareSearch';
-import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
@@ -16,6 +15,9 @@ import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 export default function SoftwareHome() {
   // Get data from context
   const { software, appsBySoftwareId, filterOptions, loading, error, refetch } = useAppverseData();
+
+  // Debug: Log render timing
+  console.log('[SoftwareHome] Render - loading:', loading, '| software count:', software?.length ?? 0);
 
   // URL params for filter persistence
   const [searchParams, setSearchParams] = useSearchParams();
@@ -147,11 +149,6 @@ export default function SoftwareHome() {
     return filtered;
   }, [searchedSoftware, filters, appsBySoftwareId]);
 
-  // Show loading state
-  if (loading) {
-    return <LoadingSpinner message="Loading software..." />;
-  }
-
   // Show error state
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch} />;
@@ -224,6 +221,7 @@ export default function SoftwareHome() {
             <SoftwareGrid
               software={filteredSoftware}
               appsBySoftwareId={appsBySoftwareId}
+              loading={loading}
             />
           </main>
         </div>
