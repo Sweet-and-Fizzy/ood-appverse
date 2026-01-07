@@ -18,8 +18,8 @@ export default function SoftwareGrid({ software, appsBySoftwareId, loading }) {
   if (loading) {
     console.log('[SoftwareGrid] Showing skeleton grid');
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {Array.from({ length: 8 }).map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+        {Array.from({ length: 10 }).map((_, i) => (
           <SkeletonTile key={i} />
         ))}
       </div>
@@ -43,7 +43,7 @@ export default function SoftwareGrid({ software, appsBySoftwareId, loading }) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
       {software.map((softwareItem) => {
         const appCount = (appsBySoftwareId[softwareItem.id] || []).length;
 
