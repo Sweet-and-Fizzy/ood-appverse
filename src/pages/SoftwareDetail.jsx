@@ -3,8 +3,11 @@
  * Displays software details and list of implementing apps
  *
  * Supports two URL patterns:
- * - /appverse/software/:id - UUID-based (backward compatibility)
- * - /appverse/:slug - Slug-based (e.g., /appverse/abaqus)
+ * - /software/:id - UUID-based (backward compatibility)
+ * - /:slug - Slug-based (e.g., /abaqus)
+ *
+ * Query params:
+ * - ?app=<slug|uuid> - Expands the README for a specific app
  */
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
