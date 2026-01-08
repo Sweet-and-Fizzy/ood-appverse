@@ -79,17 +79,17 @@ export function AppverseDataProvider({ children }) {
    * Fetch all data from API
    */
   const fetchData = async () => {
-    console.log('[AppverseDataContext] Starting fetch...');
+    // console.log('[AppverseDataContext] Starting fetch...');
     setData(prev => ({ ...prev, loading: true, error: null }));
 
     try {
       // Fetch both endpoints in parallel
-      console.log('[AppverseDataContext] Fetching software and apps...');
+      // console.log('[AppverseDataContext] Fetching software and apps...');
       const [softwareResult, appsResult] = await Promise.all([
         fetchAllSoftware(config),
         fetchAllApps(config)
       ]);
-      console.log('[AppverseDataContext] Fetch complete - software:', softwareResult.software.length, 'apps:', appsResult.apps.length);
+      // console.log('[AppverseDataContext] Fetch complete - software:', softwareResult.software.length, 'apps:', appsResult.apps.length);
 
       // Extract software and filter options from the result
       const { software, included: softwareIncluded } = softwareResult;

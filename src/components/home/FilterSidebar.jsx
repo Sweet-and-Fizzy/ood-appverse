@@ -34,47 +34,47 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
 
     const hasActiveFilters = Object.keys(filters).some(key => filters[key]?.length > 0);
     if (!hasActiveFilters) {
-      console.log('[FilterSidebar] No active filters, skipping scroll');
+      // console.log('[FilterSidebar] No active filters, skipping scroll');
       return;
     }
 
     // Check if filterOptions has data (needed for checkboxes to exist)
     const hasFilterOptions = Object.keys(filterOptions).some(key => filterOptions[key]?.length > 0);
     if (!hasFilterOptions) {
-      console.log('[FilterSidebar] No filter options yet, waiting...');
+      // console.log('[FilterSidebar] No filter options yet, waiting...');
       return;
     }
 
-    console.log('[FilterSidebar] Attempting scroll - filters:', filters, 'filterOptions keys:', Object.keys(filterOptions));
+    // console.log('[FilterSidebar] Attempting scroll - filters:', filters, 'filterOptions keys:', Object.keys(filterOptions));
 
     // Use requestAnimationFrame to ensure DOM has painted, then a small delay for Drupal
     const attemptScroll = () => {
-      console.log('[FilterSidebar] Running scroll attempt');
+      // console.log('[FilterSidebar] Running scroll attempt');
       let scrolledAny = false;
 
       Object.keys(filters).forEach(sectionKey => {
         const container = scrollContainerRefs.current[sectionKey];
-        console.log(`[FilterSidebar] Section "${sectionKey}" - container:`, !!container);
+        // console.log(`[FilterSidebar] Section "${sectionKey}" - container:`, !!container);
 
         if (!container) return;
 
         // Find the first selected value for this section
         const firstValue = filters[sectionKey]?.[0];
         if (!firstValue) {
-          console.log(`[FilterSidebar] Section "${sectionKey}" - no first value`);
+          // console.log(`[FilterSidebar] Section "${sectionKey}" - no first value`);
           return;
         }
 
         // Find the checkbox with this value and scroll its label into view
         const selector = `input[data-value="${CSS.escape(firstValue)}"]`;
         const checkbox = container.querySelector(selector);
-        console.log(`[FilterSidebar] Section "${sectionKey}" - looking for "${firstValue}", found:`, !!checkbox);
+        // console.log(`[FilterSidebar] Section "${sectionKey}" - looking for "${firstValue}", found:`, !!checkbox);
 
         if (checkbox) {
           const label = checkbox.closest('label');
           if (label) {
             label.scrollIntoView({ block: 'center', behavior: 'instant' });
-            console.log(`[FilterSidebar] Scrolled "${firstValue}" into view in section "${sectionKey}"`);
+            // console.log(`[FilterSidebar] Scrolled "${firstValue}" into view in section "${sectionKey}"`);
             scrolledAny = true;
           }
         }

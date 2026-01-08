@@ -17,7 +17,7 @@ export default function SoftwareHome() {
   const { software, appsBySoftwareId, filterOptions, loading, error, refetch } = useAppverseData();
 
   // Debug: Log render timing
-  console.log('[SoftwareHome] Render - loading:', loading, '| software count:', software?.length ?? 0);
+  // console.log('[SoftwareHome] Render - loading:', loading, '| software count:', software?.length ?? 0);
 
   // URL params for filter persistence
   const [searchParams, setSearchParams] = useSearchParams();

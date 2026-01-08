@@ -12,11 +12,11 @@ import { Search } from 'react-bootstrap-icons';
 
 export default function SoftwareGrid({ software, appsBySoftwareId, loading }) {
   // Debug: Log render state
-  console.log('[SoftwareGrid] Render - loading:', loading, '| software count:', software?.length ?? 0);
+  // console.log('[SoftwareGrid] Render - loading:', loading, '| software count:', software?.length ?? 0);
 
   // Show skeleton grid while loading
   if (loading) {
-    console.log('[SoftwareGrid] Showing skeleton grid');
+    // console.log('[SoftwareGrid] Showing skeleton grid');
     return (
       <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(199px, 1fr))' }}>
         {Array.from({ length: 10 }).map((_, i) => (

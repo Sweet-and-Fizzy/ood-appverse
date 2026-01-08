@@ -3,7 +3,7 @@
  * Handles JSON:API interactions with Drupal backend
  */
 
-import { logApiResponse } from './apiLogger';
+// import { logApiResponse } from './apiLogger';
 
 // Default configuration (can be overridden via config parameter)
 const DEFAULT_API_BASE_URL = '/api';
@@ -36,7 +36,7 @@ function rewriteToProxyUrl(absoluteUrl, apiBaseUrl) {
  * @param {string} apiBaseUrl - The API base URL for rewriting pagination links
  * @returns {Promise<{data: Array, included: Array}>} Merged data and included arrays
  */
-async function fetchAllPages(initialUrl, logLabel, apiBaseUrl = DEFAULT_API_BASE_URL) {
+async function fetchAllPages(initialUrl, _logLabel, apiBaseUrl = DEFAULT_API_BASE_URL) {
   let allData = [];
   let allIncluded = [];
   let nextUrl = initialUrl;
@@ -49,7 +49,7 @@ async function fetchAllPages(initialUrl, logLabel, apiBaseUrl = DEFAULT_API_BASE
     }
 
     const result = await response.json();
-    logApiResponse(`${logLabel}_PAGE_${pageNum}`, nextUrl, result);
+    // logApiResponse(`${logLabel}_PAGE_${pageNum}`, nextUrl, result);
 
     allData = allData.concat(result.data || []);
     allIncluded = allIncluded.concat(result.included || []);
@@ -122,7 +122,7 @@ export async function fetchAllSoftware(config = {}) {
         const fileUrl = endpoints.fileById(apiBaseUrl, fileRelationshipId);
         const fileResponse = await fetch(fileUrl);
         const fileData = await fileResponse.json();
-        logApiResponse('FILE_BY_ID', fileUrl, fileData);
+        // logApiResponse('FILE_BY_ID', fileUrl, fileData);
         return {
           mediaId,
           fileUrl: fileData.data?.attributes?.uri?.url || null
@@ -339,7 +339,7 @@ export async function fetchSoftwareById(id, config = {}) {
     }
 
     const data = await response.json();
-    logApiResponse('SOFTWARE_BY_ID_WITH_INCLUDES', url, data);
+    // logApiResponse('SOFTWARE_BY_ID_WITH_INCLUDES', url, data);
     const software = data.data;
     const included = data.included || [];
 
@@ -361,7 +361,7 @@ export async function fetchSoftwareById(id, config = {}) {
           const fileEndpoint = endpoints.fileById(apiBaseUrl, fileRelationshipId);
           const fileResponse = await fetch(fileEndpoint);
           const fileData = await fileResponse.json();
-          logApiResponse('FILE_BY_ID', fileEndpoint, fileData);
+          // logApiResponse('FILE_BY_ID', fileEndpoint, fileData);
           const fileUrl = fileData.data?.attributes?.uri?.url;
           if (fileUrl) {
             logoUrl = `${siteBaseUrl}${fileUrl}`;
@@ -430,7 +430,7 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
     }
 
     const data = await response.json();
-    logApiResponse('APPS_BY_SOFTWARE_ID_WITH_INCLUDES', url, data);
+    // logApiResponse('APPS_BY_SOFTWARE_ID_WITH_INCLUDES', url, data);
 
     const apps = data.data || [];
     const included = data.included || [];
