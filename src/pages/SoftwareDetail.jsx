@@ -185,7 +185,8 @@ export default function SoftwareDetail() {
   };
 
   // Show loading state
-  if (loading) {
+  // Also show spinner while context is loading for slug routes (needed to resolve slug → UUID)
+  if (loading || (isSlugRoute && contextLoading)) {
     return <LoadingSpinner message="Loading software details..." />;
   }
 

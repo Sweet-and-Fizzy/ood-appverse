@@ -44532,7 +44532,7 @@ function OT() {
     }
     Pc(P, s).then((W) => g(W)).catch((W) => v(W)).finally(() => E(!1)), kv(P, s).then((W) => b(W)).catch((W) => console.error("Failed to fetch apps:", W));
   };
-  return h ? /* @__PURE__ */ B.jsx(Ax, { message: "Loading software details..." }) : S ? /* @__PURE__ */ B.jsx(cA, { error: S, onRetry: L }) : p ? /* @__PURE__ */ B.jsx("div", { className: "min-h-screen bg-white", children: /* @__PURE__ */ B.jsxs("div", { className: "px-6 py-8", children: [
+  return h || w && c ? /* @__PURE__ */ B.jsx(Ax, { message: "Loading software details..." }) : S ? /* @__PURE__ */ B.jsx(cA, { error: S, onRetry: L }) : p ? /* @__PURE__ */ B.jsx("div", { className: "min-h-screen bg-white", children: /* @__PURE__ */ B.jsxs("div", { className: "px-6 py-8", children: [
     /* @__PURE__ */ B.jsxs(
       cl,
       {
