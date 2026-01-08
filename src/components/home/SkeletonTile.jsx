@@ -4,7 +4,7 @@
  */
 export default function SkeletonTile() {
   return (
-    <div className="flex flex-col items-center gap-4 border-gray-200 border-2 rounded-lg p-6 bg-white h-[199px] min-w-[199px] animate-pulse">
+    <div className="flex flex-col items-center gap-4 border-gray-200 border-2 rounded-lg p-6 bg-white h-[199px] animate-pulse">
       {/* Logo placeholder */}
       <div className="h-[60px] w-full flex items-center justify-center">
         <div className="w-16 h-16 rounded-lg bg-gray-200" />
