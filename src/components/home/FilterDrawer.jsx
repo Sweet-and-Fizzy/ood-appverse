@@ -6,6 +6,7 @@
 import { useEffect } from 'react';
 import { X } from 'react-bootstrap-icons';
 import FilterSidebar from './FilterSidebar';
+import { useFixedHeaderOffset } from '../../hooks/useFixedHeaderOffset';
 
 export default function FilterDrawer({
   isOpen,
@@ -14,6 +15,9 @@ export default function FilterDrawer({
   onFilterChange,
   filterOptions
 }) {
+  // Detect fixed header (e.g., Drupal navbar) to offset drawer position
+  const headerOffset = useFixedHeaderOffset();
+
   // Prevent body scroll when drawer is open on mobile
   useEffect(() => {
     if (isOpen) {
@@ -44,12 +48,16 @@ export default function FilterDrawer({
       {/* Backdrop - mobile only */}
       <div
         className="lg:hidden fixed inset-0 bg-black/50 z-40"
+        style={{ top: headerOffset }}
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Drawer panel - mobile only */}
-      <div className="lg:hidden fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-white shadow-xl flex flex-col">
+      <div
+        className="lg:hidden fixed left-0 bottom-0 z-50 w-80 max-w-[85vw] bg-white shadow-xl flex flex-col"
+        style={{ top: headerOffset }}
+      >
         {/* Drawer header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
           <h2 className="text-lg font-serif font-bold text-gray-900">Filters</h2>
