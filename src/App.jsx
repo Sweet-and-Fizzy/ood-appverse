@@ -26,9 +26,7 @@ export default function App() {
         <main>
           <Routes>
             <Route path="/" element={<SoftwareHome />} />
-            {/* UUID route (backward compatibility) */}
-            <Route path="/software/:id" element={<SoftwareDetail />} />
-            {/* Slug route: /abaqus → looks up "abaqus" in slugMap */}
+            {/* Slug route: /gimp → looks up "gimp" in slugMap */}
             <Route path="/:slug" element={<SoftwareDetail />} />
             {/* Legacy route redirects: /appverse/* → /* */}
             <Route path="/appverse/*" element={<LegacyRedirect />} />

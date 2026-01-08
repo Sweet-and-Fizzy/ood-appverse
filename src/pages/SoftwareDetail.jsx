@@ -2,9 +2,7 @@
  * SoftwareDetail Page
  * Displays software details and list of implementing apps
  *
- * Supports two URL patterns:
- * - /software/:id - UUID-based (backward compatibility)
- * - /:slug - Slug-based (e.g., /abaqus)
+ * URL pattern: /:slug (e.g., /gimp)
  *
  * Query params:
  * - ?app=<slug|uuid> - Expands the README for a specific app
@@ -29,8 +27,7 @@ function isUUID(str) {
 }
 
 export default function SoftwareDetail() {
-  // Route can provide either :id (UUID) or :slug
-  const { id, slug } = useParams();
+  const { slug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Get config for API calls
@@ -47,11 +44,8 @@ export default function SoftwareDetail() {
   // Get expanded app param from URL (could be UUID or slug)
   const expandedAppParam = searchParams.get('app');
 
-  // Determine the software UUID
-  // If we have :id param, use it directly
-  // If we have :slug param and it's not a UUID, look it up in slugMap
-  const identifier = id || slug;
-  const isSlugRoute = slug && !isUUID(slug);
+  // Slug could be a human-readable slug (e.g., "gimp") or a UUID for backward compat
+  const isSlugLookup = slug && !isUUID(slug);
 
   // Fetch software and apps data
   useEffect(() => {
@@ -60,15 +54,15 @@ export default function SoftwareDetail() {
       setError(null);
 
       try {
-        let softwareId = identifier;
+        let softwareId = slug;
         let softwareData = null;
 
-        if (isSlugRoute) {
+        if (isSlugLookup) {
           // Wait for context to load before looking up slug
           if (contextLoading) return;
 
           // Look up software by slug from context
-          const contextSoftware = getSoftwareBySlug(identifier);
+          const contextSoftware = getSoftwareBySlug(slug);
           if (!contextSoftware) {
             setSoftware(null);
             setApps([]);
@@ -97,10 +91,10 @@ export default function SoftwareDetail() {
       }
     }
 
-    if (identifier) {
+    if (slug) {
       fetchData();
     }
-  }, [identifier, isSlugRoute, contextLoading, getSoftwareBySlug, config]);
+  }, [slug, isSlugLookup, contextLoading, getSoftwareBySlug, config]);
 
   // Build app slug maps for URL-friendly ?app= params
   // Format: "org-name--app-title" or just "app-title" if no org
@@ -162,9 +156,9 @@ export default function SoftwareDetail() {
     setError(null);
 
     // Determine software ID (from slug if needed)
-    let softwareId = identifier;
-    if (isSlugRoute) {
-      const contextSoftware = getSoftwareBySlug(identifier);
+    let softwareId = slug;
+    if (isSlugLookup) {
+      const contextSoftware = getSoftwareBySlug(slug);
       if (!contextSoftware) {
         setError(new Error('Software not found'));
         setLoading(false);
@@ -186,7 +180,7 @@ export default function SoftwareDetail() {
 
   // Show loading state
   // Also show spinner while context is loading for slug routes (needed to resolve slug → UUID)
-  if (loading || (isSlugRoute && contextLoading)) {
+  if (loading || (isSlugLookup && contextLoading)) {
     return <LoadingSpinner message="Loading software details..." />;
   }
 
