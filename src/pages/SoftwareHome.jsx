@@ -9,6 +9,7 @@ import { useSoftwareSearch } from '../hooks/useSoftwareSearch';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
+import FilterDrawer from '../components/home/FilterDrawer';
 import SoftwareGrid from '../components/home/SoftwareGrid';
 import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
@@ -158,7 +159,7 @@ export default function SoftwareHome() {
     <div className="min-h-screen bg-white">
       {/* Header section */}
       <div className="mx-6 mt-6 mb-4">
-        <div className="flex items-start justify-between gap-8">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
           <div className="flex-1">
             <h1 className="text-3xl font-serif font-bold text-appverse-black mb-2">
               Welcome to the Appverse
@@ -169,7 +170,7 @@ export default function SoftwareHome() {
           </div>
           <a
             href="/node/add/appverse_app"
-            className="flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
+            className="w-full lg:w-auto text-center lg:flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
           >
             Add an app
           </a>
@@ -203,16 +204,27 @@ export default function SoftwareHome() {
         </div>
       </div>
 
+      {/* Mobile filter drawer */}
+      <FilterDrawer
+        isOpen={showFilters}
+        onClose={() => setShowFilters(false)}
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        filterOptions={filterOptions}
+      />
+
       {/* Main content: Sidebar + Grid */}
       <div className="mx-6 mb-6">
         <div className="flex gap-8">
-          {/* Filter sidebar */}
+          {/* Filter sidebar - desktop only (hidden on mobile, drawer handles it) */}
           {showFilters && (
-            <FilterSidebar
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              filterOptions={filterOptions}
-            />
+            <div className="hidden lg:block">
+              <FilterSidebar
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                filterOptions={filterOptions}
+              />
+            </div>
           )}
 
           {/* Software grid */}

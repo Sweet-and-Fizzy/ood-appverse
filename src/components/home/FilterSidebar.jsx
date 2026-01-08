@@ -12,7 +12,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'react-bootstrap-icons';
 
-export default function FilterSidebar({ filters, onFilterChange, filterOptions = {} }) {
+export default function FilterSidebar({ filters, onFilterChange, filterOptions = {}, isInDrawer = false }) {
   // Track which sections are expanded (header collapse/expand)
   // Default all sections to expanded so users see all filter options
   const [expandedSections, setExpandedSections] = useState({
@@ -153,75 +153,87 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
     return (filters[sectionKey] || []).includes(optionValue);
   };
 
+  // Filter content - shared between drawer and sidebar modes
+  const filterContent = (
+    <>
+      {filterSections.map((section) => {
+        const isExpanded = expandedSections[section.key];
+
+        return (
+          <div key={section.key} className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => setExpandedSections({
+                ...expandedSections,
+                [section.key]: !isExpanded
+              })}
+              className="w-full flex items-center justify-between bg-gray-100 px-4 py-2 hover:bg-gray-200 transition-colors"
+            >
+              <h3 className="text-base font-serif font-bold text-gray-900">
+                {section.title} ({section.options.length})
+              </h3>
+              <ChevronDown
+                className={`w-4 h-4 text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {isExpanded && (
+              <div
+                ref={el => scrollContainerRefs.current[section.key] = el}
+                className={`px-4 py-3 space-y-2 ${section.options.length > SCROLL_THRESHOLD ? 'max-h-64 overflow-y-auto' : ''}`}
+              >
+                {section.options.map((option) => {
+                  const checked = isChecked(section.key, option.value);
+
+                  return (
+                    <label
+                      key={option.value}
+                      className="flex items-center cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        data-value={option.value}
+                        checked={checked}
+                        onChange={(e) => handleCheckboxChange(
+                          section.key,
+                          option.value,
+                          e.target.checked
+                        )}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                      <span className="ml-3 text-sm font-sans text-gray-900">
+                        {option.label}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Clear filters button (only show if filters are active) */}
+      {Object.keys(filters).some(key => filters[key]?.length > 0) && (
+        <button
+          onClick={() => onFilterChange({})}
+          className="w-full mt-4 px-4 py-2 text-sm font-sans font-semibold text-appverse-red border-2 border-appverse-red rounded-appverse hover:bg-appverse-pink transition-colors"
+        >
+          Clear All Filters
+        </button>
+      )}
+    </>
+  );
+
+  // When inside drawer, just render the content without wrapper
+  if (isInDrawer) {
+    return filterContent;
+  }
+
+  // Desktop: render with sticky sidebar wrapper
   return (
     <aside className="w-64 flex-shrink-0">
       <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pr-2">
-
-        {filterSections.map((section) => {
-          const isExpanded = expandedSections[section.key];
-
-          return (
-            <div key={section.key} className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setExpandedSections({
-                  ...expandedSections,
-                  [section.key]: !isExpanded
-                })}
-                className="w-full flex items-center justify-between bg-gray-100 px-4 py-2 hover:bg-gray-200 transition-colors"
-              >
-                <h3 className="text-base font-serif font-bold text-gray-900">
-                  {section.title} ({section.options.length})
-                </h3>
-                <ChevronDown
-                  className={`w-4 h-4 text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {isExpanded && (
-                <div
-                  ref={el => scrollContainerRefs.current[section.key] = el}
-                  className={`px-4 py-3 space-y-2 ${section.options.length > SCROLL_THRESHOLD ? 'max-h-64 overflow-y-auto' : ''}`}
-                >
-                  {section.options.map((option) => {
-                    const checked = isChecked(section.key, option.value);
-
-                    return (
-                      <label
-                        key={option.value}
-                        className="flex items-center cursor-pointer group"
-                      >
-                        <input
-                          type="checkbox"
-                          data-value={option.value}
-                          checked={checked}
-                          onChange={(e) => handleCheckboxChange(
-                            section.key,
-                            option.value,
-                            e.target.checked
-                          )}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-                        <span className="ml-3 text-sm font-sans text-gray-900">
-                          {option.label}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-
-        {/* Clear filters button (only show if filters are active) */}
-        {Object.keys(filters).some(key => filters[key]?.length > 0) && (
-          <button
-            onClick={() => onFilterChange({})}
-            className="w-full mt-4 px-4 py-2 text-sm font-sans font-semibold text-appverse-red border-2 border-appverse-red rounded-appverse hover:bg-appverse-pink transition-colors"
-          >
-            Clear All Filters
-          </button>
-        )}
+        {filterContent}
       </div>
     </aside>
   );
