@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start dev server at http://localhost:3000/appverse/ |
+| `npm run dev` | Start dev server at http://localhost:3000/#/appverse/ |
 | `npm run build` | Build standard app |
 | `npm run build:lib` | Build embeddable UMD/ES bundle to dist/ |
 | `npm run serve:demo` | Build library and serve demo at http://localhost:3000/demo/index.html |
@@ -20,7 +20,7 @@ AppVerse Browser is an embeddable React app for browsing Open OnDemand software 
 - **Development** (`src/main.jsx`): Standard Vite dev entry
 - **Library** (`src/lib/index.js` → `src/lib/mount.jsx`): CDN/UMD entry that exports `mount()` function
 
-Both use BrowserRouter. The widget reads and syncs with the browser URL at `/appverse/*` paths.
+Both use HashRouter. The widget reads and syncs with the URL hash at `/#/appverse/*` paths. Hash routing avoids conflicts with server-side routing (e.g., Drupal).
 
 ### Data Flow
 
@@ -40,8 +40,9 @@ Data is globally available via `useAppverseData()` hook. The context resolves lo
 
 | Path | Component |
 |------|-----------|
-| `/appverse/` | SoftwareHome - Grid with FilterSidebar, search syncs to URL params |
-| `/appverse/software/:id` | SoftwareDetail - Detail view with AppList |
+| `/#/appverse/` | SoftwareHome - Grid with FilterSidebar, search syncs to URL params |
+| `/#/appverse/:slug` | SoftwareDetail - Detail view with AppList (slug-based) |
+| `/#/appverse/software/:id` | SoftwareDetail - Detail view with AppList (UUID-based, backward compat) |
 
 ### API Proxy
 

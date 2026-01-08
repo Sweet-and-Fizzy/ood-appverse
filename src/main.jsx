@@ -1,10 +1,11 @@
 /**
  * Development entry point (npm run dev)
- * Uses BrowserRouter for normal browser routing (URL bar updates)
+ * Uses HashRouter for hash-based routing (e.g., /#/appverse/abaqus)
+ * Hash routing avoids conflicts with server-side routing (e.g., Drupal)
  */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 import App from './App'
 import { ConfigProvider } from './contexts/ConfigContext'
 import './fonts.css'
@@ -18,10 +19,10 @@ const config = {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <ConfigProvider config={config}>
         <App />
       </ConfigProvider>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>
 )
