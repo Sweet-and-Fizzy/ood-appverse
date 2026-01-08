@@ -155,7 +155,7 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
 
   return (
     <aside className="w-64 flex-shrink-0">
-      <div className="sticky top-4">
+      <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pr-2">
 
         {filterSections.map((section) => {
           const isExpanded = expandedSections[section.key];
