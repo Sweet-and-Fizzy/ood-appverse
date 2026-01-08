@@ -9,11 +9,11 @@ npm install
 npm run dev
 ```
 
-Visit `http://localhost:3000/#/appverse/`
+Visit `http://localhost:3000/#/`
 
 ## Live Demo
 
-https://ood-appverse-react.netlify.app/appverse/
+https://ood-appverse-react.netlify.app/#/
 
 ## Available Scripts
 
@@ -30,9 +30,9 @@ Uses hash-based routing to avoid conflicts with server-side routing (e.g., Drupa
 
 | Route | Component | Purpose |
 |-------|-----------|---------|
-| `/#/appverse/` | SoftwareHome | Main grid view with search and filters. |
-| `/#/appverse/:slug` | SoftwareDetail | Software detail by slug (e.g., `/#/appverse/abaqus`). |
-| `/#/appverse/software/:uuid` | SoftwareDetail | Software detail by UUID (backward compatibility). |
+| `/#/` | SoftwareHome | Main grid view with search and filters. |
+| `/#/:slug` | SoftwareDetail | Software detail by slug (e.g., `/#/abaqus`). |
+| `/#/software/:uuid` | SoftwareDetail | Software detail by UUID (backward compatibility). |
 
 **Slugs** are generated from software titles: `"AlphaFold"` → `alphafold`, `"LAMMPS"` → `lammps`.
 
@@ -40,10 +40,10 @@ Uses hash-based routing to avoid conflicts with server-side routing (e.g., Drupa
 
 | Page | Param | Purpose | Example |
 |------|-------|---------|---------|
-| Grid | `?topics=` | Filter by science domain | `/#/appverse/?topics=Materials+Science` |
-| Grid | `?type=` | Filter by app type | `/#/appverse/?type=Interactive+Apps` |
-| Grid | `?tags=` | Filter by tag | `/#/appverse/?tags=singularity` |
-| Detail | `?app=` | Expand README for specific app | `/#/appverse/alphafold?app=icds-roar-ood--bc-osc-alphafold` |
+| Grid | `?topics=` | Filter by science domain | `/#/?topics=Materials+Science` |
+| Grid | `?type=` | Filter by app type | `/#/?type=Interactive+Apps` |
+| Grid | `?tags=` | Filter by tag | `/#/?tags=singularity` |
+| Detail | `?app=` | Expand README for specific app | `/#/alphafold?app=icds-roar-ood--bc-osc-alphafold` |
 
 Filter values use term **names** (not UUIDs). Multiple values: `?tags=singularity&tags=gpu`.
 
@@ -68,7 +68,7 @@ function MyApp() {
 
 ### CDN Embed
 
-**Important:** Widget uses hash-based routing (`/#/appverse/...`). The server only needs to serve ONE page—all navigation happens via URL hash.
+**Important:** Widget uses hash-based routing (`/#/...`). The server only needs to serve ONE page—all navigation happens via URL hash.
 
 ```html
 <div id="appverse"></div>
@@ -95,9 +95,9 @@ With hash-based routing, Drupal only needs ONE page. All navigation happens via 
 | `/appverse` | Everything! Hash routing handles the rest |
 
 Example URLs (all served by the same Drupal page):
-- `/appverse/#/appverse/` → Software grid
-- `/appverse/#/appverse/abaqus` → Abaqus detail page
-- `/appverse/#/appverse/?tags=gpu` → Filtered grid
+- `/appverse#/` → Software grid
+- `/appverse#/abaqus` → Abaqus detail page
+- `/appverse#/?tags=gpu` → Filtered grid
 
 **Linking from Drupal content:**
 
@@ -105,10 +105,10 @@ When creating links to specific views within Drupal (menus, content, etc.), use 
 
 | To link to... | Use this URL |
 |---------------|--------------|
-| Software grid | `/appverse/#/appverse/` |
-| Specific software | `/appverse/#/appverse/abaqus` |
-| Filtered grid | `/appverse/#/appverse/?topics=Materials+Science` |
-| Software with app README open | `/appverse/#/appverse/alphafold?app=org-name--app-title` |
+| Software grid | `/appverse#/` |
+| Specific software | `/appverse#/abaqus` |
+| Filtered grid | `/appverse#/?topics=Materials+Science` |
+| Software with app README open | `/appverse#/alphafold?app=org-name--app-title` |
 
 The `#` is required—it tells the browser to let the React widget handle routing instead of Drupal.
 
@@ -192,9 +192,9 @@ After making changes, follow these steps to deploy to the Drupal-embedded versio
 ```
 
 **How it works:**
-1. User visits `/appverse/` → Drupal serves the template → Widget shows grid at `/#/appverse/`
-2. User clicks a tile → URL hash changes to `/#/appverse/abaqus` (no page reload, Drupal unaware)
-3. User shares link `/appverse/#/appverse/abaqus` → Drupal serves same template → Widget reads hash and shows detail
+1. User visits `/appverse` → Drupal serves the template → Widget shows grid at `#/`
+2. User clicks a tile → URL hash changes to `#/abaqus` (no page reload, Drupal unaware)
+3. User shares link `/appverse#/abaqus` → Drupal serves same template → Widget reads hash and shows detail
 
 **Note:** All navigation happens via hash changes, which never trigger server requests. Drupal is only involved on initial page load.
 
@@ -221,21 +221,21 @@ The widget uses React Router with `HashRouter`:
 
 | URL | What Shows |
 |-----|------------|
-| `/appverse/#/appverse/` | Grid with all software |
-| `/appverse/#/appverse/?topics=Materials+Science` | Grid filtered by topic |
-| `/appverse/#/appverse/abaqus` | Abaqus detail page (slug route) |
-| `/appverse/#/appverse/alphafold?app=icds-roar-ood--bc-osc-alphafold` | Detail with README expanded |
-| `/appverse/#/appverse/software/097bde81-...` | Detail by UUID (backward compat) |
+| `/appverse#/` | Grid with all software |
+| `/appverse#/?topics=Materials+Science` | Grid filtered by topic |
+| `/appverse#/abaqus` | Abaqus detail page (slug route) |
+| `/appverse#/alphafold?app=icds-roar-ood--bc-osc-alphafold` | Detail with README expanded |
+| `/appverse#/software/097bde81-...` | Detail by UUID (backward compat) |
 
-**Unmatched routes** redirect to `/#/appverse/`.
+**Unmatched routes** redirect to `#/`.
 
 ## Project Structure
 
 ```
 src/
 ├── pages/
-│   ├── SoftwareHome.jsx       # /appverse/
-│   └── SoftwareDetail.jsx     # /appverse/software/:id
+│   ├── SoftwareHome.jsx       # /
+│   └── SoftwareDetail.jsx     # /:slug or /software/:id
 ├── lib/
 │   └── mount.jsx              # CDN entry point
 ├── App.jsx                    # Routes

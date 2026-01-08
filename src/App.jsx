@@ -13,13 +13,13 @@ export default function App() {
       <div className="appverse-container">
         <main>
           <Routes>
-            <Route path="/appverse/" element={<SoftwareHome />} />
+            <Route path="/" element={<SoftwareHome />} />
             {/* UUID route (backward compatibility) */}
-            <Route path="/appverse/software/:id" element={<SoftwareDetail />} />
-            {/* Slug route: /appverse/abaqus → looks up "abaqus" in slugMap */}
-            <Route path="/appverse/:slug" element={<SoftwareDetail />} />
+            <Route path="/software/:id" element={<SoftwareDetail />} />
+            {/* Slug route: /abaqus → looks up "abaqus" in slugMap */}
+            <Route path="/:slug" element={<SoftwareDetail />} />
             {/* Catch-all: redirect any unmatched route to main page */}
-            <Route path="*" element={<Navigate to="/appverse/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>

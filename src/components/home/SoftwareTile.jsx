@@ -26,7 +26,7 @@ export default function SoftwareTile({ software, appCount = 0 }) {
 
   return (
     <Link
-      to={`/appverse/${slug}`}
+      to={`/${slug}`}
       className="block group"
     >
       <div className="flex flex-col items-center gap-4 border-appverse-black border-2 rounded-lg p-6 bg-white h-[199px] hover:border-red-500 transition-all duration-200">

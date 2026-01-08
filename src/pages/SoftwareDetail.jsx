@@ -210,7 +210,7 @@ export default function SoftwareDetail() {
       <div className="px-6 py-8">
         {/* Back link */}
         <Link
-          to="/appverse/"
+          to="/"
           className="inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors mb-6"
         >
           <svg

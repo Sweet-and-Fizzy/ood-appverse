@@ -1,6 +1,6 @@
 /**
  * Development entry point (npm run dev)
- * Uses HashRouter for hash-based routing (e.g., /#/appverse/abaqus)
+ * Uses HashRouter for hash-based routing (e.g., /#/abaqus)
  * Hash routing avoids conflicts with server-side routing (e.g., Drupal)
  */
 import { StrictMode } from 'react'

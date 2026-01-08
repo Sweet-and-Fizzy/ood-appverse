@@ -13411,7 +13411,7 @@ function Ex({ software: e, appCount: a = 0 }) {
   return /* @__PURE__ */ F.jsx(
     cl,
     {
-      to: `/appverse/${s}`,
+      to: `/${s}`,
       className: "block group",
       children: /* @__PURE__ */ F.jsxs("div", { className: "flex flex-col items-center gap-4 border-appverse-black border-2 rounded-lg p-6 bg-white h-[199px] hover:border-red-500 transition-all duration-200", children: [
         /* @__PURE__ */ F.jsx("div", { className: "h-[60px] w-full flex items-center justify-center", children: i ? /* @__PURE__ */ F.jsx(
@@ -44536,7 +44536,7 @@ function OT() {
     /* @__PURE__ */ F.jsxs(
       cl,
       {
-        to: "/appverse/",
+        to: "/",
         className: "inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors mb-6",
         children: [
           /* @__PURE__ */ F.jsx(
@@ -44579,10 +44579,10 @@ function OT() {
 }
 function YD() {
   return /* @__PURE__ */ F.jsx(CN, { children: /* @__PURE__ */ F.jsx("div", { className: "appverse-container", children: /* @__PURE__ */ F.jsx("main", { children: /* @__PURE__ */ F.jsxs(PR, { children: [
-    /* @__PURE__ */ F.jsx(Zi, { path: "/appverse/", element: /* @__PURE__ */ F.jsx(Tx, {}) }),
-    /* @__PURE__ */ F.jsx(Zi, { path: "/appverse/software/:id", element: /* @__PURE__ */ F.jsx(OT, {}) }),
-    /* @__PURE__ */ F.jsx(Zi, { path: "/appverse/:slug", element: /* @__PURE__ */ F.jsx(OT, {}) }),
-    /* @__PURE__ */ F.jsx(Zi, { path: "*", element: /* @__PURE__ */ F.jsx(jR, { to: "/appverse/", replace: !0 }) })
+    /* @__PURE__ */ F.jsx(Zi, { path: "/", element: /* @__PURE__ */ F.jsx(Tx, {}) }),
+    /* @__PURE__ */ F.jsx(Zi, { path: "/software/:id", element: /* @__PURE__ */ F.jsx(OT, {}) }),
+    /* @__PURE__ */ F.jsx(Zi, { path: "/:slug", element: /* @__PURE__ */ F.jsx(OT, {}) }),
+    /* @__PURE__ */ F.jsx(Zi, { path: "*", element: /* @__PURE__ */ F.jsx(jR, { to: "/", replace: !0 }) })
   ] }) }) }) });
 }
 function WD(e, a = {}) {
