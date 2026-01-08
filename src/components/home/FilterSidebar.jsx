@@ -9,7 +9,7 @@
  * @param {Array} filterOptions.tags - [{id, name}, ...]
  * @param {Array} filterOptions.appType - [{id, name}, ...]
  */
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'react-bootstrap-icons';
 
 export default function FilterSidebar({ filters, onFilterChange, filterOptions = {} }) {
@@ -23,6 +23,39 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
 
   // Number of items before we make the list scrollable
   const SCROLL_THRESHOLD = 8;
+
+  // Refs to scrollable containers for each section
+  const scrollContainerRefs = useRef({});
+
+  // Scroll first selected filter into view on initial load
+  const hasScrolledRef = useRef(false);
+  useEffect(() => {
+    if (hasScrolledRef.current) return;
+
+    const hasActiveFilters = Object.keys(filters).some(key => filters[key]?.length > 0);
+    if (!hasActiveFilters) return;
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      Object.keys(filters).forEach(sectionKey => {
+        const container = scrollContainerRefs.current[sectionKey];
+        if (!container) return;
+
+        // Find the first selected value for this section
+        const firstValue = filters[sectionKey]?.[0];
+        if (!firstValue) return;
+
+        // Find the checkbox with this value and scroll its label into view
+        const checkbox = container.querySelector(`input[data-value="${CSS.escape(firstValue)}"]`);
+        if (checkbox) {
+          checkbox.closest('label')?.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+      });
+      hasScrolledRef.current = true;
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [filters, filterOptions]);
 
   // Build filter sections from API data (per mockup: Topics, Type, Tags)
   // Use term name as value for URL-friendly params (not UUIDs)
@@ -105,7 +138,10 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
               </button>
 
               {isExpanded && (
-                <div className={`px-4 py-3 space-y-2 ${section.options.length > SCROLL_THRESHOLD ? 'max-h-64 overflow-y-auto' : ''}`}>
+                <div
+                  ref={el => scrollContainerRefs.current[section.key] = el}
+                  className={`px-4 py-3 space-y-2 ${section.options.length > SCROLL_THRESHOLD ? 'max-h-64 overflow-y-auto' : ''}`}
+                >
                   {section.options.map((option) => {
                     const checked = isChecked(section.key, option.value);
 
@@ -116,6 +152,7 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
                       >
                         <input
                           type="checkbox"
+                          data-value={option.value}
                           checked={checked}
                           onChange={(e) => handleCheckboxChange(
                             section.key,
