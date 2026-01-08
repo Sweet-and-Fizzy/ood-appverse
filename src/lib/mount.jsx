@@ -4,7 +4,7 @@
  * Hash routing avoids conflicts with server-side routing (e.g., Drupal)
  */
 import { createRoot } from 'react-dom/client'
-import { HashRouter } from 'react-router-dom'
+import PrettyHashRouter from '../components/PrettyHashRouter'
 import App from '../App'
 import { ConfigProvider } from '../contexts/ConfigContext'
 import '../fonts.css'
@@ -29,11 +29,11 @@ function mount(elementId, config = {}) {
   const root = createRoot(container)
 
   root.render(
-    <HashRouter>
+    <PrettyHashRouter>
       <ConfigProvider config={config}>
         <App />
       </ConfigProvider>
-    </HashRouter>
+    </PrettyHashRouter>
   )
 
   return {
