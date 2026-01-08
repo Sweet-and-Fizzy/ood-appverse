@@ -13257,78 +13257,83 @@ function yx({
   ] });
 }
 function Ex({ filters: e, onFilterChange: a, filterOptions: r = {} }) {
-  var g, f, b;
+  var f, b, h;
   const [i, s] = H.useState({
     topics: !0,
     appType: !0,
     tags: !0
-  }), u = [
-    ((g = r.topics) == null ? void 0 : g.length) > 0 && {
+  }), u = 8, c = [
+    ((f = r.topics) == null ? void 0 : f.length) > 0 && {
       key: "topics",
       title: "Topics",
-      options: r.topics.map((h) => ({
-        value: h.name,
+      options: r.topics.map((y) => ({
+        value: y.name,
         // Use name for URL params
-        label: h.name.replace(/_/g, " ")
+        label: y.name.replace(/_/g, " ")
         // "engineering_and_technology" → "engineering and technology"
       }))
     },
-    ((f = r.appType) == null ? void 0 : f.length) > 0 && {
+    ((b = r.appType) == null ? void 0 : b.length) > 0 && {
       key: "appType",
       title: "Type",
-      options: r.appType.map((h) => ({
-        value: h.name,
+      options: r.appType.map((y) => ({
+        value: y.name,
         // Use name for URL params
-        label: h.name.replace(/_/g, " ")
+        label: y.name.replace(/_/g, " ")
         // "batch_connect" → "batch connect"
       }))
     },
-    ((b = r.tags) == null ? void 0 : b.length) > 0 && {
+    ((h = r.tags) == null ? void 0 : h.length) > 0 && {
       key: "tags",
       title: "Tags",
-      options: r.tags.map((h) => ({
-        value: h.name,
+      options: r.tags.map((y) => ({
+        value: y.name,
         // Use name for URL params
-        label: h.name
+        label: y.name
       }))
     }
-  ].filter(Boolean), c = (h, y, S) => {
-    if (y === "all") {
-      const _ = { ...e };
-      delete _[h], a(_);
+  ].filter(Boolean), p = (y, S, v) => {
+    if (S === "all") {
+      const w = { ...e };
+      delete w[y], a(w);
       return;
     }
-    const v = e[h] || [], R = S ? [...v, y] : v.filter((_) => _ !== y);
+    const R = e[y] || [], _ = v ? [...R, S] : R.filter((w) => w !== S);
     a({
       ...e,
-      [h]: R.length > 0 ? R : void 0
+      [y]: _.length > 0 ? _ : void 0
     });
-  }, p = (h, y) => y === "all" ? !e[h] || e[h].length === 0 : (e[h] || []).includes(y);
-  return /* @__PURE__ */ B.jsx("aside", { className: "w-64 pr-8 flex-shrink-0", children: /* @__PURE__ */ B.jsxs("div", { className: "sticky top-4", children: [
-    u.map((h) => {
-      const y = i[h.key];
-      return /* @__PURE__ */ B.jsxs("div", { className: "mb-4", children: [
+  }, g = (y, S) => S === "all" ? !e[y] || e[y].length === 0 : (e[y] || []).includes(S);
+  return /* @__PURE__ */ B.jsx("aside", { className: "w-64 flex-shrink-0", children: /* @__PURE__ */ B.jsxs("div", { className: "sticky top-4", children: [
+    c.map((y) => {
+      const S = i[y.key];
+      return /* @__PURE__ */ B.jsxs("div", { className: "mb-6 border border-gray-200 rounded-lg overflow-hidden", children: [
         /* @__PURE__ */ B.jsxs(
           "button",
           {
             onClick: () => s({
               ...i,
-              [h.key]: !y
+              [y.key]: !S
             }),
-            className: "w-full flex items-center justify-between bg-gray-100 px-4 py-2 rounded hover:bg-gray-200 transition-colors",
+            className: "w-full flex items-center justify-between bg-gray-100 px-4 py-2 hover:bg-gray-200 transition-colors",
             children: [
-              /* @__PURE__ */ B.jsx("h3", { className: "text-base font-serif font-bold text-gray-900", children: h.title }),
+              /* @__PURE__ */ B.jsxs("h3", { className: "text-base font-serif font-bold text-gray-900", children: [
+                y.title,
+                " (",
+                y.options.length,
+                ")"
+              ] }),
               /* @__PURE__ */ B.jsx(
                 eA,
                 {
-                  className: `w-4 h-4 text-gray-600 transition-transform ${y ? "rotate-180" : ""}`
+                  className: `w-4 h-4 text-gray-600 transition-transform ${S ? "rotate-180" : ""}`
                 }
               )
             ]
           }
         ),
-        y && /* @__PURE__ */ B.jsx("div", { className: "mt-3 space-y-2 px-2", children: h.options.map((S) => {
-          const v = p(h.key, S.value);
+        S && /* @__PURE__ */ B.jsx("div", { className: `px-4 py-3 space-y-2 ${y.options.length > u ? "max-h-64 overflow-y-auto" : ""}`, children: y.options.map((v) => {
+          const R = g(y.key, v.value);
           return /* @__PURE__ */ B.jsxs(
             "label",
             {
@@ -13338,26 +13343,26 @@ function Ex({ filters: e, onFilterChange: a, filterOptions: r = {} }) {
                   "input",
                   {
                     type: "checkbox",
-                    checked: v,
-                    onChange: (R) => c(
-                      h.key,
-                      S.value,
-                      R.target.checked
+                    checked: R,
+                    onChange: (_) => p(
+                      y.key,
+                      v.value,
+                      _.target.checked
                     ),
                     className: "w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                   }
                 ),
-                /* @__PURE__ */ B.jsx("span", { className: "ml-3 text-sm font-sans text-gray-900", children: S.label })
+                /* @__PURE__ */ B.jsx("span", { className: "ml-3 text-sm font-sans text-gray-900", children: v.label })
               ]
             },
-            S.value
+            v.value
           );
         }) })
-      ] }, h.key);
+      ] }, y.key);
     }),
-    Object.keys(e).some((h) => {
-      var y;
-      return ((y = e[h]) == null ? void 0 : y.length) > 0;
+    Object.keys(e).some((y) => {
+      var S;
+      return ((S = e[y]) == null ? void 0 : S.length) > 0;
     }) && /* @__PURE__ */ B.jsx(
       "button",
       {
@@ -13378,7 +13383,7 @@ function Sx({ software: e, appCount: a = 0 }) {
     {
       to: `/appverse/${s}`,
       className: "block group",
-      children: /* @__PURE__ */ B.jsxs("div", { className: "flex flex-col items-center gap-4 border-appverse-black border-2 rounded-lg p-6 bg-white h-[199px] min-w-[199px] hover:border-red-500 transition-all duration-200", children: [
+      children: /* @__PURE__ */ B.jsxs("div", { className: "flex flex-col items-center gap-4 border-appverse-black border-2 rounded-lg p-6 bg-white h-[199px] hover:border-red-500 transition-all duration-200", children: [
         /* @__PURE__ */ B.jsx("div", { className: "h-[60px] w-full flex items-center justify-center", children: i ? /* @__PURE__ */ B.jsx(
           "img",
           {
@@ -13401,7 +13406,7 @@ function Sx({ software: e, appCount: a = 0 }) {
   );
 }
 function vx() {
-  return /* @__PURE__ */ B.jsxs("div", { className: "flex flex-col items-center gap-4 border-gray-200 border-2 rounded-lg p-6 bg-white h-[199px] min-w-[199px] animate-pulse", children: [
+  return /* @__PURE__ */ B.jsxs("div", { className: "flex flex-col items-center gap-4 border-gray-200 border-2 rounded-lg p-6 bg-white h-[199px] animate-pulse", children: [
     /* @__PURE__ */ B.jsx("div", { className: "h-[60px] w-full flex items-center justify-center", children: /* @__PURE__ */ B.jsx("div", { className: "w-16 h-16 rounded-lg bg-gray-200" }) }),
     /* @__PURE__ */ B.jsx("div", { className: "w-3/4 h-6 bg-gray-200 rounded" }),
     /* @__PURE__ */ B.jsxs("div", { className: "mt-auto flex items-center gap-1.5", children: [
@@ -13411,11 +13416,11 @@ function vx() {
   ] });
 }
 function Tx({ software: e, appsBySoftwareId: a, loading: r }) {
-  return console.log("[SoftwareGrid] Render - loading:", r, "| software count:", (e == null ? void 0 : e.length) ?? 0), r ? (console.log("[SoftwareGrid] Showing skeleton grid"), /* @__PURE__ */ B.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6", children: Array.from({ length: 10 }).map((i, s) => /* @__PURE__ */ B.jsx(vx, {}, s)) })) : !e || e.length === 0 ? /* @__PURE__ */ B.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
+  return console.log("[SoftwareGrid] Render - loading:", r, "| software count:", (e == null ? void 0 : e.length) ?? 0), r ? (console.log("[SoftwareGrid] Showing skeleton grid"), /* @__PURE__ */ B.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: Array.from({ length: 10 }).map((i, s) => /* @__PURE__ */ B.jsx(vx, {}, s)) })) : !e || e.length === 0 ? /* @__PURE__ */ B.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
     /* @__PURE__ */ B.jsx("div", { className: "w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4", children: /* @__PURE__ */ B.jsx(Kd, { className: "w-10 h-10 text-gray-400" }) }),
     /* @__PURE__ */ B.jsx("h3", { className: "text-xl font-serif font-bold text-appverse-black mb-2", children: "No Software Found" }),
     /* @__PURE__ */ B.jsx("p", { className: "text-gray-600 font-sans text-center max-w-md", children: "No software matches your current filters. Try adjusting your search or clearing filters." })
-  ] }) : /* @__PURE__ */ B.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6", children: e.map((i) => {
+  ] }) : /* @__PURE__ */ B.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: e.map((i) => {
     const s = (a[i.id] || []).length;
     return /* @__PURE__ */ B.jsx(
       Sx,
@@ -44499,7 +44504,7 @@ function CT() {
     }
     qc(P, s).then((W) => g(W)).catch((W) => v(W)).finally(() => y(!1)), Rv(P, s).then((W) => b(W)).catch((W) => console.error("Failed to fetch apps:", W));
   };
-  return h ? /* @__PURE__ */ B.jsx(wx, { message: "Loading software details..." }) : S ? /* @__PURE__ */ B.jsx(uA, { error: S, onRetry: M }) : p ? /* @__PURE__ */ B.jsx("div", { className: "min-h-screen bg-white", children: /* @__PURE__ */ B.jsxs("div", { className: "max-w-7xl mx-auto px-6 py-8", children: [
+  return h ? /* @__PURE__ */ B.jsx(wx, { message: "Loading software details..." }) : S ? /* @__PURE__ */ B.jsx(uA, { error: S, onRetry: M }) : p ? /* @__PURE__ */ B.jsx("div", { className: "min-h-screen bg-white", children: /* @__PURE__ */ B.jsxs("div", { className: "px-6 py-8", children: [
     /* @__PURE__ */ B.jsxs(
       dl,
       {
