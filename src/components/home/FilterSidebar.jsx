@@ -21,9 +21,8 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
     tags: true
   });
 
-  // Track which sections show all items vs truncated (see more/less)
-  const [showAllItems, setShowAllItems] = useState({});
-  const INITIAL_ITEMS_TO_SHOW = 5;
+  // Number of items before we make the list scrollable
+  const SCROLL_THRESHOLD = 8;
 
   // Build filter sections from API data (per mockup: Topics, Type, Tags)
   // Use term name as value for URL-friendly params (not UUIDs)
@@ -82,23 +81,23 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
   };
 
   return (
-    <aside className="w-64 pr-8 flex-shrink-0">
+    <aside className="w-64 flex-shrink-0">
       <div className="sticky top-4">
 
         {filterSections.map((section) => {
           const isExpanded = expandedSections[section.key];
 
           return (
-            <div key={section.key} className="mb-4">
+            <div key={section.key} className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
               <button
                 onClick={() => setExpandedSections({
                   ...expandedSections,
                   [section.key]: !isExpanded
                 })}
-                className="w-full flex items-center justify-between bg-gray-100 px-4 py-2 rounded hover:bg-gray-200 transition-colors"
+                className="w-full flex items-center justify-between bg-gray-100 px-4 py-2 hover:bg-gray-200 transition-colors"
               >
                 <h3 className="text-base font-serif font-bold text-gray-900">
-                  {section.title}
+                  {section.title} ({section.options.length})
                 </h3>
                 <ChevronDown
                   className={`w-4 h-4 text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
@@ -106,56 +105,31 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
               </button>
 
               {isExpanded && (
-                <div className="mt-3 space-y-2 px-2">
-                  {(() => {
-                    const showAll = showAllItems[section.key];
-                    const hasMore = section.options.length > INITIAL_ITEMS_TO_SHOW;
-                    const visibleOptions = showAll
-                      ? section.options
-                      : section.options.slice(0, INITIAL_ITEMS_TO_SHOW);
+                <div className={`px-4 py-3 space-y-2 ${section.options.length > SCROLL_THRESHOLD ? 'max-h-64 overflow-y-auto' : ''}`}>
+                  {section.options.map((option) => {
+                    const checked = isChecked(section.key, option.value);
 
                     return (
-                      <>
-                        {visibleOptions.map((option) => {
-                          const checked = isChecked(section.key, option.value);
-
-                          return (
-                            <label
-                              key={option.value}
-                              className="flex items-center cursor-pointer group"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={(e) => handleCheckboxChange(
-                                  section.key,
-                                  option.value,
-                                  e.target.checked
-                                )}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                              />
-                              <span className="ml-3 text-sm font-sans text-gray-900">
-                                {option.label}
-                              </span>
-                            </label>
-                          );
-                        })}
-                        {hasMore && (
-                          <button
-                            onClick={() => setShowAllItems({
-                              ...showAllItems,
-                              [section.key]: !showAll
-                            })}
-                            className="text-sm font-sans text-appverse-blue hover:underline mt-1"
-                          >
-                            {showAll
-                              ? 'See less'
-                              : `See ${section.options.length - INITIAL_ITEMS_TO_SHOW} more`}
-                          </button>
-                        )}
-                      </>
+                      <label
+                        key={option.value}
+                        className="flex items-center cursor-pointer group"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => handleCheckboxChange(
+                            section.key,
+                            option.value,
+                            e.target.checked
+                          )}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                        <span className="ml-3 text-sm font-sans text-gray-900">
+                          {option.label}
+                        </span>
+                      </label>
                     );
-                  })()}
+                  })}
                 </div>
               )}
             </div>
