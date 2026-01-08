@@ -13,13 +13,17 @@ import { useState } from 'react';
 import { ChevronDown } from 'react-bootstrap-icons';
 
 export default function FilterSidebar({ filters, onFilterChange, filterOptions = {} }) {
-  // Track which sections are expanded
+  // Track which sections are expanded (header collapse/expand)
   // Default all sections to expanded so users see all filter options
   const [expandedSections, setExpandedSections] = useState({
     topics: true,
     appType: true,
     tags: true
   });
+
+  // Track which sections show all items vs truncated (see more/less)
+  const [showAllItems, setShowAllItems] = useState({});
+  const INITIAL_ITEMS_TO_SHOW = 5;
 
   // Build filter sections from API data (per mockup: Topics, Type, Tags)
   // Use term name as value for URL-friendly params (not UUIDs)
@@ -103,30 +107,55 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
 
               {isExpanded && (
                 <div className="mt-3 space-y-2 px-2">
-                  {section.options.map((option) => {
-                    const checked = isChecked(section.key, option.value);
+                  {(() => {
+                    const showAll = showAllItems[section.key];
+                    const hasMore = section.options.length > INITIAL_ITEMS_TO_SHOW;
+                    const visibleOptions = showAll
+                      ? section.options
+                      : section.options.slice(0, INITIAL_ITEMS_TO_SHOW);
 
                     return (
-                      <label
-                        key={option.value}
-                        className="flex items-center cursor-pointer group"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={(e) => handleCheckboxChange(
-                            section.key,
-                            option.value,
-                            e.target.checked
-                          )}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-                        <span className="ml-3 text-sm font-sans text-gray-900">
-                          {option.label}
-                        </span>
-                      </label>
+                      <>
+                        {visibleOptions.map((option) => {
+                          const checked = isChecked(section.key, option.value);
+
+                          return (
+                            <label
+                              key={option.value}
+                              className="flex items-center cursor-pointer group"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(e) => handleCheckboxChange(
+                                  section.key,
+                                  option.value,
+                                  e.target.checked
+                                )}
+                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                              />
+                              <span className="ml-3 text-sm font-sans text-gray-900">
+                                {option.label}
+                              </span>
+                            </label>
+                          );
+                        })}
+                        {hasMore && (
+                          <button
+                            onClick={() => setShowAllItems({
+                              ...showAllItems,
+                              [section.key]: !showAll
+                            })}
+                            className="text-sm font-sans text-appverse-blue hover:underline mt-1"
+                          >
+                            {showAll
+                              ? 'See less'
+                              : `See ${section.options.length - INITIAL_ITEMS_TO_SHOW} more`}
+                          </button>
+                        )}
+                      </>
                     );
-                  })}
+                  })()}
                 </div>
               )}
             </div>
