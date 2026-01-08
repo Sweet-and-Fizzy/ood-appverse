@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Visit `http://localhost:3000/appverse/`
+Visit `http://localhost:3000/#/appverse/`
 
 ## Live Demo
 
@@ -26,11 +26,13 @@ https://ood-appverse-react.netlify.app/appverse/
 
 ## Routes
 
+Uses hash-based routing to avoid conflicts with server-side routing (e.g., Drupal).
+
 | Route | Component | Purpose |
 |-------|-----------|---------|
-| `/appverse/` | SoftwareHome | Main grid view with search and filters. |
-| `/appverse/:slug` | SoftwareDetail | Software detail by slug (e.g., `/appverse/abaqus`). |
-| `/appverse/software/:uuid` | SoftwareDetail | Software detail by UUID (backward compatibility). |
+| `/#/appverse/` | SoftwareHome | Main grid view with search and filters. |
+| `/#/appverse/:slug` | SoftwareDetail | Software detail by slug (e.g., `/#/appverse/abaqus`). |
+| `/#/appverse/software/:uuid` | SoftwareDetail | Software detail by UUID (backward compatibility). |
 
 **Slugs** are generated from software titles: `"AlphaFold"` → `alphafold`, `"LAMMPS"` → `lammps`.
 
@@ -38,10 +40,10 @@ https://ood-appverse-react.netlify.app/appverse/
 
 | Page | Param | Purpose | Example |
 |------|-------|---------|---------|
-| Grid | `?topics=` | Filter by science domain | `?topics=Materials+Science` |
-| Grid | `?type=` | Filter by app type | `?type=Interactive+Apps` |
-| Grid | `?tags=` | Filter by tag | `?tags=singularity` |
-| Detail | `?app=` | Expand README for specific app | `?app=icds-roar-ood--bc-osc-alphafold` |
+| Grid | `?topics=` | Filter by science domain | `/#/appverse/?topics=Materials+Science` |
+| Grid | `?type=` | Filter by app type | `/#/appverse/?type=Interactive+Apps` |
+| Grid | `?tags=` | Filter by tag | `/#/appverse/?tags=singularity` |
+| Detail | `?app=` | Expand README for specific app | `/#/appverse/alphafold?app=icds-roar-ood--bc-osc-alphafold` |
 
 Filter values use term **names** (not UUIDs). Multiple values: `?tags=singularity&tags=gpu`.
 
@@ -66,7 +68,7 @@ function MyApp() {
 
 ### CDN Embed
 
-**Important:** Widget reads the current browser URL. Embed on pages at `/appverse/` or `/appverse/software/:id`.
+**Important:** Widget uses hash-based routing (`/#/appverse/...`). The server only needs to serve ONE page—all navigation happens via URL hash.
 
 ```html
 <div id="appverse"></div>
@@ -84,15 +86,31 @@ function MyApp() {
 
 #### Drupal Embedding
 
-The widget reads the browser URL to determine what to display. Drupal must serve pages at the expected paths.
+With hash-based routing, Drupal only needs ONE page. All navigation happens via URL hash, which Drupal never sees.
 
-**Required Drupal routes:**
+**Required Drupal route:**
 
 | Drupal Path | What Widget Shows |
 |-------------|-------------------|
-| `/appverse/` | Software grid |
-| `/appverse/*` | Software detail (wildcard catches slugs like `abaqus`) |
-| `/appverse/software/*` | Software detail by UUID (optional, backward compat) |
+| `/appverse` | Everything! Hash routing handles the rest |
+
+Example URLs (all served by the same Drupal page):
+- `/appverse/#/appverse/` → Software grid
+- `/appverse/#/appverse/abaqus` → Abaqus detail page
+- `/appverse/#/appverse/?tags=gpu` → Filtered grid
+
+**Linking from Drupal content:**
+
+When creating links to specific views within Drupal (menus, content, etc.), use the hash-based URLs:
+
+| To link to... | Use this URL |
+|---------------|--------------|
+| Software grid | `/appverse/#/appverse/` |
+| Specific software | `/appverse/#/appverse/abaqus` |
+| Filtered grid | `/appverse/#/appverse/?topics=Materials+Science` |
+| Software with app README open | `/appverse/#/appverse/alphafold?app=org-name--app-title` |
+
+The `#` is required—it tells the browser to let the React widget handle routing instead of Drupal.
 
 **Embed code for Drupal:**
 
@@ -174,11 +192,11 @@ After making changes, follow these steps to deploy to the Drupal-embedded versio
 ```
 
 **How it works:**
-1. User visits `/appverse/` → Drupal serves the template → Widget shows grid
-2. User clicks a tile → URL changes to `/appverse/abaqus` (no page reload)
-3. User shares link `/appverse/abaqus` → Drupal serves template → Widget shows detail
+1. User visits `/appverse/` → Drupal serves the template → Widget shows grid at `/#/appverse/`
+2. User clicks a tile → URL hash changes to `/#/appverse/abaqus` (no page reload, Drupal unaware)
+3. User shares link `/appverse/#/appverse/abaqus` → Drupal serves same template → Widget reads hash and shows detail
 
-**Note:** Client-side navigation (clicking tiles) does NOT reload the page. If you need full page reloads for each navigation, additional configuration would be needed.
+**Note:** All navigation happens via hash changes, which never trigger server requests. Drupal is only involved on initial page load.
 
 ### API
 
@@ -193,23 +211,23 @@ instance.unmount()
 
 ## How Routing Works
 
-The widget uses React Router with `BrowserRouter`:
+The widget uses React Router with `HashRouter`:
 
-1. **On mount:** Widget reads current browser URL to determine view
-2. **On navigation:** URL updates without page reload (client-side routing)
-3. **On direct visit:** URL is read, correct view is shown
+1. **On mount:** Widget reads URL hash to determine view
+2. **On navigation:** Hash updates without page reload (client-side routing)
+3. **On direct visit/share:** Hash is read, correct view is shown
 
 **Example URLs:**
 
 | URL | What Shows |
 |-----|------------|
-| `/appverse/` | Grid with all software |
-| `/appverse/?topics=Materials+Science` | Grid filtered by topic |
-| `/appverse/abaqus` | Abaqus detail page (slug route) |
-| `/appverse/alphafold?app=icds-roar-ood--bc-osc-alphafold` | Detail with README expanded |
-| `/appverse/software/097bde81-...` | Detail by UUID (backward compat) |
+| `/appverse/#/appverse/` | Grid with all software |
+| `/appverse/#/appverse/?topics=Materials+Science` | Grid filtered by topic |
+| `/appverse/#/appverse/abaqus` | Abaqus detail page (slug route) |
+| `/appverse/#/appverse/alphafold?app=icds-roar-ood--bc-osc-alphafold` | Detail with README expanded |
+| `/appverse/#/appverse/software/097bde81-...` | Detail by UUID (backward compat) |
 
-**Unmatched routes** redirect to `/appverse/`.
+**Unmatched routes** redirect to `/#/appverse/`.
 
 ## Project Structure
 
