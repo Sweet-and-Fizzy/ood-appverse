@@ -227,10 +227,10 @@ export default function SoftwareDetail() {
           Back to Software
         </Link>
 
-        {/* Two-column layout per mockup */}
-        <div className="flex gap-12">
+        {/* Two-column layout per mockup - stacks on mobile */}
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* Left column - Software info sidebar */}
-          <div className="w-[280px] flex-shrink-0">
+          <div className="w-full lg:w-[280px] lg:flex-shrink-0">
             <SoftwareHeader software={software} />
           </div>
 

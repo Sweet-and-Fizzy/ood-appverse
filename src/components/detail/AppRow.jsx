@@ -49,10 +49,10 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
   return (
     <div className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
-      {/* App header row - 3 column layout */}
+      {/* App header row - responsive layout */}
       {/* !p-5: Drupal theme has .p-5 with !important, so we need to override it */}
       <div className="!p-5">
-        <div className="flex gap-6">
+        <div className="flex flex-col md:flex-row md:gap-6">
           {/* Left column: title, org, date */}
           <div className="flex-1 min-w-0">
             <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
@@ -70,10 +70,24 @@ export default function AppRow({ app, isExpanded, onToggle }) {
                 <span className="font-semibold">LAST COMMIT:</span> {formattedDate}
               </p>
             )}
+
+            {/* Tags - mobile only (shown below title) */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4 md:hidden">
+                {tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded"
+                  >
+                    {tag.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Middle column: tags (aligned left within column) */}
-          <div className="w-[180px] flex-shrink-0">
+          {/* Middle column: tags - desktop only (aligned left within column) */}
+          <div className="hidden md:block w-[180px] flex-shrink-0">
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
@@ -88,9 +102,9 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             )}
           </div>
 
-          {/* Right column: action buttons (VIEW REPO top, SHOW README bottom) */}
-          {/* Fixed width prevents layout shift when button text changes */}
-          <div className="flex flex-col justify-between flex-shrink-0 min-h-[70px] w-[130px]">
+          {/* Right column: action buttons */}
+          {/* Mobile: horizontal row at bottom. Desktop: vertical column on right */}
+          <div className="flex flex-row md:flex-col justify-start md:justify-between gap-4 md:gap-0 mt-4 md:mt-0 flex-shrink-0 md:min-h-[70px] md:w-[130px]">
             {githubUrl && (
               <a
                 href={githubUrl}
@@ -108,7 +122,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             {readme && (
               <button
                 onClick={onToggle}
-                className="inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap mt-auto focus:outline-none"
+                className="inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap md:mt-auto focus:outline-none"
               >
                 <span
                   className={`w-5 h-5 rounded-full bg-appverse-red flex items-center justify-center transition-transform duration-200 ${
