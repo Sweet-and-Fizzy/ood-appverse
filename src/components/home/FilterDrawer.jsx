@@ -89,16 +89,6 @@ export default function FilterDrawer({
             isInDrawer={true}
           />
         </div>
-
-        {/* Apply button at bottom */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
-          <button
-            onClick={onClose}
-            className="w-full py-3 px-4 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
-          >
-            Apply Filters
-          </button>
-        </div>
       </div>
     </>
   );
