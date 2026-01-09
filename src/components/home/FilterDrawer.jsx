@@ -18,15 +18,25 @@ export default function FilterDrawer({
   // Detect fixed header (e.g., Drupal navbar) to offset drawer position
   const headerOffset = useFixedHeaderOffset();
 
-  // Prevent body scroll when drawer is open on mobile
+  // Prevent body scroll when drawer is open on mobile only
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    // lg breakpoint is 1024px - only lock scroll on mobile
+    const isMobile = () => window.innerWidth < 1024;
+
+    const updateOverflow = () => {
+      if (isOpen && isMobile()) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    };
+
+    updateOverflow();
+    window.addEventListener('resize', updateOverflow);
+
     return () => {
       document.body.style.overflow = '';
+      window.removeEventListener('resize', updateOverflow);
     };
   }, [isOpen]);
 
