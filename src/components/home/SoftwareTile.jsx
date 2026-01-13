@@ -8,7 +8,6 @@
  */
 import { Link } from 'react-router-dom';
 import { slugify } from '../../utils/slugify';
-import { StarFill } from 'react-bootstrap-icons';
 
 export default function SoftwareTile({ software, appCount = 0 }) {
   const softwareTitle = software.attributes?.title || 'Untitled Software';
@@ -17,8 +16,8 @@ export default function SoftwareTile({ software, appCount = 0 }) {
   // Generate slug from title for semantic URL
   const slug = slugify(softwareTitle);
 
-  // Format app count text
-  const appCountText = appCount === 1 ? '1 repo' : `${appCount} repos`;
+  // Format app count text (number is shown in circle, so just singular/plural)
+  const appCountText = appCount === 1 ? 'repo' : 'repos';
 
   // Debug: Log if logo URL exists but might be broken
   const handleImageError = (e) => {
@@ -72,13 +71,9 @@ export default function SoftwareTile({ software, appCount = 0 }) {
             <span className={`relative inline-flex items-center justify-center w-5 h-5 rounded-full ${
               appCount === 0 ? 'bg-appverse-green' : 'bg-appverse-blue'
             }`}>
-              {appCount === 0 ? (
-                <StarFill className="w-3 h-3 text-white" />
-              ) : (
-                <span className="text-[10px] font-bold text-white leading-none">
-                  {appCount}
-                </span>
-              )}
+              <span className="text-[10px] font-bold text-white leading-none">
+                {appCount === 0 ? '★' : appCount}
+              </span>
             </span>
             <span className={appCount === 0 ? 'text-appverse-green' : 'text-appverse-black'}>
               {appCount === 0 ? 'Add Repos' : appCountText}
