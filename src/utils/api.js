@@ -103,10 +103,10 @@ export async function fetchAllSoftware(config = {}) {
       includedMap[item.id] = item;
     }
 
-    // Separate media items for logo resolution
+    // Separate media items for logo resolution (both SVG and image types)
     const mediaMap = {};
     for (const item of included) {
-      if (item.type === 'media--svg') {
+      if (item.type === 'media--svg' || item.type === 'media--image') {
         mediaMap[item.id] = item;
       }
     }
@@ -114,7 +114,10 @@ export async function fetchAllSoftware(config = {}) {
     // Fetch actual file URLs for each media item
     const mediaFilePromises = Object.keys(mediaMap).map(async (mediaId) => {
       const media = mediaMap[mediaId];
-      const fileRelationshipId = media.relationships?.field_media_image_1?.data?.id;
+      // SVG uses field_media_image_1, image uses field_media_image
+      const fileRelationshipId = media.type === 'media--svg'
+        ? media.relationships?.field_media_image_1?.data?.id
+        : media.relationships?.field_media_image?.data?.id;
 
       if (!fileRelationshipId) return null;
 
@@ -354,7 +357,10 @@ export async function fetchSoftwareById(id, config = {}) {
     const logoMediaId = software.relationships?.field_appverse_logo?.data?.id;
     if (logoMediaId) {
       const logoMedia = includedMap[logoMediaId];
-      const fileRelationshipId = logoMedia?.relationships?.field_media_image_1?.data?.id;
+      // SVG uses field_media_image_1, image uses field_media_image
+      const fileRelationshipId = logoMedia?.type === 'media--svg'
+        ? logoMedia?.relationships?.field_media_image_1?.data?.id
+        : logoMedia?.relationships?.field_media_image?.data?.id;
 
       if (fileRelationshipId) {
         try {
