@@ -8,6 +8,7 @@
  */
 import { Link } from 'react-router-dom';
 import { slugify } from '../../utils/slugify';
+import { StarFill } from 'react-bootstrap-icons';
 
 export default function SoftwareTile({ software, appCount = 0 }) {
   const softwareTitle = software.attributes?.title || 'Untitled Software';
@@ -55,15 +56,33 @@ export default function SoftwareTile({ software, appCount = 0 }) {
           {softwareTitle}
         </h3>
 
-        {/* App count badge */}
+        {/* App count badge or Add Repos button */}
         <div className="mt-auto">
-          <span className="inline-flex items-center gap-1.5 text-base font-medium">
-            <span className="relative inline-flex items-center justify-center w-5 h-5 bg-appverse-blue rounded-full">
-              <span className="text-[10px] font-bold text-white leading-none">
-                {appCount}
-              </span>
+          <span
+            role={appCount === 0 ? 'button' : undefined}
+            onClick={appCount === 0 ? (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.href = '/node/add/appverse_app';
+            } : undefined}
+            className={`inline-flex items-center gap-1.5 text-base font-medium ${
+              appCount === 0 ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
+            }`}
+          >
+            <span className={`relative inline-flex items-center justify-center w-5 h-5 rounded-full ${
+              appCount === 0 ? 'bg-appverse-green' : 'bg-appverse-blue'
+            }`}>
+              {appCount === 0 ? (
+                <StarFill className="w-3 h-3 text-white" />
+              ) : (
+                <span className="text-[10px] font-bold text-white leading-none">
+                  {appCount}
+                </span>
+              )}
             </span>
-            <span className="text-appverse-black">{appCountText}</span>
+            <span className={appCount === 0 ? 'text-appverse-green' : 'text-appverse-black'}>
+              {appCount === 0 ? 'Add Repos' : appCountText}
+            </span>
           </span>
         </div>
       </div>
