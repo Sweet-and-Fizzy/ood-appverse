@@ -13286,10 +13286,10 @@ function Tx({
         value: e,
         onChange: (i) => a(i.target.value),
         placeholder: r,
-        className: "w-full pl-4 pr-12 py-2 border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 hover:border-gray-400 focus:ring-0 transition-colors"
+        className: "w-full pl-4 pr-10 py-2 border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 hover:border-gray-400 focus:ring-0 transition-colors rounded-appverse"
       }
     ),
-    /* @__PURE__ */ U.jsx("div", { className: "absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none", children: /* @__PURE__ */ U.jsx(Kd, { className: "h-4 w-4 text-gray-600" }) })
+    /* @__PURE__ */ U.jsx("div", { className: "absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none", children: /* @__PURE__ */ U.jsx(Kd, { className: "h-4 w-4 text-gray-600" }) })
   ] });
 }
 function pA({ filters: e, onFilterChange: a, filterOptions: r = {}, isInDrawer: i = !1 }) {
@@ -13569,7 +13569,7 @@ function kx({ software: e, appCount: a = 0 }) {
             className: `inline-flex items-center gap-1.5 text-base font-medium ${a === 0 ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`,
             children: [
               /* @__PURE__ */ U.jsx("span", { className: `relative inline-flex items-center justify-center w-5 h-5 rounded-full ${a === 0 ? "bg-appverse-green" : "bg-appverse-blue"}`, children: /* @__PURE__ */ U.jsx("span", { className: "text-[10px] font-bold text-white leading-none", children: a === 0 ? "★" : a }) }),
-              /* @__PURE__ */ U.jsx("span", { className: a === 0 ? "text-appverse-green" : "text-appverse-black", children: a === 0 ? "Add Repos" : u })
+              /* @__PURE__ */ U.jsx("span", { className: a === 0 ? "text-appverse-green" : "text-appverse-black", children: a === 0 ? "Add repo" : u })
             ]
           }
         ) })
@@ -13664,7 +13664,7 @@ function xx() {
         }
       )
     ] }) }),
-    /* @__PURE__ */ U.jsx("div", { className: "mx-6 my-6 bg-appverse-black px-6 py-3", children: /* @__PURE__ */ U.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
+    /* @__PURE__ */ U.jsx("div", { className: "mx-6 my-6 bg-appverse-black px-4 py-3 rounded-appverse", children: /* @__PURE__ */ U.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
       /* @__PURE__ */ U.jsxs(
         "button",
         {
