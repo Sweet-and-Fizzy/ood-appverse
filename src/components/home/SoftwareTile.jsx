@@ -76,7 +76,7 @@ export default function SoftwareTile({ software, appCount = 0 }) {
               </span>
             </span>
             <span className={appCount === 0 ? 'text-appverse-green' : 'text-appverse-black'}>
-              {appCount === 0 ? 'Add Repos' : appCountText}
+              {appCount === 0 ? 'Add repo' : appCountText}
             </span>
           </span>
         </div>

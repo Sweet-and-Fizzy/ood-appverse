@@ -178,7 +178,7 @@ export default function SoftwareHome() {
       </div>
 
       {/* Search and filter toggle section */}
-      <div className="mx-6 my-6 bg-appverse-black px-6 py-3">
+      <div className="mx-6 my-6 bg-appverse-black px-4 py-3 rounded-appverse">
         <div className="flex items-center justify-between gap-4">
           {/* Toggle filters button */}
           <button

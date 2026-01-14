@@ -22,11 +22,11 @@ export default function SearchBar({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-4 pr-12 py-2 border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 hover:border-gray-400 focus:ring-0 transition-colors"
+        className="w-full pl-4 pr-10 py-2 border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 hover:border-gray-400 focus:ring-0 transition-colors rounded-appverse"
       />
 
       {/* Search icon */}
-      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
         <Search className="h-4 w-4 text-gray-600" />
       </div>
     </div>
