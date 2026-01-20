@@ -13537,7 +13537,7 @@ function _x({
 }
 function kx({ software: e, appCount: a = 0 }) {
   var d;
-  const r = ((d = e.attributes) == null ? void 0 : d.title) || "Untitled Software", i = e.logoUrl, s = Ki(r), u = a === 1 ? "repo" : "repos", c = (g) => {
+  const r = ((d = e.attributes) == null ? void 0 : d.title) || "Untitled Software", i = e.logoUrl, s = Ki(r), u = a === 1 ? "app" : "apps", c = (g) => {
     console.error(`Failed to load logo for ${r}:`, i);
   };
   return /* @__PURE__ */ U.jsx(
@@ -13569,7 +13569,7 @@ function kx({ software: e, appCount: a = 0 }) {
             className: `inline-flex items-center gap-1.5 text-base font-medium ${a === 0 ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`,
             children: [
               /* @__PURE__ */ U.jsx("span", { className: `relative inline-flex items-center justify-center w-5 h-5 rounded-full ${a === 0 ? "bg-appverse-green" : "bg-appverse-blue"}`, children: /* @__PURE__ */ U.jsx("span", { className: "text-[10px] font-bold text-white leading-none", children: a === 0 ? "★" : a }) }),
-              /* @__PURE__ */ U.jsx("span", { className: a === 0 ? "text-appverse-green" : "text-appverse-black", children: a === 0 ? "Add repo" : u })
+              /* @__PURE__ */ U.jsx("span", { className: a === 0 ? "text-appverse-green" : "text-appverse-black", children: a === 0 ? "Add an app" : u })
             ]
           }
         ) })
@@ -13790,7 +13790,7 @@ function Cx({ software: e }) {
       {
         href: "/node/add/appverse_app",
         className: "corner-highlight w-fit py-3 px-8 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors",
-        children: "Add a repo"
+        children: "Add an app"
       }
     )
   ] });
