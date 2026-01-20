@@ -17,7 +17,7 @@ export default function SoftwareTile({ software, appCount = 0 }) {
   const slug = slugify(softwareTitle);
 
   // Format app count text (number is shown in circle, so just singular/plural)
-  const appCountText = appCount === 1 ? 'repo' : 'repos';
+  const appCountText = appCount === 1 ? 'app' : 'apps';
 
   // Debug: Log if logo URL exists but might be broken
   const handleImageError = (e) => {
@@ -76,7 +76,7 @@ export default function SoftwareTile({ software, appCount = 0 }) {
               </span>
             </span>
             <span className={appCount === 0 ? 'text-appverse-green' : 'text-appverse-black'}>
-              {appCount === 0 ? 'Add repo' : appCountText}
+              {appCount === 0 ? 'Add an app' : appCountText}
             </span>
           </span>
         </div>

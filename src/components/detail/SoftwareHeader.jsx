@@ -120,7 +120,7 @@ export default function SoftwareHeader({ software }) {
         href="/node/add/appverse_app"
         className="corner-highlight w-fit py-3 px-8 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
       >
-        Add a repo
+        Add an app
       </a>
     </div>
   );
