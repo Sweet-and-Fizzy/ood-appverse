@@ -7,6 +7,7 @@
  * @param {number} appCount - Number of apps for this software
  */
 import { Link } from 'react-router-dom';
+import { StarFill } from 'react-bootstrap-icons';
 import { slugify } from '../../utils/slugify';
 
 export default function SoftwareTile({ software, appCount = 0 }) {
@@ -68,12 +69,16 @@ export default function SoftwareTile({ software, appCount = 0 }) {
               appCount === 0 ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
             }`}
           >
-            <span className={`relative inline-flex items-center justify-center w-5 h-5 rounded-full ${
+            <span className={`grid place-items-center w-5 h-5 rounded-full ${
               appCount === 0 ? 'bg-appverse-green' : 'bg-appverse-blue'
             }`}>
-              <span className="text-[10px] font-bold text-white leading-none">
-                {appCount === 0 ? '★' : appCount}
-              </span>
+              {appCount === 0 ? (
+                <StarFill className="w-2.5 h-2.5 text-white -translate-y-[0.5px]" />
+              ) : (
+                <span className="text-[10px] font-bold text-white translate-x-[0.5px] -translate-y-[2px]">
+                  {appCount}
+                </span>
+              )}
             </span>
             <span className={appCount === 0 ? 'text-appverse-green' : 'text-appverse-black'}>
               {appCount === 0 ? 'Add an app' : appCountText}
