@@ -147,6 +147,13 @@ export default function SoftwareHome() {
       });
     }
 
+    // Sort alphabetically by title
+    filtered.sort((a, b) => {
+      const nameA = (a.title || '').toLowerCase();
+      const nameB = (b.title || '').toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+
     return filtered;
   }, [searchedSoftware, filters, appsBySoftwareId]);
 
