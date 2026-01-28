@@ -13655,7 +13655,7 @@ function xx() {
   return s ? /* @__PURE__ */ U.jsx(dA, { error: s, onRetry: u }) : /* @__PURE__ */ U.jsxs("div", { className: "min-h-screen bg-white", children: [
     /* @__PURE__ */ U.jsx("div", { className: "mx-6 mt-6 mb-4", children: /* @__PURE__ */ U.jsxs("div", { className: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8", children: [
       /* @__PURE__ */ U.jsxs("div", { className: "flex-1", children: [
-        /* @__PURE__ */ U.jsx("h1", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "Welcome to the Appverse" }),
+        /* @__PURE__ */ U.jsx("h2", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "Welcome to the Appverse" }),
         /* @__PURE__ */ U.jsx("p", { className: "text-base font-sans text-appverse-black max-w-2xl", children: "The Open OnDemand Appverse is a community-driven catalog of scientific software, interactive applications, dashboards, and widgets with shared deployment configurations that HPC centers can use to extend their Open OnDemand portals." })
       ] }),
       /* @__PURE__ */ U.jsx(
@@ -44583,7 +44583,7 @@ function QD({ app: e, isExpanded: a, onToggle: r }) {
     /* @__PURE__ */ U.jsxs("div", { className: "!p-5", children: [
       /* @__PURE__ */ U.jsxs("div", { className: "hidden md:flex md:gap-6", children: [
         /* @__PURE__ */ U.jsxs("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ U.jsx("h2", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: i }),
+          /* @__PURE__ */ U.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: i }),
           d && /* @__PURE__ */ U.jsx("p", { className: "text-sm font-sans text-appverse-black mb-2", children: d.name }),
           E && /* @__PURE__ */ U.jsxs("p", { className: "text-sm font-sans text-appverse-black", children: [
             /* @__PURE__ */ U.jsx("span", { className: "font-semibold", children: "LAST COMMIT:" }),
@@ -44598,7 +44598,7 @@ function QD({ app: e, isExpanded: a, onToggle: r }) {
         ] })
       ] }),
       /* @__PURE__ */ U.jsxs("div", { className: "md:hidden", children: [
-        /* @__PURE__ */ U.jsx("h2", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: i }),
+        /* @__PURE__ */ U.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: i }),
         d && /* @__PURE__ */ U.jsx("p", { className: "text-sm font-sans text-appverse-black mb-2", children: d.name }),
         E && /* @__PURE__ */ U.jsxs("p", { className: "text-sm font-sans text-appverse-black", children: [
           /* @__PURE__ */ U.jsx("span", { className: "font-semibold", children: "LAST COMMIT:" }),
@@ -44632,7 +44632,7 @@ function QD({ app: e, isExpanded: a, onToggle: r }) {
 function JD({ apps: e, expandedAppId: a, onToggleApp: r }) {
   return !e || e.length === 0 ? /* @__PURE__ */ U.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
     /* @__PURE__ */ U.jsx("div", { className: "w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4", children: /* @__PURE__ */ U.jsx(oA, { className: "w-10 h-10 text-gray-400" }) }),
-    /* @__PURE__ */ U.jsx("h2", { className: "text-xl font-serif font-bold text-appverse-black mb-2", children: "No Apps Found" }),
+    /* @__PURE__ */ U.jsx("h3", { className: "text-xl font-serif font-bold text-appverse-black mb-2", children: "No Apps Found" }),
     /* @__PURE__ */ U.jsx("p", { className: "text-gray-600 font-sans text-center max-w-md", children: "There are no applications implementing this software yet." })
   ] }) : /* @__PURE__ */ U.jsx("div", { className: "space-y-4", children: e.map((i) => /* @__PURE__ */ U.jsx(
     QD,
