@@ -99,9 +99,9 @@ export default function AppRow({ app, isExpanded, onToggle }) {
         <div className="hidden md:flex md:gap-6">
           {/* Left column: title, org, date */}
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-sans font-bold text-appverse-black mb-1">
+            <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
               {title}
-            </h2>
+            </h3>
             {organization && (
               <p className="text-sm font-sans text-appverse-black mb-2">
                 {organization.name}
@@ -129,9 +129,9 @@ export default function AppRow({ app, isExpanded, onToggle }) {
         {/* Mobile layout - stacked (hidden on desktop) */}
         <div className="md:hidden">
           {/* Title, org, date */}
-          <h2 className="text-xl font-sans font-bold text-appverse-black mb-1">
+          <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
             {title}
-          </h2>
+          </h3>
           {organization && (
             <p className="text-sm font-sans text-appverse-black mb-2">
               {organization.name}

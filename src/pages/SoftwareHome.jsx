@@ -168,9 +168,9 @@ export default function SoftwareHome() {
       <div className="mx-6 mt-6 mb-4">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
           <div className="flex-1">
-            <h1 className="text-3xl font-serif font-bold text-appverse-black mb-2">
+            <h2 className="text-3xl font-serif font-bold text-appverse-black mb-2">
               Welcome to the Appverse
-            </h1>
+            </h2>
             <p className="text-base font-sans text-appverse-black max-w-2xl">
               The Open OnDemand Appverse is a community-driven catalog of scientific software, interactive applications, dashboards, and widgets with shared deployment configurations that HPC centers can use to extend their Open OnDemand portals.
             </p>

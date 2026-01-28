@@ -18,9 +18,9 @@ export default function AppList({ apps, expandedAppId, onToggleApp }) {
         <div className="w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4">
           <FileText className="w-10 h-10 text-gray-400" />
         </div>
-        <h2 className="text-xl font-serif font-bold text-appverse-black mb-2">
+        <h3 className="text-xl font-serif font-bold text-appverse-black mb-2">
           No Apps Found
-        </h2>
+        </h3>
         <p className="text-gray-600 font-sans text-center max-w-md">
           There are no applications implementing this software yet.
         </p>
