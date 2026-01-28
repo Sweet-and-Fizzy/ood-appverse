@@ -4,6 +4,7 @@
  */
 import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
 import { AppverseDataProvider } from './contexts/AppverseDataContext'
+import { FlagProvider } from './contexts/FlagContext'
 import SoftwareHome from './pages/SoftwareHome'
 import SoftwareDetail from './pages/SoftwareDetail'
 
@@ -22,19 +23,21 @@ function LegacyRedirect() {
 export default function App() {
   return (
     <AppverseDataProvider>
-      <div className="appverse-container">
-        <main>
-          <Routes>
-            <Route path="/" element={<SoftwareHome />} />
-            {/* Slug route: /gimp → looks up "gimp" in slugMap */}
-            <Route path="/:slug" element={<SoftwareDetail />} />
-            {/* Legacy route redirects: /appverse/* → /* */}
-            <Route path="/appverse/*" element={<LegacyRedirect />} />
-            {/* Catch-all: redirect any unmatched route to main page */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-      </div>
+      <FlagProvider>
+        <div className="appverse-container">
+          <main>
+            <Routes>
+              <Route path="/" element={<SoftwareHome />} />
+              {/* Slug route: /gimp → looks up "gimp" in slugMap */}
+              <Route path="/:slug" element={<SoftwareDetail />} />
+              {/* Legacy route redirects: /appverse/* → /* */}
+              <Route path="/appverse/*" element={<LegacyRedirect />} />
+              {/* Catch-all: redirect any unmatched route to main page */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+        </div>
+      </FlagProvider>
     </AppverseDataProvider>
   )
 }
