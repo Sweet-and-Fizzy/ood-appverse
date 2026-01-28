@@ -75,7 +75,7 @@ export default function SoftwareTile({ software, appCount = 0 }) {
               {appCount === 0 ? (
                 <StarFill className="w-2.5 h-2.5 text-white -translate-y-[0.5px]" />
               ) : (
-                <span className="text-[10px] font-bold text-white translate-x-[0.5px] -translate-y-[2px]">
+                <span className="text-[10px] font-bold text-white -translate-y-[2px]">
                   {appCount}
                 </span>
               )}
