@@ -12623,7 +12623,11 @@ async function iA(e = "") {
 }
 async function HN(e, a = "") {
   const r = a, i = await iA(a), o = `${r}/flag/flag/appverse_apps/${e}?_format=json`;
-  console.log("[FlagApi] Flagging app:", { nid: e, flagUrl: o });
+  console.log("[FlagApi] Step 1: CSRF token from /session/token:", i), console.log("[FlagApi] Step 2: POST", o, {
+    method: "POST",
+    credentials: "include",
+    headers: { "X-CSRF-Token": i, "Content-Type": "application/json" }
+  });
   const u = await fetch(o, {
     method: "POST",
     credentials: "include",
@@ -12632,7 +12636,7 @@ async function HN(e, a = "") {
       "Content-Type": "application/json"
     }
   });
-  if (console.log("[FlagApi] Flag response:", u.status, u.statusText), u.status === 403)
+  if (console.log("[FlagApi] Step 2 response:", u.status, u.statusText), u.status === 403)
     throw new Error("Not authenticated");
   if (!u.ok) {
     const d = await u.text();
@@ -12643,7 +12647,11 @@ async function HN(e, a = "") {
 }
 async function qN(e, a = "") {
   const r = a, i = await iA(a), o = `${r}/flag/unflag/appverse_apps/${e}?_format=json`;
-  console.log("[FlagApi] Unflagging app:", { nid: e, unflagUrl: o });
+  console.log("[FlagApi] Step 1: CSRF token from /session/token:", i), console.log("[FlagApi] Step 3: POST", o, {
+    method: "POST",
+    credentials: "include",
+    headers: { "X-CSRF-Token": i, "Content-Type": "application/json" }
+  });
   const u = await fetch(o, {
     method: "POST",
     credentials: "include",
@@ -12652,7 +12660,7 @@ async function qN(e, a = "") {
       "Content-Type": "application/json"
     }
   });
-  if (console.log("[FlagApi] Unflag response:", u.status, u.statusText), u.status === 403)
+  if (console.log("[FlagApi] Step 3 response:", u.status, u.statusText), u.status === 403)
     throw new Error("Not authenticated");
   if (!u.ok) {
     const d = await u.text();
@@ -12666,7 +12674,7 @@ function VN({ children: e }) {
   const a = tp(), [r, i] = G.useState(/* @__PURE__ */ new Set()), [o, u] = G.useState(!0), [c, d] = G.useState(!1), [f, g] = G.useState(/* @__PURE__ */ new Set());
   G.useEffect(() => {
     (async () => {
-      console.log("[FlagContext][2] Initializing with config:", {
+      console.log("[FlagContext][3] Initializing with config:", {
         apiBaseUrl: a.apiBaseUrl,
         siteBaseUrl: a.siteBaseUrl
       });

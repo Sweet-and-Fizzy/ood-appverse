@@ -133,7 +133,12 @@ export async function flagApp(nid, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
   const flagUrl = `${baseUrl}/flag/flag/appverse_apps/${nid}?_format=json`;
 
-  console.log('[FlagApi] Flagging app:', { nid, flagUrl });
+  console.log('[FlagApi] Step 1: CSRF token from /session/token:', token);
+  console.log('[FlagApi] Step 2: POST', flagUrl, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'X-CSRF-Token': token, 'Content-Type': 'application/json' }
+  });
 
   const response = await fetch(flagUrl, {
     method: 'POST',
@@ -144,7 +149,7 @@ export async function flagApp(nid, siteBaseUrl = '') {
     }
   });
 
-  console.log('[FlagApi] Flag response:', response.status, response.statusText);
+  console.log('[FlagApi] Step 2 response:', response.status, response.statusText);
 
   if (response.status === 403) {
     throw new Error('Not authenticated');
@@ -172,7 +177,12 @@ export async function unflagApp(nid, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
   const unflagUrl = `${baseUrl}/flag/unflag/appverse_apps/${nid}?_format=json`;
 
-  console.log('[FlagApi] Unflagging app:', { nid, unflagUrl });
+  console.log('[FlagApi] Step 1: CSRF token from /session/token:', token);
+  console.log('[FlagApi] Step 3: POST', unflagUrl, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'X-CSRF-Token': token, 'Content-Type': 'application/json' }
+  });
 
   const response = await fetch(unflagUrl, {
     method: 'POST',
@@ -183,7 +193,7 @@ export async function unflagApp(nid, siteBaseUrl = '') {
     }
   });
 
-  console.log('[FlagApi] Unflag response:', response.status, response.statusText);
+  console.log('[FlagApi] Step 3 response:', response.status, response.statusText);
 
   if (response.status === 403) {
     throw new Error('Not authenticated');
