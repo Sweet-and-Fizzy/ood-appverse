@@ -23,6 +23,8 @@ export function FlagProvider({ children }) {
   const config = useConfig();
   // Store flagged app UUIDs (not NIDs) since that's what the JSON:API returns
   const [flaggedIds, setFlaggedIds] = useState(new Set());
+  // Map of appId → flaggingId (needed for unflagging via JSON:API DELETE)
+  const [flaggingMap, setFlaggingMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   // Track in-flight requests to prevent duplicates and show loading states
@@ -31,7 +33,7 @@ export function FlagProvider({ children }) {
   // Check authentication and fetch flagged apps on mount
   useEffect(() => {
     const init = async () => {
-      console.log('[FlagContext][4] Initializing with config:', {
+      console.log('[FlagContext][5] Initializing with config:', {
         apiBaseUrl: config.apiBaseUrl,
         siteBaseUrl: config.siteBaseUrl
       });
@@ -39,6 +41,7 @@ export function FlagProvider({ children }) {
       const result = await checkAuthAndFetchFlags(config.apiBaseUrl, config.siteBaseUrl);
       setAuthenticated(result.authenticated);
       setFlaggedIds(new Set(result.flaggedIds));
+      setFlaggingMap(result.flaggingMap || {});
       setLoading(false);
     };
 
@@ -64,11 +67,11 @@ export function FlagProvider({ children }) {
   }, [pendingIds]);
 
   /**
-   * Toggle flag state for an app (with optimistic update)
+   * Toggle flag state for an app (with optimistic update).
+   * Uses JSON:API: POST to create a flagging, DELETE to remove one.
    * @param {string} appId - App UUID
-   * @param {number} nid - Drupal node ID (required for flag API)
    */
-  const toggleFlag = useCallback(async (appId, nid) => {
+  const toggleFlag = useCallback(async (appId) => {
     if (!authenticated) {
       console.log('[FlagContext] toggleFlag: user not authenticated');
       return;
@@ -79,7 +82,7 @@ export function FlagProvider({ children }) {
     }
 
     const wasFlagged = flaggedIds.has(appId);
-    console.log('[FlagContext] toggleFlag:', { appId, nid, wasFlagged, action: wasFlagged ? 'unflag' : 'flag' });
+    console.log('[FlagContext] toggleFlag:', { appId, wasFlagged, action: wasFlagged ? 'unflag' : 'flag' });
 
     // Optimistic update
     setPendingIds(prev => new Set(prev).add(appId));
@@ -95,9 +98,21 @@ export function FlagProvider({ children }) {
 
     try {
       if (wasFlagged) {
-        await unflagApp(nid, config.siteBaseUrl);
+        const flaggingId = flaggingMap[appId];
+        if (!flaggingId) {
+          throw new Error(`No flagging UUID found for app ${appId}`);
+        }
+        await unflagApp(flaggingId, config.apiBaseUrl, config.siteBaseUrl);
+        // Remove from map
+        setFlaggingMap(prev => {
+          const next = { ...prev };
+          delete next[appId];
+          return next;
+        });
       } else {
-        await flagApp(nid, config.siteBaseUrl);
+        const result = await flagApp(appId, config.apiBaseUrl, config.siteBaseUrl);
+        // Store the new flagging UUID so we can unflag later
+        setFlaggingMap(prev => ({ ...prev, [appId]: result.flaggingId }));
       }
       console.log('[FlagContext] toggleFlag: success');
     } catch (error) {
@@ -119,7 +134,7 @@ export function FlagProvider({ children }) {
         return next;
       });
     }
-  }, [authenticated, flaggedIds, pendingIds, config.siteBaseUrl]);
+  }, [authenticated, flaggedIds, flaggingMap, pendingIds, config.apiBaseUrl, config.siteBaseUrl]);
 
   const value = {
     authenticated,

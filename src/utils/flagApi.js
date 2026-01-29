@@ -65,12 +65,20 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
     }
 
     const data = await flagResponse.json();
-    const flaggedIds = (data.data || [])
-      .map(flagging => flagging.relationships?.flagged_entity?.data?.id)
-      .filter(Boolean);
+    // Build both a list of flagged app UUIDs and a map of appId → flaggingId
+    // (the flagging UUID is needed for unflagging via JSON:API DELETE)
+    const flaggedIds = [];
+    const flaggingMap = {};
+    for (const flagging of (data.data || [])) {
+      const appId = flagging.relationships?.flagged_entity?.data?.id;
+      if (appId) {
+        flaggedIds.push(appId);
+        flaggingMap[appId] = flagging.id;
+      }
+    }
 
     console.log('[FlagApi] Authenticated, user has', flaggedIds.length, 'flagged apps:', flaggedIds);
-    return { authenticated: true, flaggedIds };
+    return { authenticated: true, flaggedIds, flaggingMap };
   } catch (error) {
     console.error('[FlagApi] Auth check failed:', error);
     return { authenticated: false, flaggedIds: [] };
@@ -147,33 +155,44 @@ export function clearCsrfToken() {
 }
 
 /**
- * Flag an app for the current user
- * @param {number} nid - Drupal node ID (drupal_internal__nid)
- * @param {string} siteBaseUrl - Base URL for site
- * @returns {Promise<{status: boolean}>}
+ * Flag an app via JSON:API (create a flagging entity)
+ * @param {string} appId - App UUID
+ * @param {string} apiBaseUrl - Base URL for JSON:API calls
+ * @param {string} siteBaseUrl - Base URL for CSRF token endpoint
+ * @returns {Promise<{flaggingId: string}>} The created flagging entity's UUID
  */
-export async function flagApp(nid, siteBaseUrl = '') {
-  const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
+export async function flagApp(appId, apiBaseUrl, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
-  const flagUrl = `${baseUrl}/flag/flag/appverse_apps/${nid}?_format=json`;
+  const flagUrl = `${apiBaseUrl}/flagging/appverse_apps`;
 
-  console.log('[FlagApi] Step 1: CSRF token from /session/token:', token);
-  console.log('[FlagApi] Step 2: POST', flagUrl, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'X-CSRF-Token': token, 'Content-Type': 'application/json' }
-  });
+  const body = {
+    data: {
+      type: 'flagging--appverse_apps',
+      relationships: {
+        flagged_entity: {
+          data: {
+            type: 'node--appverse_app',
+            id: appId
+          }
+        }
+      }
+    }
+  };
+
+  console.log('[FlagApi] Flagging app via JSON:API POST:', flagUrl, { appId });
 
   const response = await fetch(flagUrl, {
     method: 'POST',
     credentials: 'include',
     headers: {
       'X-CSRF-Token': token,
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/vnd.api+json',
+      'Accept': 'application/vnd.api+json'
+    },
+    body: JSON.stringify(body)
   });
 
-  console.log('[FlagApi] Step 2 response:', response.status, response.statusText);
+  console.log('[FlagApi] Flag response:', response.status, response.statusText);
 
   if (response.status === 403) {
     throw new Error('Not authenticated');
@@ -186,51 +205,45 @@ export async function flagApp(nid, siteBaseUrl = '') {
   }
 
   const data = await response.json();
-  console.log('[FlagApi] Flag success:', data);
-  return data;
+  const flaggingId = data.data?.id;
+  console.log('[FlagApi] Flag success, flagging UUID:', flaggingId);
+  return { flaggingId };
 }
 
 /**
- * Unflag an app for the current user
- * @param {number} nid - Drupal node ID
- * @param {string} siteBaseUrl - Base URL for site
- * @returns {Promise<{status: boolean}>}
+ * Unflag an app via JSON:API (delete the flagging entity)
+ * @param {string} flaggingId - Flagging entity UUID (not the app UUID)
+ * @param {string} apiBaseUrl - Base URL for JSON:API calls
+ * @param {string} siteBaseUrl - Base URL for CSRF token endpoint
  */
-export async function unflagApp(nid, siteBaseUrl = '') {
-  const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
+export async function unflagApp(flaggingId, apiBaseUrl, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
-  const unflagUrl = `${baseUrl}/flag/unflag/appverse_apps/${nid}?_format=json`;
+  const unflagUrl = `${apiBaseUrl}/flagging/appverse_apps/${flaggingId}`;
 
-  console.log('[FlagApi] Step 1: CSRF token from /session/token:', token);
-  console.log('[FlagApi] Step 3: POST', unflagUrl, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'X-CSRF-Token': token, 'Content-Type': 'application/json' }
-  });
+  console.log('[FlagApi] Unflagging via JSON:API DELETE:', unflagUrl, { flaggingId });
 
   const response = await fetch(unflagUrl, {
-    method: 'POST',
+    method: 'DELETE',
     credentials: 'include',
     headers: {
       'X-CSRF-Token': token,
-      'Content-Type': 'application/json'
+      'Accept': 'application/vnd.api+json'
     }
   });
 
-  console.log('[FlagApi] Step 3 response:', response.status, response.statusText);
+  console.log('[FlagApi] Unflag response:', response.status, response.statusText);
 
   if (response.status === 403) {
     throw new Error('Not authenticated');
   }
 
+  // JSON:API DELETE returns 204 No Content on success
   if (!response.ok) {
     const text = await response.text();
     console.error('[FlagApi] Unflag failed:', text);
     throw new Error(`Failed to unflag app: ${response.statusText}`);
   }
 
-  const data = await response.json();
-  console.log('[FlagApi] Unflag success:', data);
-  return data;
+  console.log('[FlagApi] Unflag success');
 }
 

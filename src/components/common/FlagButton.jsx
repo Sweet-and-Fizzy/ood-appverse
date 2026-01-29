@@ -4,13 +4,12 @@
  *
  * Props:
  * @param {string} appId - App UUID (used for tracking flag state)
- * @param {number} nid - Drupal node ID (used for flag API calls)
  * @param {string} className - Additional CSS classes
  */
 import { Flag, FlagFill } from 'react-bootstrap-icons';
 import { useFlag } from '../../contexts/FlagContext';
 
-export default function FlagButton({ appId, nid, className = '' }) {
+export default function FlagButton({ appId, className = '' }) {
   const { authenticated, loading, isFlagged, isPending, toggleFlag } = useFlag();
 
   // Don't render for unauthenticated users
@@ -24,7 +23,7 @@ export default function FlagButton({ appId, nid, className = '' }) {
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFlag(appId, nid);
+    toggleFlag(appId);
   };
 
   return (

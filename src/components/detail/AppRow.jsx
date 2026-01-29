@@ -23,9 +23,8 @@ export default function AppRow({ app, isExpanded, onToggle }) {
   const organization = app.organization;
   const tags = app.tags || [];
 
-  // App identifiers for flagging
+  // App identifier for flagging
   const appId = app.id; // UUID
-  const nid = app.attributes?.drupal_internal__nid; // Drupal node ID for flag API
 
   // For smooth height animation of README panel
   const readmeRef = useRef(null);
@@ -127,7 +126,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
           {/* Right column: action buttons (vertical) */}
           <div className="flex flex-col gap-2 flex-shrink-0 w-[150px]">
             <ViewRepoButton />
-            {nid && <FlagButton appId={appId} nid={nid} />}
+            <FlagButton appId={appId} />
             <ShowReadmeButton className="mt-auto" />
           </div>
         </div>
@@ -159,7 +158,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
           {/* Action buttons (horizontal row) */}
           <div className="flex flex-row flex-wrap gap-4 mt-4">
             <ViewRepoButton />
-            {nid && <FlagButton appId={appId} nid={nid} />}
+            <FlagButton appId={appId} />
             <ShowReadmeButton />
           </div>
         </div>
