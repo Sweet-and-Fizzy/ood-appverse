@@ -12586,7 +12586,8 @@ function jN({ children: e }) {
 }
 let Vc = null, Lr = null;
 function PN() {
-  return /S?SESS/.test(document.cookie);
+  const e = document.cookie, a = /S?SESS/.test(e);
+  return console.log("[FlagApi] Cookie check:", { cookies: e.substring(0, 100), match: a }), a;
 }
 function HN() {
   const e = PN();
@@ -12669,7 +12670,7 @@ function WN({ children: e }) {
   const a = tp(), [r, i] = G.useState(/* @__PURE__ */ new Set()), [o, u] = G.useState(!0), [c, d] = G.useState(!1), [f, g] = G.useState(/* @__PURE__ */ new Set());
   G.useEffect(() => {
     (async () => {
-      console.log("[FlagContext] Initializing with config:", {
+      console.log("[FlagContext][1] Initializing with config:", {
         apiBaseUrl: a.apiBaseUrl,
         siteBaseUrl: a.siteBaseUrl
       });
