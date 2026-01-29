@@ -157,17 +157,22 @@ export function clearCsrfToken() {
 /**
  * Flag an app via JSON:API (create a flagging entity)
  * @param {string} appId - App UUID
+ * @param {number} nid - Drupal node ID (required as entity_id attribute)
  * @param {string} apiBaseUrl - Base URL for JSON:API calls
  * @param {string} siteBaseUrl - Base URL for CSRF token endpoint
  * @returns {Promise<{flaggingId: string}>} The created flagging entity's UUID
  */
-export async function flagApp(appId, apiBaseUrl, siteBaseUrl = '') {
+export async function flagApp(appId, nid, apiBaseUrl, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
   const flagUrl = `${apiBaseUrl}/flagging/appverse_apps`;
 
   const body = {
     data: {
       type: 'flagging--appverse_apps',
+      attributes: {
+        entity_type: 'node',
+        entity_id: String(nid),
+      },
       relationships: {
         flagged_entity: {
           data: {
@@ -179,7 +184,7 @@ export async function flagApp(appId, apiBaseUrl, siteBaseUrl = '') {
     }
   };
 
-  console.log('[FlagApi] Flagging app via JSON:API POST:', flagUrl, { appId });
+  console.log('[FlagApi] Flagging app via JSON:API POST:', flagUrl, { appId, nid });
 
   const response = await fetch(flagUrl, {
     method: 'POST',

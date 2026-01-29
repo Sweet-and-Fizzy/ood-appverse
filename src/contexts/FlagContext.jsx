@@ -70,8 +70,9 @@ export function FlagProvider({ children }) {
    * Toggle flag state for an app (with optimistic update).
    * Uses JSON:API: POST to create a flagging, DELETE to remove one.
    * @param {string} appId - App UUID
+   * @param {number} nid - Drupal node ID (needed for entity_id when creating a flagging)
    */
-  const toggleFlag = useCallback(async (appId) => {
+  const toggleFlag = useCallback(async (appId, nid) => {
     if (!authenticated) {
       console.log('[FlagContext] toggleFlag: user not authenticated');
       return;
@@ -110,7 +111,7 @@ export function FlagProvider({ children }) {
           return next;
         });
       } else {
-        const result = await flagApp(appId, config.apiBaseUrl, config.siteBaseUrl);
+        const result = await flagApp(appId, nid, config.apiBaseUrl, config.siteBaseUrl);
         // Store the new flagging UUID so we can unflag later
         setFlaggingMap(prev => ({ ...prev, [appId]: result.flaggingId }));
       }
