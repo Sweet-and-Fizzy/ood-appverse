@@ -12,10 +12,9 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useConfig } from './ConfigContext';
 import {
-  isAuthenticated,
+  checkAuthAndFetchFlags,
   flagApp,
   unflagApp,
-  fetchUserFlaggings
 } from '../utils/flagApi';
 
 const FlagContext = createContext(null);
@@ -32,25 +31,14 @@ export function FlagProvider({ children }) {
   // Check authentication and fetch flagged apps on mount
   useEffect(() => {
     const init = async () => {
-      console.log('[FlagContext][1] Initializing with config:', {
+      console.log('[FlagContext][2] Initializing with config:', {
         apiBaseUrl: config.apiBaseUrl,
         siteBaseUrl: config.siteBaseUrl
       });
 
-      const isAuth = isAuthenticated();
-      setAuthenticated(isAuth);
-
-      if (isAuth) {
-        try {
-          const ids = await fetchUserFlaggings(config.apiBaseUrl);
-          setFlaggedIds(new Set(ids));
-        } catch (error) {
-          console.error('[FlagContext] Failed to fetch flagged apps:', error);
-        }
-      } else {
-        console.log('[FlagContext] User not authenticated, skipping flaggings fetch');
-      }
-
+      const result = await checkAuthAndFetchFlags(config.apiBaseUrl);
+      setAuthenticated(result.authenticated);
+      setFlaggedIds(new Set(result.flaggedIds));
       setLoading(false);
     };
 

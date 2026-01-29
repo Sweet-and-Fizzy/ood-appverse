@@ -8,32 +8,49 @@ let csrfToken = null;
 let csrfTokenPromise = null;
 
 /**
- * Check for a Drupal session cookie.
- * @returns {boolean}
+ * Check if user is authenticated by attempting to fetch their flaggings.
+ * Session cookie is HttpOnly so we can't check it from JavaScript;
+ * instead we let the server tell us via the response status.
+ * @param {string} apiBaseUrl - Base URL for API calls
+ * @returns {Promise<{authenticated: boolean, flaggedIds: string[]}>}
  */
-function hasDrupalSessionCookie() {
-  // instead of document.cookie.includes('SESSaccesscisso'),
-  // match SESS* or SSESS* to handle any Drupal site/protocol
-  const cookies = document.cookie;
-  const match = /S?SESS/.test(cookies);
-  console.log('[FlagApi] Cookie check:', { cookies: cookies.substring(0, 100), match });
-  return match;
-}
-
-/**
- * Check if user is authenticated by looking for session cookie
- * @returns {boolean}
- */
-export function isAuthenticated() {
-  // In dev mode, assume authenticated to allow UI testing
-  // (actual flag operations will still fail without real Drupal session)
+export async function checkAuthAndFetchFlags(apiBaseUrl = '/api') {
   if (import.meta.env.DEV) {
     console.log('[FlagApi] Dev mode: simulating authenticated user');
-    return true;
+    return { authenticated: true, flaggedIds: [] };
   }
-  const hasSession = hasDrupalSessionCookie();
-  console.log('[FlagApi] isAuthenticated:', hasSession);
-  return hasSession;
+
+  const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
+  console.log('[FlagApi] Checking auth via flaggings fetch:', flaggingsUrl);
+
+  try {
+    const response = await fetch(flaggingsUrl, {
+      credentials: 'include'
+    });
+
+    console.log('[FlagApi] Auth check response:', response.status, response.statusText);
+
+    if (response.status === 403 || response.status === 401) {
+      console.log('[FlagApi] User not authenticated');
+      return { authenticated: false, flaggedIds: [] };
+    }
+
+    if (!response.ok) {
+      console.error('[FlagApi] Unexpected status:', response.status);
+      return { authenticated: false, flaggedIds: [] };
+    }
+
+    const data = await response.json();
+    const flaggedIds = (data.data || [])
+      .map(flagging => flagging.relationships?.flagged_entity?.data?.id)
+      .filter(Boolean);
+
+    console.log('[FlagApi] Authenticated, user has', flaggedIds.length, 'flagged apps:', flaggedIds);
+    return { authenticated: true, flaggedIds };
+  } catch (error) {
+    console.error('[FlagApi] Auth check failed:', error);
+    return { authenticated: false, flaggedIds: [] };
+  }
 }
 
 /**
@@ -183,40 +200,3 @@ export async function unflagApp(nid, siteBaseUrl = '') {
   return data;
 }
 
-/**
- * Fetch the current user's flagged apps via JSON:API
- * Returns the UUIDs of flagged app nodes
- * @param {string} apiBaseUrl - Base URL for API calls (e.g., '/api')
- * @returns {Promise<string[]>} Array of flagged app UUIDs
- */
-export async function fetchUserFlaggings(apiBaseUrl = '/api') {
-  const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
-  console.log('[FlagApi] Fetching user flaggings from:', flaggingsUrl);
-
-  const response = await fetch(flaggingsUrl, {
-    credentials: 'include'
-  });
-
-  console.log('[FlagApi] Flaggings response:', response.status, response.statusText);
-
-  // Not authenticated or no flags - return empty array
-  if (response.status === 403 || response.status === 401) {
-    console.log('[FlagApi] User not authenticated, returning empty flaggings');
-    return [];
-  }
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch flagged apps: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-
-  // Extract app UUIDs from the flagging relationships
-  // Each flagging has relationships.flagged_entity.data.id which is the app UUID
-  const flaggedAppIds = (data.data || [])
-    .map(flagging => flagging.relationships?.flagged_entity?.data?.id)
-    .filter(Boolean);
-
-  console.log('[FlagApi] User has', flaggedAppIds.length, 'flagged apps:', flaggedAppIds);
-  return flaggedAppIds;
-}
