@@ -14,7 +14,10 @@ let csrfTokenPromise = null;
 function hasDrupalSessionCookie() {
   // instead of document.cookie.includes('SESSaccesscisso'),
   // match SESS* or SSESS* to handle any Drupal site/protocol
-  return /S?SESS/.test(document.cookie);
+  const cookies = document.cookie;
+  const match = /S?SESS/.test(cookies);
+  console.log('[FlagApi] Cookie check:', { cookies: cookies.substring(0, 100), match });
+  return match;
 }
 
 /**

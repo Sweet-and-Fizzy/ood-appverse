@@ -32,7 +32,7 @@ export function FlagProvider({ children }) {
   // Check authentication and fetch flagged apps on mount
   useEffect(() => {
     const init = async () => {
-      console.log('[FlagContext] Initializing with config:', {
+      console.log('[FlagContext][1] Initializing with config:', {
         apiBaseUrl: config.apiBaseUrl,
         siteBaseUrl: config.siteBaseUrl
       });
