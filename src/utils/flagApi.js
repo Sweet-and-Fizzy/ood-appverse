@@ -8,39 +8,63 @@ let csrfToken = null;
 let csrfTokenPromise = null;
 
 /**
- * Check if user is authenticated by attempting to fetch their flaggings.
- * Session cookie is HttpOnly so we can't check it from JavaScript;
- * instead we let the server tell us via the response status.
- * @param {string} apiBaseUrl - Base URL for API calls
+ * Check if user is authenticated using Drupal's /user/login_status endpoint,
+ * then fetch their flaggings if logged in.
+ *
+ * Previous approach checked /jsonapi/flagging/appverse_apps response status,
+ * but that endpoint returns 200 for anonymous users too.
+ *
+ * @param {string} apiBaseUrl - Base URL for JSON:API calls
+ * @param {string} siteBaseUrl - Base URL for non-API Drupal endpoints
  * @returns {Promise<{authenticated: boolean, flaggedIds: string[]}>}
  */
-export async function checkAuthAndFetchFlags(apiBaseUrl = '/api') {
+export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = '') {
   if (import.meta.env.DEV) {
     console.log('[FlagApi] Dev mode: simulating authenticated user');
     return { authenticated: true, flaggedIds: [] };
   }
 
-  const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
-  console.log('[FlagApi] Checking auth via flaggings fetch:', flaggingsUrl);
+  // Step 1: Check login status via Drupal core endpoint
+  // Returns 1 for logged-in, 0 for anonymous
+  const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
+  const loginStatusUrl = `${baseUrl}/user/login_status?_format=json`;
+  console.log('[FlagApi] Checking login status:', loginStatusUrl);
 
   try {
-    const response = await fetch(flaggingsUrl, {
+    const statusResponse = await fetch(loginStatusUrl, {
       credentials: 'include'
     });
 
-    console.log('[FlagApi] Auth check response:', response.status, response.statusText);
+    console.log('[FlagApi] Login status response:', statusResponse.status);
 
-    if (response.status === 403 || response.status === 401) {
-      console.log('[FlagApi] User not authenticated');
+    if (!statusResponse.ok) {
+      console.error('[FlagApi] Login status check failed:', statusResponse.status);
       return { authenticated: false, flaggedIds: [] };
     }
 
-    if (!response.ok) {
-      console.error('[FlagApi] Unexpected status:', response.status);
+    const loginStatus = await statusResponse.json();
+    console.log('[FlagApi] Login status value:', loginStatus);
+
+    if (loginStatus !== 1) {
+      console.log('[FlagApi] User not authenticated (login_status =', loginStatus, ')');
       return { authenticated: false, flaggedIds: [] };
     }
 
-    const data = await response.json();
+    // Step 2: User is authenticated, fetch their flaggings
+    const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
+    console.log('[FlagApi] User authenticated, fetching flaggings:', flaggingsUrl);
+
+    const flagResponse = await fetch(flaggingsUrl, {
+      credentials: 'include'
+    });
+
+    if (!flagResponse.ok) {
+      console.error('[FlagApi] Flaggings fetch failed:', flagResponse.status);
+      // Authenticated but can't fetch flaggings — still report as authenticated
+      return { authenticated: true, flaggedIds: [] };
+    }
+
+    const data = await flagResponse.json();
     const flaggedIds = (data.data || [])
       .map(flagging => flagging.relationships?.flagged_entity?.data?.id)
       .filter(Boolean);

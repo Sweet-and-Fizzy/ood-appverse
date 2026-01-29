@@ -31,12 +31,12 @@ export function FlagProvider({ children }) {
   // Check authentication and fetch flagged apps on mount
   useEffect(() => {
     const init = async () => {
-      console.log('[FlagContext][3] Initializing with config:', {
+      console.log('[FlagContext][4] Initializing with config:', {
         apiBaseUrl: config.apiBaseUrl,
         siteBaseUrl: config.siteBaseUrl
       });
 
-      const result = await checkAuthAndFetchFlags(config.apiBaseUrl);
+      const result = await checkAuthAndFetchFlags(config.apiBaseUrl, config.siteBaseUrl);
       setAuthenticated(result.authenticated);
       setFlaggedIds(new Set(result.flaggedIds));
       setLoading(false);

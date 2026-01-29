@@ -32,6 +32,18 @@ export default defineConfig(({ mode }) => {
             });
           }
         },
+        // Drupal user endpoints (login_status, etc.)
+        '/user': {
+          target: 'https://md-2622-accessmatch.pantheonsite.io',
+          changeOrigin: true,
+          secure: false,
+          configure: (proxy) => {
+            proxy.on('proxyRes', (proxyRes) => {
+              proxyRes.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000';
+              proxyRes.headers['Access-Control-Allow-Credentials'] = 'true';
+            });
+          }
+        },
         // CSRF session token endpoint
         '/session': {
           target: 'https://md-2622-accessmatch.pantheonsite.io',
