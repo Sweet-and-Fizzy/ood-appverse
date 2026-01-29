@@ -8,6 +8,16 @@ let csrfToken = null;
 let csrfTokenPromise = null;
 
 /**
+ * Check for a Drupal session cookie.
+ * @returns {boolean}
+ */
+function hasDrupalSessionCookie() {
+  // instead of document.cookie.includes('SESSaccesscisso'),
+  // match SESS* or SSESS* to handle any Drupal site/protocol
+  return /S?SESS/.test(document.cookie);
+}
+
+/**
  * Check if user is authenticated by looking for session cookie
  * @returns {boolean}
  */
@@ -18,8 +28,7 @@ export function isAuthenticated() {
     console.log('[FlagApi] Dev mode: simulating authenticated user');
     return true;
   }
-  // Check for Drupal SSO session cookie
-  const hasSession = document.cookie.includes('SESSaccesscisso');
+  const hasSession = hasDrupalSessionCookie();
   console.log('[FlagApi] isAuthenticated:', hasSession);
   return hasSession;
 }
