@@ -141,8 +141,9 @@ export async function flagApp(nid, siteBaseUrl = '') {
   const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
   const flagUrl = `${baseUrl}/entity/flagging?_format=json`;
 
+  // Try both array-of-objects and nested target_id formats for flag_id
   const body = {
-    flag_id: [{ value: 'appverse_apps' }],
+    flag_id: [{ target_id: 'appverse_apps' }],
     entity_type: [{ value: 'node' }],
     entity_id: [{ value: String(nid) }],
   };

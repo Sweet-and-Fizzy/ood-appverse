@@ -12628,7 +12628,7 @@ async function iA(e = "") {
 async function HN(e, a = "") {
   var g, b;
   const r = await iA(a), o = `${a}/entity/flagging?_format=json`, u = {
-    flag_id: [{ value: "appverse_apps" }],
+    flag_id: [{ target_id: "appverse_apps" }],
     entity_type: [{ value: "node" }],
     entity_id: [{ value: String(e) }]
   };
