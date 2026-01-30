@@ -1,7 +1,30 @@
 /**
- * Flag API utilities for authenticated user operations
- * Uses Drupal REST entity endpoints for flag/unflag (POST/DELETE /entity/flagging),
- * and JSON:API for reading the current user's flaggings.
+ * Flag API utilities for authenticated user operations.
+ *
+ * WHAT WORKS:
+ * - Auth detection: GET /user/login_status?_format=json → returns 1 or 0
+ * - Reading flags: GET /jsonapi/flagging/appverse_apps → returns user's flaggings
+ * - CSRF tokens: GET /session/token → returns token for write operations
+ *
+ * WHAT WE NEED TO SOLVE:
+ * Creating/deleting flaggings. Two approaches have been tried:
+ *
+ * 1) JSON:API POST /jsonapi/flagging/appverse_apps
+ *    → 500: uid is NULL. JSON:API bypasses Flag module logic and does a raw
+ *      INSERT without setting uid from the session. We couldn't get the user's
+ *      UUID to pass explicitly (user entity not exposed via JSON:API or REST).
+ *
+ * 2) REST entity POST /entity/flagging?_format=json
+ *    → 422 "flag_id field is missing" (body format unclear)
+ *    → 500 after adjusting body (likely same uid problem)
+ *
+ * The Flag module's own action endpoints (/flag/flag/..., /flag/unflag/...)
+ * would handle uid automatically, but they return 404 — those routes don't
+ * exist in this Flag module version even with the Flagging REST resource enabled.
+ *
+ * flagApp() and unflagApp() below are stubs that log the request details.
+ * Use browser devtools or curl to experiment with the correct endpoint/body
+ * format, then update these functions once a working approach is found.
  */
 
 // CSRF token cache - fetch once per session
@@ -9,12 +32,8 @@ let csrfToken = null;
 let csrfTokenPromise = null;
 
 /**
- * Check if user is authenticated using Drupal's /user/login_status endpoint,
- * then fetch their flaggings if logged in.
- *
- * @param {string} apiBaseUrl - Base URL for JSON:API calls
- * @param {string} siteBaseUrl - Base URL for non-API Drupal endpoints
- * @returns {Promise<{authenticated: boolean, flaggedIds: string[]}>}
+ * Check if user is authenticated, then fetch their flaggings.
+ * This part works reliably.
  */
 export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = '') {
   if (import.meta.env.DEV) {
@@ -36,12 +55,13 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
     }
 
     const loginStatus = await statusResponse.json();
+    console.log('[FlagApi] Login status:', loginStatus);
 
     if (loginStatus !== 1) {
       return { authenticated: false, flaggedIds: [] };
     }
 
-    // User is authenticated — fetch their flaggings via JSON:API
+    // Fetch flaggings via JSON:API (this works)
     const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
     const flagResponse = await fetch(flaggingsUrl, { credentials: 'include' });
 
@@ -69,13 +89,6 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
   }
 }
 
-/**
- * Get the base URL for flag-related API calls.
- * In dev mode, we use empty string so requests go through Vite's proxy.
- * In production (embedded in Drupal), we use the provided siteBaseUrl.
- * @param {string} siteBaseUrl - Base URL for site (non-API endpoints)
- * @returns {string}
- */
 function getFlagApiBaseUrl(siteBaseUrl) {
   if (import.meta.env.DEV) {
     return '';
@@ -84,15 +97,12 @@ function getFlagApiBaseUrl(siteBaseUrl) {
 }
 
 /**
- * Fetch CSRF token from Drupal (cached for session)
- * @param {string} siteBaseUrl - Base URL for site (non-API endpoints)
- * @returns {Promise<string>}
+ * Fetch CSRF token from Drupal (cached for session). This works.
  */
 export async function getCsrfToken(siteBaseUrl = '') {
   if (csrfToken) {
     return csrfToken;
   }
-
   if (csrfTokenPromise) {
     return csrfTokenPromise;
   }
@@ -122,36 +132,40 @@ export async function getCsrfToken(siteBaseUrl = '') {
   return csrfTokenPromise;
 }
 
-/**
- * Clear cached CSRF token (e.g., on logout or session expiry)
- */
 export function clearCsrfToken() {
   csrfToken = null;
   csrfTokenPromise = null;
 }
 
 /**
- * Flag an app via Drupal REST entity endpoint (POST /entity/flagging).
- * @param {number} nid - Drupal node ID of the app to flag
+ * Flag an app — STUB. Logs everything for debugging.
+ * Once a working approach is found, replace the body/URL/method here.
+ *
+ * @param {number} nid - Drupal node ID of the app
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
- * @returns {Promise<{flaggingId: string}>} The created flagging entity's UUID
+ * @returns {Promise<{flaggingId: string}>}
  */
 export async function flagApp(nid, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
   const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
-  const flagUrl = `${baseUrl}/entity/flagging?_format=json`;
 
-  // Try both array-of-objects and nested target_id formats for flag_id
+  // === CONFIGURE ENDPOINT HERE ===
+  const url = `${baseUrl}/entity/flagging?_format=json`;
+  const method = 'POST';
   const body = {
     flag_id: [{ target_id: 'appverse_apps' }],
     entity_type: [{ value: 'node' }],
     entity_id: [{ value: String(nid) }],
   };
 
-  console.log('[FlagApi] Flagging app via REST:', flagUrl, { nid });
+  console.log('[FlagApi] === FLAG REQUEST ===');
+  console.log('[FlagApi] URL:', url);
+  console.log('[FlagApi] Method:', method);
+  console.log('[FlagApi] CSRF Token:', token?.substring(0, 10) + '...');
+  console.log('[FlagApi] Body:', JSON.stringify(body, null, 2));
 
-  const response = await fetch(flagUrl, {
-    method: 'POST',
+  const response = await fetch(url, {
+    method,
     credentials: 'include',
     headers: {
       'X-CSRF-Token': token,
@@ -160,54 +174,55 @@ export async function flagApp(nid, siteBaseUrl = '') {
     body: JSON.stringify(body)
   });
 
-  console.log('[FlagApi] Flag response:', response.status);
-
-  if (response.status === 403) {
-    throw new Error('Not authenticated');
-  }
+  const responseText = await response.text();
+  console.log('[FlagApi] === FLAG RESPONSE ===');
+  console.log('[FlagApi] Status:', response.status, response.statusText);
+  console.log('[FlagApi] Body:', responseText);
 
   if (!response.ok) {
-    const text = await response.text();
-    console.error('[FlagApi] Flag failed:', text);
-    throw new Error(`Failed to flag app: ${response.statusText}`);
+    throw new Error(`Flag failed (${response.status}): ${responseText}`);
   }
 
-  const data = await response.json();
+  const data = JSON.parse(responseText);
   const flaggingId = data.uuid?.[0]?.value;
-  console.log('[FlagApi] Flag success, flagging UUID:', flaggingId);
+  console.log('[FlagApi] Flagging UUID:', flaggingId);
   return { flaggingId };
 }
 
 /**
- * Unflag an app via Drupal REST entity endpoint (DELETE /entity/flagging/{id}).
+ * Unflag an app — STUB. Logs everything for debugging.
+ *
  * @param {string} flaggingId - Flagging entity UUID
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
  */
 export async function unflagApp(flaggingId, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
   const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
-  const unflagUrl = `${baseUrl}/entity/flagging/${flaggingId}?_format=json`;
 
-  console.log('[FlagApi] Unflagging via REST DELETE:', unflagUrl);
+  // === CONFIGURE ENDPOINT HERE ===
+  const url = `${baseUrl}/entity/flagging/${flaggingId}?_format=json`;
+  const method = 'DELETE';
 
-  const response = await fetch(unflagUrl, {
-    method: 'DELETE',
+  console.log('[FlagApi] === UNFLAG REQUEST ===');
+  console.log('[FlagApi] URL:', url);
+  console.log('[FlagApi] Method:', method);
+  console.log('[FlagApi] CSRF Token:', token?.substring(0, 10) + '...');
+
+  const response = await fetch(url, {
+    method,
     credentials: 'include',
     headers: {
       'X-CSRF-Token': token,
     }
   });
 
-  console.log('[FlagApi] Unflag response:', response.status);
-
-  if (response.status === 403) {
-    throw new Error('Not authenticated');
-  }
+  console.log('[FlagApi] === UNFLAG RESPONSE ===');
+  console.log('[FlagApi] Status:', response.status, response.statusText);
 
   if (!response.ok) {
-    const text = await response.text();
-    console.error('[FlagApi] Unflag failed:', text);
-    throw new Error(`Failed to unflag app: ${response.statusText}`);
+    const responseText = await response.text();
+    console.log('[FlagApi] Body:', responseText);
+    throw new Error(`Unflag failed (${response.status}): ${responseText}`);
   }
 
   console.log('[FlagApi] Unflag success');

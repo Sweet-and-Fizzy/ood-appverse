@@ -12594,7 +12594,8 @@ async function PN(e = "/api", a = "") {
     });
     if (!d.ok)
       return console.error("[FlagApi] Login status check failed:", d.status), { authenticated: !1, flaggedIds: [] };
-    if (await d.json() !== 1)
+    const f = await d.json();
+    if (console.log("[FlagApi] Login status:", f), f !== 1)
       return { authenticated: !1, flaggedIds: [] };
     const g = `${e}/flagging/appverse_apps`, b = await fetch(g, { credentials: "include" });
     if (!b.ok)
@@ -12626,46 +12627,40 @@ async function iA(e = "") {
   }), Lr;
 }
 async function HN(e, a = "") {
-  var g, b;
-  const r = await iA(a), o = `${a}/entity/flagging?_format=json`, u = {
+  var h, E;
+  const r = await iA(a), o = `${a}/entity/flagging?_format=json`, u = "POST", c = {
     flag_id: [{ target_id: "appverse_apps" }],
     entity_type: [{ value: "node" }],
     entity_id: [{ value: String(e) }]
   };
-  console.log("[FlagApi] Flagging app via REST:", o, { nid: e });
-  const c = await fetch(o, {
-    method: "POST",
+  console.log("[FlagApi] === FLAG REQUEST ==="), console.log("[FlagApi] URL:", o), console.log("[FlagApi] Method:", u), console.log("[FlagApi] CSRF Token:", (r == null ? void 0 : r.substring(0, 10)) + "..."), console.log("[FlagApi] Body:", JSON.stringify(c, null, 2));
+  const d = await fetch(o, {
+    method: u,
     credentials: "include",
     headers: {
       "X-CSRF-Token": r,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(u)
-  });
-  if (console.log("[FlagApi] Flag response:", c.status), c.status === 403)
-    throw new Error("Not authenticated");
-  if (!c.ok) {
-    const h = await c.text();
-    throw console.error("[FlagApi] Flag failed:", h), new Error(`Failed to flag app: ${c.statusText}`);
-  }
-  const f = (b = (g = (await c.json()).uuid) == null ? void 0 : g[0]) == null ? void 0 : b.value;
-  return console.log("[FlagApi] Flag success, flagging UUID:", f), { flaggingId: f };
+    body: JSON.stringify(c)
+  }), f = await d.text();
+  if (console.log("[FlagApi] === FLAG RESPONSE ==="), console.log("[FlagApi] Status:", d.status, d.statusText), console.log("[FlagApi] Body:", f), !d.ok)
+    throw new Error(`Flag failed (${d.status}): ${f}`);
+  const b = (E = (h = JSON.parse(f).uuid) == null ? void 0 : h[0]) == null ? void 0 : E.value;
+  return console.log("[FlagApi] Flagging UUID:", b), { flaggingId: b };
 }
 async function qN(e, a = "") {
-  const r = await iA(a), o = `${a}/entity/flagging/${e}?_format=json`;
-  console.log("[FlagApi] Unflagging via REST DELETE:", o);
-  const u = await fetch(o, {
-    method: "DELETE",
+  const r = await iA(a), o = `${a}/entity/flagging/${e}?_format=json`, u = "DELETE";
+  console.log("[FlagApi] === UNFLAG REQUEST ==="), console.log("[FlagApi] URL:", o), console.log("[FlagApi] Method:", u), console.log("[FlagApi] CSRF Token:", (r == null ? void 0 : r.substring(0, 10)) + "...");
+  const c = await fetch(o, {
+    method: u,
     credentials: "include",
     headers: {
       "X-CSRF-Token": r
     }
   });
-  if (console.log("[FlagApi] Unflag response:", u.status), u.status === 403)
-    throw new Error("Not authenticated");
-  if (!u.ok) {
-    const c = await u.text();
-    throw console.error("[FlagApi] Unflag failed:", c), new Error(`Failed to unflag app: ${u.statusText}`);
+  if (console.log("[FlagApi] === UNFLAG RESPONSE ==="), console.log("[FlagApi] Status:", c.status, c.statusText), !c.ok) {
+    const d = await c.text();
+    throw console.log("[FlagApi] Body:", d), new Error(`Unflag failed (${c.status}): ${d}`);
   }
   console.log("[FlagApi] Unflag success");
 }
