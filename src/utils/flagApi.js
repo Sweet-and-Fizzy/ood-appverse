@@ -138,92 +138,34 @@ export function clearCsrfToken() {
 }
 
 /**
- * Flag an app — STUB. Logs everything for debugging.
- * Once a working approach is found, replace the body/URL/method here.
+ * Flag an app — NO-OP STUB. Logs context info only, makes no requests.
+ * Once a working Drupal endpoint/body is confirmed, wire it in here.
  *
  * @param {number} nid - Drupal node ID of the app
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
  * @returns {Promise<{flaggingId: string}>}
  */
 export async function flagApp(nid, siteBaseUrl = '') {
-  const token = await getCsrfToken(siteBaseUrl);
-  const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
+  console.log('[FlagApi] === FLAG (no-op) ===');
+  console.log('[FlagApi] App NID:', nid);
+  console.log('[FlagApi] siteBaseUrl:', JSON.stringify(siteBaseUrl));
+  console.log('[FlagApi] drupalSettings.user:', JSON.stringify(window.drupalSettings?.user));
+  console.log('[FlagApi] drupalSettings.path:', JSON.stringify(window.drupalSettings?.path));
+  console.log('[FlagApi] Origin:', window.location.origin);
+  console.log('[FlagApi] Cookie present:', document.cookie.length > 0);
 
-  // === CONFIGURE ENDPOINT HERE ===
-  const url = `${baseUrl}/entity/flagging?_format=json`;
-  const method = 'POST';
-  const body = {
-    flag_id: [{ target_id: 'appverse_apps' }],
-    entity_type: [{ value: 'node' }],
-    entity_id: [{ value: String(nid) }],
-  };
-
-  console.log('[FlagApi] === FLAG REQUEST ===');
-  console.log('[FlagApi] URL:', url);
-  console.log('[FlagApi] Method:', method);
-  console.log('[FlagApi] CSRF Token:', token?.substring(0, 10) + '...');
-  console.log('[FlagApi] Body:', JSON.stringify(body, null, 2));
-
-  const response = await fetch(url, {
-    method,
-    credentials: 'include',
-    headers: {
-      'X-CSRF-Token': token,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body)
-  });
-
-  const responseText = await response.text();
-  console.log('[FlagApi] === FLAG RESPONSE ===');
-  console.log('[FlagApi] Status:', response.status, response.statusText);
-  console.log('[FlagApi] Body:', responseText);
-
-  if (!response.ok) {
-    throw new Error(`Flag failed (${response.status}): ${responseText}`);
-  }
-
-  const data = JSON.parse(responseText);
-  const flaggingId = data.uuid?.[0]?.value;
-  console.log('[FlagApi] Flagging UUID:', flaggingId);
-  return { flaggingId };
+  // No request made — return a fake flaggingId so the UI toggles
+  return { flaggingId: 'stub-' + nid };
 }
 
 /**
- * Unflag an app — STUB. Logs everything for debugging.
+ * Unflag an app — NO-OP STUB. Logs context info only, makes no requests.
  *
  * @param {string} flaggingId - Flagging entity UUID
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
  */
 export async function unflagApp(flaggingId, siteBaseUrl = '') {
-  const token = await getCsrfToken(siteBaseUrl);
-  const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
-
-  // === CONFIGURE ENDPOINT HERE ===
-  const url = `${baseUrl}/entity/flagging/${flaggingId}?_format=json`;
-  const method = 'DELETE';
-
-  console.log('[FlagApi] === UNFLAG REQUEST ===');
-  console.log('[FlagApi] URL:', url);
-  console.log('[FlagApi] Method:', method);
-  console.log('[FlagApi] CSRF Token:', token?.substring(0, 10) + '...');
-
-  const response = await fetch(url, {
-    method,
-    credentials: 'include',
-    headers: {
-      'X-CSRF-Token': token,
-    }
-  });
-
-  console.log('[FlagApi] === UNFLAG RESPONSE ===');
-  console.log('[FlagApi] Status:', response.status, response.statusText);
-
-  if (!response.ok) {
-    const responseText = await response.text();
-    console.log('[FlagApi] Body:', responseText);
-    throw new Error(`Unflag failed (${response.status}): ${responseText}`);
-  }
-
-  console.log('[FlagApi] Unflag success');
+  console.log('[FlagApi] === UNFLAG (no-op) ===');
+  console.log('[FlagApi] Flagging ID:', flaggingId);
+  console.log('[FlagApi] siteBaseUrl:', JSON.stringify(siteBaseUrl));
 }
