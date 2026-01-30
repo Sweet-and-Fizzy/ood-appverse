@@ -1,30 +1,12 @@
 /**
  * Flag API utilities for authenticated user operations.
  *
- * WHAT WORKS:
- * - Auth detection: GET /user/login_status?_format=json → returns 1 or 0
- * - Reading flags: GET /jsonapi/flagging/appverse_apps → returns user's flaggings
- * - CSRF tokens: GET /session/token → returns token for write operations
- *
- * WHAT WE NEED TO SOLVE:
- * Creating/deleting flaggings. Two approaches have been tried:
- *
- * 1) JSON:API POST /jsonapi/flagging/appverse_apps
- *    → 500: uid is NULL. JSON:API bypasses Flag module logic and does a raw
- *      INSERT without setting uid from the session. We couldn't get the user's
- *      UUID to pass explicitly (user entity not exposed via JSON:API or REST).
- *
- * 2) REST entity POST /entity/flagging?_format=json
- *    → 422 "flag_id field is missing" (body format unclear)
- *    → 500 after adjusting body (likely same uid problem)
- *
- * The Flag module's own action endpoints (/flag/flag/..., /flag/unflag/...)
- * would handle uid automatically, but they return 404 — those routes don't
- * exist in this Flag module version even with the Flagging REST resource enabled.
- *
- * flagApp() and unflagApp() below are stubs that log the request details.
- * Use browser devtools or curl to experiment with the correct endpoint/body
- * format, then update these functions once a working approach is found.
+ * Auth detection: GET /user/login_status?_format=json → returns 1 or 0
+ * User UUID:     GET /jsonapi (with credentials) → meta.links.me.meta.id
+ * Read flags:    GET /jsonapi/flagging/appverse_apps → user's flaggings
+ * Create flag:   POST /jsonapi/flagging/appverse_apps (with explicit uid relationship)
+ * Delete flag:   DELETE /jsonapi/flagging/appverse_apps/{flaggingId}
+ * CSRF tokens:   GET /session/token → token for write operations
  */
 
 // CSRF token cache - fetch once per session
@@ -32,13 +14,12 @@ let csrfToken = null;
 let csrfTokenPromise = null;
 
 /**
- * Check if user is authenticated, then fetch their flaggings.
- * This part works reliably.
+ * Check if user is authenticated, fetch their UUID, and fetch their flaggings.
  */
 export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = '') {
   if (import.meta.env.DEV) {
     console.log('[FlagApi] Dev mode: simulating authenticated user');
-    return { authenticated: true, flaggedIds: [] };
+    return { authenticated: true, flaggedIds: [], userUuid: null };
   }
 
   const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
@@ -51,23 +32,69 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
 
     if (!statusResponse.ok) {
       console.error('[FlagApi] Login status check failed:', statusResponse.status);
-      return { authenticated: false, flaggedIds: [] };
+      return { authenticated: false, flaggedIds: [], userUuid: null };
     }
 
     const loginStatus = await statusResponse.json();
     console.log('[FlagApi] Login status:', loginStatus);
 
     if (loginStatus !== 1) {
-      return { authenticated: false, flaggedIds: [] };
+      return { authenticated: false, flaggedIds: [], userUuid: null };
     }
 
-    // Fetch flaggings via JSON:API (this works)
+    // Fetch user UUID and flaggings in parallel
+    const [userUuid, flagResult] = await Promise.all([
+      fetchUserUuid(apiBaseUrl),
+      fetchFlaggings(apiBaseUrl),
+    ]);
+
+    console.log('[FlagApi] Authenticated, UUID:', userUuid, ', flagged apps:', flagResult.flaggedIds.length);
+    return {
+      authenticated: true,
+      userUuid,
+      flaggedIds: flagResult.flaggedIds,
+      flaggingMap: flagResult.flaggingMap,
+    };
+  } catch (error) {
+    console.error('[FlagApi] Auth check failed:', error);
+    return { authenticated: false, flaggedIds: [], userUuid: null };
+  }
+}
+
+/**
+ * Fetch current user's UUID from the JSON:API root endpoint.
+ * Drupal exposes meta.links.me.meta.id for authenticated users.
+ */
+async function fetchUserUuid(apiBaseUrl) {
+  try {
+    const response = await fetch(apiBaseUrl, { credentials: 'include' });
+    if (!response.ok) {
+      console.error('[FlagApi] JSON:API root fetch failed:', response.status);
+      return null;
+    }
+    const data = await response.json();
+    const uuid = data?.meta?.links?.me?.meta?.id;
+    if (!uuid) {
+      console.error('[FlagApi] No user UUID in JSON:API root response');
+    }
+    return uuid || null;
+  } catch (error) {
+    console.error('[FlagApi] Failed to fetch user UUID:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch user's flaggings via JSON:API.
+ */
+async function fetchFlaggings(apiBaseUrl) {
+  try {
     const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
     const flagResponse = await fetch(flaggingsUrl, { credentials: 'include' });
 
     if (!flagResponse.ok) {
       console.error('[FlagApi] Flaggings fetch failed:', flagResponse.status);
-      return { authenticated: true, flaggedIds: [] };
+      return { flaggedIds: [], flaggingMap: {} };
     }
 
     const data = await flagResponse.json();
@@ -81,11 +108,10 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
       }
     }
 
-    console.log('[FlagApi] Authenticated, user has', flaggedIds.length, 'flagged apps');
-    return { authenticated: true, flaggedIds, flaggingMap };
+    return { flaggedIds, flaggingMap };
   } catch (error) {
-    console.error('[FlagApi] Auth check failed:', error);
-    return { authenticated: false, flaggedIds: [] };
+    console.error('[FlagApi] Flaggings fetch failed:', error);
+    return { flaggedIds: [], flaggingMap: {} };
   }
 }
 
@@ -97,7 +123,7 @@ function getFlagApiBaseUrl(siteBaseUrl) {
 }
 
 /**
- * Fetch CSRF token from Drupal (cached for session). This works.
+ * Fetch CSRF token from Drupal (cached for session).
  */
 export async function getCsrfToken(siteBaseUrl = '') {
   if (csrfToken) {
@@ -138,36 +164,93 @@ export function clearCsrfToken() {
 }
 
 /**
- * Flag an app — NO-OP STUB. Logs context info only, makes no requests.
- * Once a working Drupal endpoint/body is confirmed, wire it in here.
+ * Flag an app by creating a flagging entity via JSON:API.
  *
- * @param {number} nid - Drupal node ID of the app
+ * @param {string} appId - App UUID (for the flagged_entity relationship)
+ * @param {number} nid - Drupal node ID (entity_id attribute)
+ * @param {string} userUuid - Current user's UUID (for the uid relationship)
+ * @param {string} apiBaseUrl - JSON:API base URL
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
  * @returns {Promise<{flaggingId: string}>}
  */
-export async function flagApp(nid, siteBaseUrl = '') {
+export async function flagApp(appId, nid, userUuid, apiBaseUrl = '/api', siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
 
-  console.log('[FlagApi] === FLAG (no-op) ===');
-  console.log('[FlagApi] App NID:', nid);
-  console.log('[FlagApi] CSRF Token:', token);
-  console.log('[FlagApi] siteBaseUrl:', JSON.stringify(siteBaseUrl));
-  console.log('[FlagApi] drupalSettings.user:', JSON.stringify(window.drupalSettings?.user));
-  console.log('[FlagApi] drupalSettings.path:', JSON.stringify(window.drupalSettings?.path));
-  console.log('[FlagApi] Origin:', window.location.origin);
+  console.log('[FlagApi] Creating flagging — appId:', appId, 'nid:', nid, 'userUuid:', userUuid);
 
-  // No request made — return a fake flaggingId so the UI toggles
-  return { flaggingId: 'stub-' + nid };
+  const body = {
+    data: {
+      type: 'flagging--appverse_apps',
+      attributes: {
+        entity_type: 'node',
+        entity_id: String(nid),
+      },
+      relationships: {
+        uid: {
+          data: { type: 'user--user', id: userUuid }
+        },
+        flagged_entity: {
+          data: { type: 'node--appverse_app', id: appId }
+        }
+      }
+    }
+  };
+
+  const url = `${apiBaseUrl}/flagging/appverse_apps`;
+  console.log('[FlagApi] POST', url, JSON.stringify(body, null, 2));
+
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/vnd.api+json',
+      'Accept': 'application/vnd.api+json',
+      'X-CSRF-Token': token,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error('[FlagApi] Flag failed:', response.status, text);
+    throw new Error(`Flag failed: ${response.status} ${text}`);
+  }
+
+  const data = await response.json();
+  const flaggingId = data.data?.id;
+  console.log('[FlagApi] Flag created, flaggingId:', flaggingId);
+  return { flaggingId };
 }
 
 /**
- * Unflag an app — NO-OP STUB. Logs context info only, makes no requests.
+ * Unflag an app by deleting the flagging entity via JSON:API.
  *
  * @param {string} flaggingId - Flagging entity UUID
+ * @param {string} apiBaseUrl - JSON:API base URL
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
  */
-export async function unflagApp(flaggingId, siteBaseUrl = '') {
-  console.log('[FlagApi] === UNFLAG (no-op) ===');
-  console.log('[FlagApi] Flagging ID:', flaggingId);
-  console.log('[FlagApi] siteBaseUrl:', JSON.stringify(siteBaseUrl));
+export async function unflagApp(flaggingId, apiBaseUrl = '/api', siteBaseUrl = '') {
+  const token = await getCsrfToken(siteBaseUrl);
+
+  console.log('[FlagApi] Deleting flagging:', flaggingId);
+
+  const url = `${apiBaseUrl}/flagging/appverse_apps/${flaggingId}`;
+  console.log('[FlagApi] DELETE', url);
+
+  const response = await fetch(url, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/vnd.api+json',
+      'X-CSRF-Token': token,
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error('[FlagApi] Unflag failed:', response.status, text);
+    throw new Error(`Unflag failed: ${response.status} ${text}`);
+  }
+
+  console.log('[FlagApi] Flagging deleted successfully');
 }
