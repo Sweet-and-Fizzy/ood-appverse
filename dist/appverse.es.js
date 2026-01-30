@@ -12593,14 +12593,13 @@ async function PN(e = "/api", a = "") {
     });
     if (!o.ok)
       return console.error("[FlagApi] Login status check failed:", o.status), { authenticated: !1, flaggedIds: [], userUuid: null };
-    const u = await o.json();
-    if (console.log("[FlagApi] Login status:", u), u !== 1)
+    if (await o.json() !== 1)
       return { authenticated: !1, flaggedIds: [], userUuid: null };
     const [c, d] = await Promise.all([
       HN(e),
       qN(e)
     ]);
-    return console.log("[FlagApi] Authenticated, UUID:", c, ", flagged apps:", d.flaggedIds.length), {
+    return {
       authenticated: !0,
       userUuid: c,
       flaggedIds: d.flaggedIds,
@@ -12655,10 +12654,8 @@ async function iA(e = "") {
   }), Lr;
 }
 async function VN(e, a, r, i = "/api", o = "") {
-  var h;
-  const u = await iA(o);
-  console.log("[FlagApi] Creating flagging — appId:", e, "nid:", a, "userUuid:", r);
-  const c = {
+  var b;
+  const u = await iA(o), c = {
     data: {
       type: "flagging--appverse_apps",
       attributes: {
@@ -12674,9 +12671,7 @@ async function VN(e, a, r, i = "/api", o = "") {
         }
       }
     }
-  }, d = `${i}/flagging/appverse_apps`;
-  console.log("[FlagApi] POST", d, JSON.stringify(c, null, 2));
-  const f = await fetch(d, {
+  }, d = `${i}/flagging/appverse_apps`, f = await fetch(d, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -12687,18 +12682,13 @@ async function VN(e, a, r, i = "/api", o = "") {
     body: JSON.stringify(c)
   });
   if (!f.ok) {
-    const E = await f.text();
-    throw console.error("[FlagApi] Flag failed:", f.status, E), new Error(`Flag failed: ${f.status} ${E}`);
+    const h = await f.text();
+    throw console.error("[FlagApi] Flag failed:", f.status, h), new Error(`Flag failed: ${f.status}`);
   }
-  const b = (h = (await f.json()).data) == null ? void 0 : h.id;
-  return console.log("[FlagApi] Flag created, flaggingId:", b), { flaggingId: b };
+  return { flaggingId: (b = (await f.json()).data) == null ? void 0 : b.id };
 }
 async function YN(e, a = "/api", r = "") {
-  const i = await iA(r);
-  console.log("[FlagApi] Deleting flagging:", e);
-  const o = `${a}/flagging/appverse_apps/${e}`;
-  console.log("[FlagApi] DELETE", o);
-  const u = await fetch(o, {
+  const i = await iA(r), o = `${a}/flagging/appverse_apps/${e}`, u = await fetch(o, {
     method: "DELETE",
     credentials: "include",
     headers: {
@@ -12708,9 +12698,8 @@ async function YN(e, a = "/api", r = "") {
   });
   if (!u.ok) {
     const c = await u.text();
-    throw console.error("[FlagApi] Unflag failed:", u.status, c), new Error(`Unflag failed: ${u.status} ${c}`);
+    throw console.error("[FlagApi] Unflag failed:", u.status, c), new Error(`Unflag failed: ${u.status}`);
   }
-  console.log("[FlagApi] Flagging deleted successfully");
 }
 const lA = G.createContext(null);
 function WN({ children: e }) {

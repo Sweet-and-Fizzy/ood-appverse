@@ -18,7 +18,6 @@ let csrfTokenPromise = null;
  */
 export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = '') {
   if (import.meta.env.DEV) {
-    console.log('[FlagApi] Dev mode: simulating authenticated user');
     return { authenticated: true, flaggedIds: [], userUuid: null };
   }
 
@@ -36,7 +35,6 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
     }
 
     const loginStatus = await statusResponse.json();
-    console.log('[FlagApi] Login status:', loginStatus);
 
     if (loginStatus !== 1) {
       return { authenticated: false, flaggedIds: [], userUuid: null };
@@ -48,7 +46,6 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
       fetchFlaggings(apiBaseUrl),
     ]);
 
-    console.log('[FlagApi] Authenticated, UUID:', userUuid, ', flagged apps:', flagResult.flaggedIds.length);
     return {
       authenticated: true,
       userUuid,
@@ -176,8 +173,6 @@ export function clearCsrfToken() {
 export async function flagApp(appId, nid, userUuid, apiBaseUrl = '/api', siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
 
-  console.log('[FlagApi] Creating flagging — appId:', appId, 'nid:', nid, 'userUuid:', userUuid);
-
   const body = {
     data: {
       type: 'flagging--appverse_apps',
@@ -197,8 +192,6 @@ export async function flagApp(appId, nid, userUuid, apiBaseUrl = '/api', siteBas
   };
 
   const url = `${apiBaseUrl}/flagging/appverse_apps`;
-  console.log('[FlagApi] POST', url, JSON.stringify(body, null, 2));
-
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'include',
@@ -213,13 +206,11 @@ export async function flagApp(appId, nid, userUuid, apiBaseUrl = '/api', siteBas
   if (!response.ok) {
     const text = await response.text();
     console.error('[FlagApi] Flag failed:', response.status, text);
-    throw new Error(`Flag failed: ${response.status} ${text}`);
+    throw new Error(`Flag failed: ${response.status}`);
   }
 
   const data = await response.json();
-  const flaggingId = data.data?.id;
-  console.log('[FlagApi] Flag created, flaggingId:', flaggingId);
-  return { flaggingId };
+  return { flaggingId: data.data?.id };
 }
 
 /**
@@ -232,11 +223,7 @@ export async function flagApp(appId, nid, userUuid, apiBaseUrl = '/api', siteBas
 export async function unflagApp(flaggingId, apiBaseUrl = '/api', siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
 
-  console.log('[FlagApi] Deleting flagging:', flaggingId);
-
   const url = `${apiBaseUrl}/flagging/appverse_apps/${flaggingId}`;
-  console.log('[FlagApi] DELETE', url);
-
   const response = await fetch(url, {
     method: 'DELETE',
     credentials: 'include',
@@ -249,8 +236,6 @@ export async function unflagApp(flaggingId, apiBaseUrl = '/api', siteBaseUrl = '
   if (!response.ok) {
     const text = await response.text();
     console.error('[FlagApi] Unflag failed:', response.status, text);
-    throw new Error(`Unflag failed: ${response.status} ${text}`);
+    throw new Error(`Unflag failed: ${response.status}`);
   }
-
-  console.log('[FlagApi] Flagging deleted successfully');
 }
