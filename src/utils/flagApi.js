@@ -50,42 +50,46 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
       return { authenticated: false, flaggedIds: [] };
     }
 
-    // Step 2: Fetch current user UUID and flaggings in parallel
-    // Drupal's /user redirects logged-in users to /user/{uid}
-    // With ?_format=json it returns the user entity as JSON
+    // Step 2: Fetch current user UUID and flaggings
+    // Drupal's /user redirects to /user/{username}, dropping ?_format=json.
+    // So we follow the redirect manually: first request with redirect:'manual'
+    // to get the final URL, then fetch that URL with ?_format=json.
     const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
-    const userUrl = `${baseUrl}/user?_format=json`;
     console.log('[FlagApi] User authenticated, fetching flaggings and user info');
-    console.log('[FlagApi] User URL:', userUrl);
 
-    const [flagResponse, userResponse] = await Promise.all([
-      fetch(flaggingsUrl, { credentials: 'include' }),
-      fetch(userUrl, { credentials: 'include' })
-    ]);
+    // Start flaggings fetch immediately
+    const flagPromise = fetch(flaggingsUrl, { credentials: 'include' });
 
-    // Parse user UUID from Drupal REST user endpoint
-    // Response format: { uuid: [{value: "..."}], uid: [{value: N}], ... }
+    // Get user UUID via redirect-then-fetch
     let userUuid = null;
-    console.log('[FlagApi] User endpoint response:', userResponse.status, 'url:', userResponse.url);
-    if (userResponse.ok) {
-      try {
-        const contentType = userResponse.headers.get('content-type') || '';
-        if (contentType.includes('json')) {
+    try {
+      const redirectResponse = await fetch(`${baseUrl}/user`, {
+        credentials: 'include',
+        redirect: 'manual'
+      });
+      // 302/301 redirect — Location header has the user-specific URL
+      const userPageUrl = redirectResponse.headers.get('location');
+      console.log('[FlagApi] /user redirect location:', userPageUrl);
+
+      if (userPageUrl) {
+        const jsonUrl = `${userPageUrl}${userPageUrl.includes('?') ? '&' : '?'}_format=json`;
+        console.log('[FlagApi] Fetching user JSON:', jsonUrl);
+        const userResponse = await fetch(jsonUrl, { credentials: 'include' });
+        console.log('[FlagApi] User JSON response:', userResponse.status);
+
+        if (userResponse.ok) {
           const userData = await userResponse.json();
-          console.log('[FlagApi] User data keys:', Object.keys(userData));
           if (userData.uuid) {
             userUuid = Array.isArray(userData.uuid) ? userData.uuid[0]?.value : userData.uuid;
             console.log('[FlagApi] Current user UUID:', userUuid);
           }
-        } else {
-          console.warn('[FlagApi] User endpoint returned non-JSON:', contentType);
         }
-      } catch (e) {
-        console.error('[FlagApi] Failed to parse user response:', e.message);
       }
-    } else {
-      console.error('[FlagApi] User endpoint failed:', userResponse.status);
+    } catch (e) {
+      console.error('[FlagApi] Failed to get user UUID:', e.message);
     }
+
+    const flagResponse = await flagPromise;
 
     if (!flagResponse.ok) {
       console.error('[FlagApi] Flaggings fetch failed:', flagResponse.status);
