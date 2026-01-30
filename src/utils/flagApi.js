@@ -51,9 +51,11 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
     }
 
     // Step 2: Fetch current user UUID and flaggings in parallel
+    // Use /jsonapi without filters — Drupal non-admins can only see their own user
     const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
-    const userUrl = `${apiBaseUrl}/user/user?filter[status]=1&page[limit]=1&fields[user--user]=drupal_internal__uid`;
+    const userUrl = `${apiBaseUrl}/user/user`;
     console.log('[FlagApi] User authenticated, fetching flaggings and user UUID');
+    console.log('[FlagApi] User URL:', userUrl);
 
     const [flagResponse, userResponse] = await Promise.all([
       fetch(flaggingsUrl, { credentials: 'include' }),
@@ -61,14 +63,19 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
     ]);
 
     // Parse user UUID from JSON:API user endpoint
-    // Drupal JSON:API returns only the current user's record for non-admins
     let userUuid = null;
+    console.log('[FlagApi] User endpoint response:', userResponse.status);
     if (userResponse.ok) {
       const userData = await userResponse.json();
+      console.log('[FlagApi] User endpoint data count:', userData.data?.length);
       if (userData.data?.length > 0) {
         userUuid = userData.data[0].id;
         console.log('[FlagApi] Current user UUID:', userUuid);
+      } else {
+        console.warn('[FlagApi] User endpoint returned no data');
       }
+    } else {
+      console.error('[FlagApi] User endpoint failed:', userResponse.status);
     }
 
     if (!flagResponse.ok) {
