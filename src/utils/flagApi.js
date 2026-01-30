@@ -146,13 +146,16 @@ export function clearCsrfToken() {
  * @returns {Promise<{flaggingId: string}>}
  */
 export async function flagApp(nid, siteBaseUrl = '') {
+  const token = await getCsrfToken(siteBaseUrl);
+
   console.log('[FlagApi] === FLAG (no-op) ===');
   console.log('[FlagApi] App NID:', nid);
+  console.log('[FlagApi] CSRF Token:', token);
   console.log('[FlagApi] siteBaseUrl:', JSON.stringify(siteBaseUrl));
   console.log('[FlagApi] drupalSettings.user:', JSON.stringify(window.drupalSettings?.user));
   console.log('[FlagApi] drupalSettings.path:', JSON.stringify(window.drupalSettings?.path));
   console.log('[FlagApi] Origin:', window.location.origin);
-  console.log('[FlagApi] Cookie present:', document.cookie.length > 0);
+  console.log('[FlagApi] document.cookie:', document.cookie);
 
   // No request made — return a fake flaggingId so the UI toggles
   return { flaggingId: 'stub-' + nid };
