@@ -27,6 +27,8 @@ export function FlagProvider({ children }) {
   const [flaggingMap, setFlaggingMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  // Current user's UUID (needed for uid relationship when creating flaggings)
+  const [userUuid, setUserUuid] = useState(null);
   // Track in-flight requests to prevent duplicates and show loading states
   const [pendingIds, setPendingIds] = useState(new Set());
 
@@ -42,6 +44,7 @@ export function FlagProvider({ children }) {
       setAuthenticated(result.authenticated);
       setFlaggedIds(new Set(result.flaggedIds));
       setFlaggingMap(result.flaggingMap || {});
+      setUserUuid(result.userUuid || null);
       setLoading(false);
     };
 
@@ -111,7 +114,7 @@ export function FlagProvider({ children }) {
           return next;
         });
       } else {
-        const result = await flagApp(appId, nid, config.apiBaseUrl, config.siteBaseUrl);
+        const result = await flagApp(appId, nid, userUuid, config.apiBaseUrl, config.siteBaseUrl);
         // Store the new flagging UUID so we can unflag later
         setFlaggingMap(prev => ({ ...prev, [appId]: result.flaggingId }));
       }
@@ -135,7 +138,7 @@ export function FlagProvider({ children }) {
         return next;
       });
     }
-  }, [authenticated, flaggedIds, flaggingMap, pendingIds, config.apiBaseUrl, config.siteBaseUrl]);
+  }, [authenticated, flaggedIds, flaggingMap, pendingIds, userUuid, config.apiBaseUrl, config.siteBaseUrl]);
 
   const value = {
     authenticated,

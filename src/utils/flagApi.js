@@ -50,18 +50,30 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
       return { authenticated: false, flaggedIds: [] };
     }
 
-    // Step 2: User is authenticated, fetch their flaggings
+    // Step 2: Fetch current user UUID and flaggings in parallel
     const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
-    console.log('[FlagApi] User authenticated, fetching flaggings:', flaggingsUrl);
+    const userUrl = `${apiBaseUrl}/user/user?filter[status]=1&page[limit]=1&fields[user--user]=drupal_internal__uid`;
+    console.log('[FlagApi] User authenticated, fetching flaggings and user UUID');
 
-    const flagResponse = await fetch(flaggingsUrl, {
-      credentials: 'include'
-    });
+    const [flagResponse, userResponse] = await Promise.all([
+      fetch(flaggingsUrl, { credentials: 'include' }),
+      fetch(userUrl, { credentials: 'include' })
+    ]);
+
+    // Parse user UUID from JSON:API user endpoint
+    // Drupal JSON:API returns only the current user's record for non-admins
+    let userUuid = null;
+    if (userResponse.ok) {
+      const userData = await userResponse.json();
+      if (userData.data?.length > 0) {
+        userUuid = userData.data[0].id;
+        console.log('[FlagApi] Current user UUID:', userUuid);
+      }
+    }
 
     if (!flagResponse.ok) {
       console.error('[FlagApi] Flaggings fetch failed:', flagResponse.status);
-      // Authenticated but can't fetch flaggings — still report as authenticated
-      return { authenticated: true, flaggedIds: [] };
+      return { authenticated: true, flaggedIds: [], userUuid };
     }
 
     const data = await flagResponse.json();
@@ -78,7 +90,7 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
     }
 
     console.log('[FlagApi] Authenticated, user has', flaggedIds.length, 'flagged apps:', flaggedIds);
-    return { authenticated: true, flaggedIds, flaggingMap };
+    return { authenticated: true, flaggedIds, flaggingMap, userUuid };
   } catch (error) {
     console.error('[FlagApi] Auth check failed:', error);
     return { authenticated: false, flaggedIds: [] };
@@ -158,13 +170,33 @@ export function clearCsrfToken() {
  * Flag an app via JSON:API (create a flagging entity)
  * @param {string} appId - App UUID
  * @param {number} nid - Drupal node ID (required as entity_id attribute)
+ * @param {string} userUuid - Current user's UUID (required for uid relationship)
  * @param {string} apiBaseUrl - Base URL for JSON:API calls
  * @param {string} siteBaseUrl - Base URL for CSRF token endpoint
  * @returns {Promise<{flaggingId: string}>} The created flagging entity's UUID
  */
-export async function flagApp(appId, nid, apiBaseUrl, siteBaseUrl = '') {
+export async function flagApp(appId, nid, userUuid, apiBaseUrl, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
   const flagUrl = `${apiBaseUrl}/flagging/appverse_apps`;
+
+  const relationships = {
+    flagged_entity: {
+      data: {
+        type: 'node--appverse_app',
+        id: appId
+      }
+    }
+  };
+
+  // Explicitly set uid — Drupal JSON:API doesn't always resolve it from the session
+  if (userUuid) {
+    relationships.uid = {
+      data: {
+        type: 'user--user',
+        id: userUuid
+      }
+    };
+  }
 
   const body = {
     data: {
@@ -173,14 +205,7 @@ export async function flagApp(appId, nid, apiBaseUrl, siteBaseUrl = '') {
         entity_type: 'node',
         entity_id: String(nid),
       },
-      relationships: {
-        flagged_entity: {
-          data: {
-            type: 'node--appverse_app',
-            id: appId
-          }
-        }
-      }
+      relationships
     }
   };
 
