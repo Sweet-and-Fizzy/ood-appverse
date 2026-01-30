@@ -22,6 +22,8 @@ const FlagContext = createContext(null);
 export function FlagProvider({ children }) {
   const config = useConfig();
   const [flaggedIds, setFlaggedIds] = useState(new Set());
+  // Map of appId → flaggingId (needed for DELETE /entity/flagging/{id})
+  const [flaggingMap, setFlaggingMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [pendingIds, setPendingIds] = useState(new Set());
@@ -32,6 +34,7 @@ export function FlagProvider({ children }) {
       const result = await checkAuthAndFetchFlags(config.apiBaseUrl, config.siteBaseUrl);
       setAuthenticated(result.authenticated);
       setFlaggedIds(new Set(result.flaggedIds));
+      setFlaggingMap(result.flaggingMap || {});
       setLoading(false);
     };
 
@@ -48,9 +51,9 @@ export function FlagProvider({ children }) {
 
   /**
    * Toggle flag state for an app (with optimistic update).
-   * Uses Flag module REST endpoints which handle uid from the session.
+   * Uses Drupal REST entity endpoints (POST/DELETE /entity/flagging).
    * @param {string} appId - App UUID (used for local state tracking)
-   * @param {number} nid - Drupal node ID (used for REST flag/unflag endpoint)
+   * @param {number} nid - Drupal node ID (used for creating flagging entity)
    */
   const toggleFlag = useCallback(async (appId, nid) => {
     if (!authenticated) return;
@@ -72,9 +75,19 @@ export function FlagProvider({ children }) {
 
     try {
       if (wasFlagged) {
-        await unflagApp(nid, config.siteBaseUrl);
+        const flaggingId = flaggingMap[appId];
+        if (!flaggingId) {
+          throw new Error(`No flagging UUID found for app ${appId}`);
+        }
+        await unflagApp(flaggingId, config.siteBaseUrl);
+        setFlaggingMap(prev => {
+          const next = { ...prev };
+          delete next[appId];
+          return next;
+        });
       } else {
-        await flagApp(nid, config.siteBaseUrl);
+        const result = await flagApp(nid, config.siteBaseUrl);
+        setFlaggingMap(prev => ({ ...prev, [appId]: result.flaggingId }));
       }
     } catch (error) {
       console.error('[FlagContext] toggleFlag failed, rolling back:', error);
@@ -95,7 +108,7 @@ export function FlagProvider({ children }) {
         return next;
       });
     }
-  }, [authenticated, flaggedIds, pendingIds, config.siteBaseUrl]);
+  }, [authenticated, flaggedIds, flaggingMap, pendingIds, config.siteBaseUrl]);
 
   const value = {
     authenticated,

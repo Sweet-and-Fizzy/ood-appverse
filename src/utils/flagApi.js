@@ -1,6 +1,6 @@
 /**
  * Flag API utilities for authenticated user operations
- * Uses Drupal Flag module REST endpoints for flag/unflag actions,
+ * Uses Drupal REST entity endpoints for flag/unflag (POST/DELETE /entity/flagging),
  * and JSON:API for reading the current user's flaggings.
  */
 
@@ -52,15 +52,17 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
 
     const data = await flagResponse.json();
     const flaggedIds = [];
+    const flaggingMap = {};
     for (const flagging of (data.data || [])) {
       const appId = flagging.relationships?.flagged_entity?.data?.id;
       if (appId) {
         flaggedIds.push(appId);
+        flaggingMap[appId] = flagging.id;
       }
     }
 
     console.log('[FlagApi] Authenticated, user has', flaggedIds.length, 'flagged apps');
-    return { authenticated: true, flaggedIds };
+    return { authenticated: true, flaggedIds, flaggingMap };
   } catch (error) {
     console.error('[FlagApi] Auth check failed:', error);
     return { authenticated: false, flaggedIds: [] };
@@ -129,17 +131,23 @@ export function clearCsrfToken() {
 }
 
 /**
- * Flag an app via Flag module REST endpoint.
- * The Flag module handles uid/session resolution internally.
+ * Flag an app via Drupal REST entity endpoint (POST /entity/flagging).
  * @param {number} nid - Drupal node ID of the app to flag
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
+ * @returns {Promise<{flaggingId: string}>} The created flagging entity's UUID
  */
 export async function flagApp(nid, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
   const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
-  const flagUrl = `${baseUrl}/flag/flag/appverse_apps/${nid}?_format=json`;
+  const flagUrl = `${baseUrl}/entity/flagging?_format=json`;
 
-  console.log('[FlagApi] Flagging app:', flagUrl);
+  const body = {
+    flag_id: [{ value: 'appverse_apps' }],
+    entity_type: [{ value: 'node' }],
+    entity_id: [{ value: String(nid) }],
+  };
+
+  console.log('[FlagApi] Flagging app via REST:', flagUrl, { nid });
 
   const response = await fetch(flagUrl, {
     method: 'POST',
@@ -147,7 +155,8 @@ export async function flagApp(nid, siteBaseUrl = '') {
     headers: {
       'X-CSRF-Token': token,
       'Content-Type': 'application/json',
-    }
+    },
+    body: JSON.stringify(body)
   });
 
   console.log('[FlagApi] Flag response:', response.status);
@@ -162,27 +171,29 @@ export async function flagApp(nid, siteBaseUrl = '') {
     throw new Error(`Failed to flag app: ${response.statusText}`);
   }
 
-  console.log('[FlagApi] Flag success');
+  const data = await response.json();
+  const flaggingId = data.uuid?.[0]?.value;
+  console.log('[FlagApi] Flag success, flagging UUID:', flaggingId);
+  return { flaggingId };
 }
 
 /**
- * Unflag an app via Flag module REST endpoint.
- * @param {number} nid - Drupal node ID of the app to unflag
+ * Unflag an app via Drupal REST entity endpoint (DELETE /entity/flagging/{id}).
+ * @param {string} flaggingId - Flagging entity UUID
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
  */
-export async function unflagApp(nid, siteBaseUrl = '') {
+export async function unflagApp(flaggingId, siteBaseUrl = '') {
   const token = await getCsrfToken(siteBaseUrl);
   const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
-  const unflagUrl = `${baseUrl}/flag/unflag/appverse_apps/${nid}?_format=json`;
+  const unflagUrl = `${baseUrl}/entity/flagging/${flaggingId}?_format=json`;
 
-  console.log('[FlagApi] Unflagging app:', unflagUrl);
+  console.log('[FlagApi] Unflagging via REST DELETE:', unflagUrl);
 
   const response = await fetch(unflagUrl, {
-    method: 'POST',
+    method: 'DELETE',
     credentials: 'include',
     headers: {
       'X-CSRF-Token': token,
-      'Content-Type': 'application/json',
     }
   });
 
