@@ -10,6 +10,12 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
 
     // Dev server configuration
+    // Dev proxy: forwards requests to the Drupal backend so the browser
+    // doesn't hit CORS restrictions. The /flag, /user, and /session proxies
+    // also inject Access-Control-Allow-Origin and Allow-Credentials headers
+    // on the response (Drupal doesn't send them) so the browser will accept
+    // credentialed (cookie-based) requests from localhost.
+    // None of this applies in production — the widget is served same-origin.
     server: {
       port: 3000,
       open: true,

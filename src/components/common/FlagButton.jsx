@@ -49,7 +49,7 @@ export default function FlagButton({ appId, nid, className = '' }) {
           <Flag className="w-3 h-3 text-white" />
         )}
       </span>
-      {flagged ? 'MY APP' : 'FLAG APP'}
+      {flagged ? 'FLAGGED' : 'FLAG APP'}
     </button>
   );
 }

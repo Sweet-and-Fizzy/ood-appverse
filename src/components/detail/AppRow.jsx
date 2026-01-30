@@ -127,7 +127,8 @@ export default function AppRow({ app, isExpanded, onToggle }) {
           {/* Right column: action buttons (vertical) */}
           <div className="flex flex-col gap-2 flex-shrink-0 w-[150px]">
             <ViewRepoButton />
-            {nid && <FlagButton appId={appId} nid={nid} />}
+            {/* TODO: Uncomment this and/or replace when new UI is specified */}
+            {/* {nid && <FlagButton appId={appId} nid={nid} />} */}
             <ShowReadmeButton className="mt-auto" />
           </div>
         </div>
