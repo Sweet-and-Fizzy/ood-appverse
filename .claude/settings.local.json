@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(curl:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebFetch(domain:www.drupal.org)"
     ]
   }
 }

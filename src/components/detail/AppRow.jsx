@@ -10,6 +10,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
+import FlagButton from '../common/FlagButton';
 
 export default function AppRow({ app, isExpanded, onToggle }) {
   const title = app.attributes?.title || 'Untitled App';
@@ -21,6 +22,10 @@ export default function AppRow({ app, isExpanded, onToggle }) {
   // Resolved taxonomy terms from API
   const organization = app.organization;
   const tags = app.tags || [];
+
+  // App identifiers for flagging
+  const appId = app.id; // UUID
+  const nid = app.attributes?.drupal_internal__nid; // needed for entity_id when creating a flagging
 
   // For smooth height animation of README panel
   const readmeRef = useRef(null);
@@ -120,8 +125,10 @@ export default function AppRow({ app, isExpanded, onToggle }) {
           </div>
 
           {/* Right column: action buttons (vertical) */}
-          <div className="flex flex-col justify-between flex-shrink-0 min-h-[70px] w-[130px]">
+          <div className="flex flex-col gap-2 flex-shrink-0 w-[150px]">
             <ViewRepoButton />
+            {/* TODO: Uncomment this and/or replace when new UI is specified */}
+            {/* {nid && <FlagButton appId={appId} nid={nid} />} */}
             <ShowReadmeButton className="mt-auto" />
           </div>
         </div>
@@ -151,8 +158,9 @@ export default function AppRow({ app, isExpanded, onToggle }) {
           )}
 
           {/* Action buttons (horizontal row) */}
-          <div className="flex flex-row gap-4 mt-4">
+          <div className="flex flex-row flex-wrap gap-4 mt-4">
             <ViewRepoButton />
+            {nid && <FlagButton appId={appId} nid={nid} />}
             <ShowReadmeButton />
           </div>
         </div>
