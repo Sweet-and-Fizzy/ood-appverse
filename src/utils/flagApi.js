@@ -155,7 +155,6 @@ export async function flagApp(nid, siteBaseUrl = '') {
   console.log('[FlagApi] drupalSettings.user:', JSON.stringify(window.drupalSettings?.user));
   console.log('[FlagApi] drupalSettings.path:', JSON.stringify(window.drupalSettings?.path));
   console.log('[FlagApi] Origin:', window.location.origin);
-  console.log('[FlagApi] document.cookie:', document.cookie);
 
   // No request made — return a fake flaggingId so the UI toggles
   return { flaggingId: 'stub-' + nid };

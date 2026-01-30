@@ -12629,7 +12629,7 @@ async function PN(e = "") {
 async function HN(e, a = "") {
   var i, o;
   const r = await PN(a);
-  return console.log("[FlagApi] === FLAG (no-op) ==="), console.log("[FlagApi] App NID:", e), console.log("[FlagApi] CSRF Token:", r), console.log("[FlagApi] siteBaseUrl:", JSON.stringify(a)), console.log("[FlagApi] drupalSettings.user:", JSON.stringify((i = window.drupalSettings) == null ? void 0 : i.user)), console.log("[FlagApi] drupalSettings.path:", JSON.stringify((o = window.drupalSettings) == null ? void 0 : o.path)), console.log("[FlagApi] Origin:", window.location.origin), console.log("[FlagApi] document.cookie:", document.cookie), { flaggingId: "stub-" + e };
+  return console.log("[FlagApi] === FLAG (no-op) ==="), console.log("[FlagApi] App NID:", e), console.log("[FlagApi] CSRF Token:", r), console.log("[FlagApi] siteBaseUrl:", JSON.stringify(a)), console.log("[FlagApi] drupalSettings.user:", JSON.stringify((i = window.drupalSettings) == null ? void 0 : i.user)), console.log("[FlagApi] drupalSettings.path:", JSON.stringify((o = window.drupalSettings) == null ? void 0 : o.path)), console.log("[FlagApi] Origin:", window.location.origin), { flaggingId: "stub-" + e };
 }
 async function qN(e, a = "") {
   console.log("[FlagApi] === UNFLAG (no-op) ==="), console.log("[FlagApi] Flagging ID:", e), console.log("[FlagApi] siteBaseUrl:", JSON.stringify(a));
