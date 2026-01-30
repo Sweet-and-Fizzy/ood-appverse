@@ -51,45 +51,38 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
     }
 
     // Step 2: Fetch current user UUID and flaggings
-    // Drupal's /user redirects to /user/{username}, dropping ?_format=json.
-    // So we follow the redirect manually: first request with redirect:'manual'
-    // to get the final URL, then fetch that URL with ?_format=json.
     const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
     console.log('[FlagApi] User authenticated, fetching flaggings and user info');
 
-    // Start flaggings fetch immediately
-    const flagPromise = fetch(flaggingsUrl, { credentials: 'include' });
-
-    // Get user UUID via redirect-then-fetch
+    // Get current user's numeric uid from drupalSettings (available since we run in Drupal page)
+    // Then fetch their UUID via /user/{uid}?_format=json
     let userUuid = null;
-    try {
-      const redirectResponse = await fetch(`${baseUrl}/user`, {
-        credentials: 'include',
-        redirect: 'manual'
-      });
-      // 302/301 redirect — Location header has the user-specific URL
-      const userPageUrl = redirectResponse.headers.get('location');
-      console.log('[FlagApi] /user redirect location:', userPageUrl);
+    const drupalUid = window.drupalSettings?.user?.uid;
+    console.log('[FlagApi] drupalSettings uid:', drupalUid);
 
-      if (userPageUrl) {
-        const jsonUrl = `${userPageUrl}${userPageUrl.includes('?') ? '&' : '?'}_format=json`;
-        console.log('[FlagApi] Fetching user JSON:', jsonUrl);
-        const userResponse = await fetch(jsonUrl, { credentials: 'include' });
-        console.log('[FlagApi] User JSON response:', userResponse.status);
+    const fetches = [fetch(flaggingsUrl, { credentials: 'include' })];
 
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          if (userData.uuid) {
-            userUuid = Array.isArray(userData.uuid) ? userData.uuid[0]?.value : userData.uuid;
-            console.log('[FlagApi] Current user UUID:', userUuid);
-          }
-        }
-      }
-    } catch (e) {
-      console.error('[FlagApi] Failed to get user UUID:', e.message);
+    if (drupalUid) {
+      const userJsonUrl = `${baseUrl}/user/${drupalUid}?_format=json`;
+      console.log('[FlagApi] Fetching user JSON:', userJsonUrl);
+      fetches.push(fetch(userJsonUrl, { credentials: 'include' }));
     }
 
-    const flagResponse = await flagPromise;
+    const [flagResponse, userResponse] = await Promise.all(fetches);
+
+    if (userResponse?.ok) {
+      try {
+        const userData = await userResponse.json();
+        if (userData.uuid) {
+          userUuid = Array.isArray(userData.uuid) ? userData.uuid[0]?.value : userData.uuid;
+          console.log('[FlagApi] Current user UUID:', userUuid);
+        }
+      } catch (e) {
+        console.error('[FlagApi] Failed to parse user JSON:', e.message);
+      }
+    } else if (userResponse) {
+      console.error('[FlagApi] User JSON fetch failed:', userResponse.status);
+    }
 
     if (!flagResponse.ok) {
       console.error('[FlagApi] Flaggings fetch failed:', flagResponse.status);
