@@ -51,10 +51,11 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
     }
 
     // Step 2: Fetch current user UUID and flaggings in parallel
-    // Use /jsonapi without filters — Drupal non-admins can only see their own user
+    // Drupal's /user redirects logged-in users to /user/{uid}
+    // With ?_format=json it returns the user entity as JSON
     const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
-    const userUrl = `${apiBaseUrl}/user/user`;
-    console.log('[FlagApi] User authenticated, fetching flaggings and user UUID');
+    const userUrl = `${baseUrl}/user?_format=json`;
+    console.log('[FlagApi] User authenticated, fetching flaggings and user info');
     console.log('[FlagApi] User URL:', userUrl);
 
     const [flagResponse, userResponse] = await Promise.all([
@@ -62,17 +63,25 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
       fetch(userUrl, { credentials: 'include' })
     ]);
 
-    // Parse user UUID from JSON:API user endpoint
+    // Parse user UUID from Drupal REST user endpoint
+    // Response format: { uuid: [{value: "..."}], uid: [{value: N}], ... }
     let userUuid = null;
-    console.log('[FlagApi] User endpoint response:', userResponse.status);
+    console.log('[FlagApi] User endpoint response:', userResponse.status, 'url:', userResponse.url);
     if (userResponse.ok) {
-      const userData = await userResponse.json();
-      console.log('[FlagApi] User endpoint data count:', userData.data?.length);
-      if (userData.data?.length > 0) {
-        userUuid = userData.data[0].id;
-        console.log('[FlagApi] Current user UUID:', userUuid);
-      } else {
-        console.warn('[FlagApi] User endpoint returned no data');
+      try {
+        const contentType = userResponse.headers.get('content-type') || '';
+        if (contentType.includes('json')) {
+          const userData = await userResponse.json();
+          console.log('[FlagApi] User data keys:', Object.keys(userData));
+          if (userData.uuid) {
+            userUuid = Array.isArray(userData.uuid) ? userData.uuid[0]?.value : userData.uuid;
+            console.log('[FlagApi] Current user UUID:', userUuid);
+          }
+        } else {
+          console.warn('[FlagApi] User endpoint returned non-JSON:', contentType);
+        }
+      } catch (e) {
+        console.error('[FlagApi] Failed to parse user response:', e.message);
       }
     } else {
       console.error('[FlagApi] User endpoint failed:', userResponse.status);
