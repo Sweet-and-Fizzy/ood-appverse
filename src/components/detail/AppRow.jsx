@@ -135,14 +135,14 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             <ViewRepoButton />
             <div className="bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px]">
               <p className="flex items-center gap-1">
-                {githubStars} <StarFill className="w-3 h-3" /> on GitHub
+                <span className="font-bold">{githubStars}</span> <StarFill className="w-3 h-3" /> on GitHub
               </p>
               <p className="flex items-center justify-between">
-                <span>{flagCount} reported usages</span>
+                <span><span className="font-bold">{flagCount}</span> reported usages</span>
                 {nid && <FlagButton appId={appId} nid={nid} compact />}
               </p>
               {formattedDate && (
-                <p>{formattedDate} last commit</p>
+                <p><span className="font-bold">{formattedDate}</span> last commit</p>
               )}
             </div>
           </div>
@@ -178,14 +178,14 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             {/* Right: Stats box */}
             <div className="bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px] w-fit flex-shrink-0">
               <p className="flex items-center gap-1">
-                {githubStars} <StarFill className="w-3 h-3" /> on GitHub
+                <span className="font-bold">{githubStars}</span> <StarFill className="w-3 h-3" /> on GitHub
               </p>
               <p className="flex items-center justify-between">
-                <span>{flagCount} reported usages</span>
+                <span><span className="font-bold">{flagCount}</span> reported usages</span>
                 {nid && <FlagButton appId={appId} nid={nid} compact />}
               </p>
               {formattedDate && (
-                <p>{formattedDate} last commit</p>
+                <p><span className="font-bold">{formattedDate}</span> last commit</p>
               )}
             </div>
           </div>

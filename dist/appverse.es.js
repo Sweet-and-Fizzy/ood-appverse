@@ -37,7 +37,7 @@ var Ev;
 function nR() {
   return Ev || (Ev = 1, zc.exports = tR()), zc.exports;
 }
-var D = nR(), Gc = { exports: {} }, qi = {}, jc = { exports: {} }, $c = {};
+var L = nR(), Gc = { exports: {} }, qi = {}, jc = { exports: {} }, $c = {};
 /**
  * @license React
  * scheduler.production.js
@@ -68,7 +68,7 @@ function aR() {
       var te = j[0], se = j.pop();
       if (se !== te) {
         j[0] = se;
-        e: for (var he = 0, x = j.length, L = x >>> 1; he < L; ) {
+        e: for (var he = 0, x = j.length, D = x >>> 1; he < D; ) {
           var W = 2 * (he + 1) - 1, k = j[W], re = W + 1, ge = j[re];
           if (0 > o(k, se))
             re < x && 0 > o(ge, k) ? (j[he] = ge, j[re] = se, he = re) : (j[he] = k, j[W] = se, he = W);
@@ -145,10 +145,10 @@ function aR() {
                 }
                 if (h !== null) te = !0;
                 else {
-                  var L = r(f);
-                  L !== null && ae(
+                  var D = r(f);
+                  D !== null && ae(
                     U,
-                    L.startTime - j
+                    D.startTime - j
                   ), te = !1;
                 }
               }
@@ -286,8 +286,8 @@ function iR() {
   if (Tv) return ve;
   Tv = 1;
   var e = Symbol.for("react.transitional.element"), a = Symbol.for("react.portal"), r = Symbol.for("react.fragment"), i = Symbol.for("react.strict_mode"), o = Symbol.for("react.profiler"), u = Symbol.for("react.consumer"), c = Symbol.for("react.context"), d = Symbol.for("react.forward_ref"), g = Symbol.for("react.suspense"), f = Symbol.for("react.memo"), b = Symbol.for("react.lazy"), h = Symbol.for("react.activity"), E = Symbol.iterator;
-  function S(L) {
-    return L === null || typeof L != "object" ? null : (L = E && L[E] || L["@@iterator"], typeof L == "function" ? L : null);
+  function S(D) {
+    return D === null || typeof D != "object" ? null : (D = E && D[E] || D["@@iterator"], typeof D == "function" ? D : null);
   }
   var v = {
     isMounted: function() {
@@ -300,23 +300,23 @@ function iR() {
     enqueueSetState: function() {
     }
   }, R = Object.assign, _ = {};
-  function w(L, W, k) {
-    this.props = L, this.context = W, this.refs = _, this.updater = k || v;
+  function w(D, W, k) {
+    this.props = D, this.context = W, this.refs = _, this.updater = k || v;
   }
-  w.prototype.isReactComponent = {}, w.prototype.setState = function(L, W) {
-    if (typeof L != "object" && typeof L != "function" && L != null)
+  w.prototype.isReactComponent = {}, w.prototype.setState = function(D, W) {
+    if (typeof D != "object" && typeof D != "function" && D != null)
       throw Error(
         "takes an object of state variables to update or a function which returns an object of state variables."
       );
-    this.updater.enqueueSetState(this, L, W, "setState");
-  }, w.prototype.forceUpdate = function(L) {
-    this.updater.enqueueForceUpdate(this, L, "forceUpdate");
+    this.updater.enqueueSetState(this, D, W, "setState");
+  }, w.prototype.forceUpdate = function(D) {
+    this.updater.enqueueForceUpdate(this, D, "forceUpdate");
   };
   function O() {
   }
   O.prototype = w.prototype;
-  function N(L, W, k) {
-    this.props = L, this.context = W, this.refs = _, this.updater = k || v;
+  function N(D, W, k) {
+    this.props = D, this.context = W, this.refs = _, this.updater = k || v;
   }
   var B = N.prototype = new O();
   B.constructor = N, R(B, w.prototype), B.isPureReactComponent = !0;
@@ -324,60 +324,60 @@ function iR() {
   function C() {
   }
   var H = { H: null, A: null, T: null, S: null }, X = Object.prototype.hasOwnProperty;
-  function V(L, W, k) {
+  function V(D, W, k) {
     var re = k.ref;
     return {
       $$typeof: e,
-      type: L,
+      type: D,
       key: W,
       ref: re !== void 0 ? re : null,
       props: k
     };
   }
-  function M(L, W) {
-    return V(L.type, W, L.props);
+  function M(D, W) {
+    return V(D.type, W, D.props);
   }
-  function Z(L) {
-    return typeof L == "object" && L !== null && L.$$typeof === e;
+  function Z(D) {
+    return typeof D == "object" && D !== null && D.$$typeof === e;
   }
-  function ee(L) {
+  function ee(D) {
     var W = { "=": "=0", ":": "=2" };
-    return "$" + L.replace(/[=:]/g, function(k) {
+    return "$" + D.replace(/[=:]/g, function(k) {
       return W[k];
     });
   }
   var ie = /\/+/g;
-  function le(L, W) {
-    return typeof L == "object" && L !== null && L.key != null ? ee("" + L.key) : W.toString(36);
+  function le(D, W) {
+    return typeof D == "object" && D !== null && D.key != null ? ee("" + D.key) : W.toString(36);
   }
-  function ae(L) {
-    switch (L.status) {
+  function ae(D) {
+    switch (D.status) {
       case "fulfilled":
-        return L.value;
+        return D.value;
       case "rejected":
-        throw L.reason;
+        throw D.reason;
       default:
-        switch (typeof L.status == "string" ? L.then(C, C) : (L.status = "pending", L.then(
+        switch (typeof D.status == "string" ? D.then(C, C) : (D.status = "pending", D.then(
           function(W) {
-            L.status === "pending" && (L.status = "fulfilled", L.value = W);
+            D.status === "pending" && (D.status = "fulfilled", D.value = W);
           },
           function(W) {
-            L.status === "pending" && (L.status = "rejected", L.reason = W);
+            D.status === "pending" && (D.status = "rejected", D.reason = W);
           }
-        )), L.status) {
+        )), D.status) {
           case "fulfilled":
-            return L.value;
+            return D.value;
           case "rejected":
-            throw L.reason;
+            throw D.reason;
         }
     }
-    throw L;
+    throw D;
   }
-  function j(L, W, k, re, ge) {
-    var pe = typeof L;
-    (pe === "undefined" || pe === "boolean") && (L = null);
+  function j(D, W, k, re, ge) {
+    var pe = typeof D;
+    (pe === "undefined" || pe === "boolean") && (D = null);
     var _e = !1;
-    if (L === null) _e = !0;
+    if (D === null) _e = !0;
     else
       switch (pe) {
         case "bigint":
@@ -386,14 +386,14 @@ function iR() {
           _e = !0;
           break;
         case "object":
-          switch (L.$$typeof) {
+          switch (D.$$typeof) {
             case e:
             case a:
               _e = !0;
               break;
             case b:
-              return _e = L._init, j(
-                _e(L._payload),
+              return _e = D._init, j(
+                _e(D._payload),
                 W,
                 k,
                 re,
@@ -402,28 +402,28 @@ function iR() {
           }
       }
     if (_e)
-      return ge = ge(L), _e = re === "" ? "." + le(L, 0) : re, U(ge) ? (k = "", _e != null && (k = _e.replace(ie, "$&/") + "/"), j(ge, W, k, "", function(xt) {
+      return ge = ge(D), _e = re === "" ? "." + le(D, 0) : re, U(ge) ? (k = "", _e != null && (k = _e.replace(ie, "$&/") + "/"), j(ge, W, k, "", function(xt) {
         return xt;
       })) : ge != null && (Z(ge) && (ge = M(
         ge,
-        k + (ge.key == null || L && L.key === ge.key ? "" : ("" + ge.key).replace(
+        k + (ge.key == null || D && D.key === ge.key ? "" : ("" + ge.key).replace(
           ie,
           "$&/"
         ) + "/") + _e
       )), W.push(ge)), 1;
     _e = 0;
     var Ge = re === "" ? "." : re + ":";
-    if (U(L))
-      for (var Me = 0; Me < L.length; Me++)
-        re = L[Me], pe = Ge + le(re, Me), _e += j(
+    if (U(D))
+      for (var Me = 0; Me < D.length; Me++)
+        re = D[Me], pe = Ge + le(re, Me), _e += j(
           re,
           W,
           k,
           pe,
           ge
         );
-    else if (Me = S(L), typeof Me == "function")
-      for (L = Me.call(L), Me = 0; !(re = L.next()).done; )
+    else if (Me = S(D), typeof Me == "function")
+      for (D = Me.call(D), Me = 0; !(re = D.next()).done; )
         re = re.value, pe = Ge + le(re, Me++), _e += j(
           re,
           W,
@@ -432,103 +432,103 @@ function iR() {
           ge
         );
     else if (pe === "object") {
-      if (typeof L.then == "function")
+      if (typeof D.then == "function")
         return j(
-          ae(L),
+          ae(D),
           W,
           k,
           re,
           ge
         );
-      throw W = String(L), Error(
-        "Objects are not valid as a React child (found: " + (W === "[object Object]" ? "object with keys {" + Object.keys(L).join(", ") + "}" : W) + "). If you meant to render a collection of children, use an array instead."
+      throw W = String(D), Error(
+        "Objects are not valid as a React child (found: " + (W === "[object Object]" ? "object with keys {" + Object.keys(D).join(", ") + "}" : W) + "). If you meant to render a collection of children, use an array instead."
       );
     }
     return _e;
   }
-  function te(L, W, k) {
-    if (L == null) return L;
+  function te(D, W, k) {
+    if (D == null) return D;
     var re = [], ge = 0;
-    return j(L, re, "", "", function(pe) {
+    return j(D, re, "", "", function(pe) {
       return W.call(k, pe, ge++);
     }), re;
   }
-  function se(L) {
-    if (L._status === -1) {
-      var W = L._result;
+  function se(D) {
+    if (D._status === -1) {
+      var W = D._result;
       W = W(), W.then(
         function(k) {
-          (L._status === 0 || L._status === -1) && (L._status = 1, L._result = k);
+          (D._status === 0 || D._status === -1) && (D._status = 1, D._result = k);
         },
         function(k) {
-          (L._status === 0 || L._status === -1) && (L._status = 2, L._result = k);
+          (D._status === 0 || D._status === -1) && (D._status = 2, D._result = k);
         }
-      ), L._status === -1 && (L._status = 0, L._result = W);
+      ), D._status === -1 && (D._status = 0, D._result = W);
     }
-    if (L._status === 1) return L._result.default;
-    throw L._result;
+    if (D._status === 1) return D._result.default;
+    throw D._result;
   }
-  var he = typeof reportError == "function" ? reportError : function(L) {
+  var he = typeof reportError == "function" ? reportError : function(D) {
     if (typeof window == "object" && typeof window.ErrorEvent == "function") {
       var W = new window.ErrorEvent("error", {
         bubbles: !0,
         cancelable: !0,
-        message: typeof L == "object" && L !== null && typeof L.message == "string" ? String(L.message) : String(L),
-        error: L
+        message: typeof D == "object" && D !== null && typeof D.message == "string" ? String(D.message) : String(D),
+        error: D
       });
       if (!window.dispatchEvent(W)) return;
     } else if (typeof process == "object" && typeof process.emit == "function") {
-      process.emit("uncaughtException", L);
+      process.emit("uncaughtException", D);
       return;
     }
-    console.error(L);
+    console.error(D);
   }, x = {
     map: te,
-    forEach: function(L, W, k) {
+    forEach: function(D, W, k) {
       te(
-        L,
+        D,
         function() {
           W.apply(this, arguments);
         },
         k
       );
     },
-    count: function(L) {
+    count: function(D) {
       var W = 0;
-      return te(L, function() {
+      return te(D, function() {
         W++;
       }), W;
     },
-    toArray: function(L) {
-      return te(L, function(W) {
+    toArray: function(D) {
+      return te(D, function(W) {
         return W;
       }) || [];
     },
-    only: function(L) {
-      if (!Z(L))
+    only: function(D) {
+      if (!Z(D))
         throw Error(
           "React.Children.only expected to receive a single React element child."
         );
-      return L;
+      return D;
     }
   };
   return ve.Activity = h, ve.Children = x, ve.Component = w, ve.Fragment = r, ve.Profiler = o, ve.PureComponent = N, ve.StrictMode = i, ve.Suspense = g, ve.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = H, ve.__COMPILER_RUNTIME = {
     __proto__: null,
-    c: function(L) {
-      return H.H.useMemoCache(L);
+    c: function(D) {
+      return H.H.useMemoCache(D);
     }
-  }, ve.cache = function(L) {
+  }, ve.cache = function(D) {
     return function() {
-      return L.apply(null, arguments);
+      return D.apply(null, arguments);
     };
   }, ve.cacheSignal = function() {
     return null;
-  }, ve.cloneElement = function(L, W, k) {
-    if (L == null)
+  }, ve.cloneElement = function(D, W, k) {
+    if (D == null)
       throw Error(
-        "The argument must be a React element, but you passed " + L + "."
+        "The argument must be a React element, but you passed " + D + "."
       );
-    var re = R({}, L.props), ge = L.key;
+    var re = R({}, D.props), ge = D.key;
     if (W != null)
       for (pe in W.key !== void 0 && (ge = "" + W.key), W)
         !X.call(W, pe) || pe === "key" || pe === "__self" || pe === "__source" || pe === "ref" && W.ref === void 0 || (re[pe] = W[pe]);
@@ -539,20 +539,20 @@ function iR() {
         _e[Ge] = arguments[Ge + 2];
       re.children = _e;
     }
-    return V(L.type, ge, re);
-  }, ve.createContext = function(L) {
-    return L = {
+    return V(D.type, ge, re);
+  }, ve.createContext = function(D) {
+    return D = {
       $$typeof: c,
-      _currentValue: L,
-      _currentValue2: L,
+      _currentValue: D,
+      _currentValue2: D,
       _threadCount: 0,
       Provider: null,
       Consumer: null
-    }, L.Provider = L, L.Consumer = {
+    }, D.Provider = D, D.Consumer = {
       $$typeof: u,
-      _context: L
-    }, L;
-  }, ve.createElement = function(L, W, k) {
+      _context: D
+    }, D;
+  }, ve.createElement = function(D, W, k) {
     var re, ge = {}, pe = null;
     if (W != null)
       for (re in W.key !== void 0 && (pe = "" + W.key), W)
@@ -564,31 +564,31 @@ function iR() {
         Ge[Me] = arguments[Me + 2];
       ge.children = Ge;
     }
-    if (L && L.defaultProps)
-      for (re in _e = L.defaultProps, _e)
+    if (D && D.defaultProps)
+      for (re in _e = D.defaultProps, _e)
         ge[re] === void 0 && (ge[re] = _e[re]);
-    return V(L, pe, ge);
+    return V(D, pe, ge);
   }, ve.createRef = function() {
     return { current: null };
-  }, ve.forwardRef = function(L) {
-    return { $$typeof: d, render: L };
-  }, ve.isValidElement = Z, ve.lazy = function(L) {
+  }, ve.forwardRef = function(D) {
+    return { $$typeof: d, render: D };
+  }, ve.isValidElement = Z, ve.lazy = function(D) {
     return {
       $$typeof: b,
-      _payload: { _status: -1, _result: L },
+      _payload: { _status: -1, _result: D },
       _init: se
     };
-  }, ve.memo = function(L, W) {
+  }, ve.memo = function(D, W) {
     return {
       $$typeof: f,
-      type: L,
+      type: D,
       compare: W === void 0 ? null : W
     };
-  }, ve.startTransition = function(L) {
+  }, ve.startTransition = function(D) {
     var W = H.T, k = {};
     H.T = k;
     try {
-      var re = L(), ge = H.S;
+      var re = D(), ge = H.S;
       ge !== null && ge(k, re), typeof re == "object" && re !== null && typeof re.then == "function" && re.then(C, he);
     } catch (pe) {
       he(pe);
@@ -597,42 +597,42 @@ function iR() {
     }
   }, ve.unstable_useCacheRefresh = function() {
     return H.H.useCacheRefresh();
-  }, ve.use = function(L) {
-    return H.H.use(L);
-  }, ve.useActionState = function(L, W, k) {
-    return H.H.useActionState(L, W, k);
-  }, ve.useCallback = function(L, W) {
-    return H.H.useCallback(L, W);
-  }, ve.useContext = function(L) {
-    return H.H.useContext(L);
+  }, ve.use = function(D) {
+    return H.H.use(D);
+  }, ve.useActionState = function(D, W, k) {
+    return H.H.useActionState(D, W, k);
+  }, ve.useCallback = function(D, W) {
+    return H.H.useCallback(D, W);
+  }, ve.useContext = function(D) {
+    return H.H.useContext(D);
   }, ve.useDebugValue = function() {
-  }, ve.useDeferredValue = function(L, W) {
-    return H.H.useDeferredValue(L, W);
-  }, ve.useEffect = function(L, W) {
-    return H.H.useEffect(L, W);
-  }, ve.useEffectEvent = function(L) {
-    return H.H.useEffectEvent(L);
+  }, ve.useDeferredValue = function(D, W) {
+    return H.H.useDeferredValue(D, W);
+  }, ve.useEffect = function(D, W) {
+    return H.H.useEffect(D, W);
+  }, ve.useEffectEvent = function(D) {
+    return H.H.useEffectEvent(D);
   }, ve.useId = function() {
     return H.H.useId();
-  }, ve.useImperativeHandle = function(L, W, k) {
-    return H.H.useImperativeHandle(L, W, k);
-  }, ve.useInsertionEffect = function(L, W) {
-    return H.H.useInsertionEffect(L, W);
-  }, ve.useLayoutEffect = function(L, W) {
-    return H.H.useLayoutEffect(L, W);
-  }, ve.useMemo = function(L, W) {
-    return H.H.useMemo(L, W);
-  }, ve.useOptimistic = function(L, W) {
-    return H.H.useOptimistic(L, W);
-  }, ve.useReducer = function(L, W, k) {
-    return H.H.useReducer(L, W, k);
-  }, ve.useRef = function(L) {
-    return H.H.useRef(L);
-  }, ve.useState = function(L) {
-    return H.H.useState(L);
-  }, ve.useSyncExternalStore = function(L, W, k) {
+  }, ve.useImperativeHandle = function(D, W, k) {
+    return H.H.useImperativeHandle(D, W, k);
+  }, ve.useInsertionEffect = function(D, W) {
+    return H.H.useInsertionEffect(D, W);
+  }, ve.useLayoutEffect = function(D, W) {
+    return H.H.useLayoutEffect(D, W);
+  }, ve.useMemo = function(D, W) {
+    return H.H.useMemo(D, W);
+  }, ve.useOptimistic = function(D, W) {
+    return H.H.useOptimistic(D, W);
+  }, ve.useReducer = function(D, W, k) {
+    return H.H.useReducer(D, W, k);
+  }, ve.useRef = function(D) {
+    return H.H.useRef(D);
+  }, ve.useState = function(D) {
+    return H.H.useState(D);
+  }, ve.useSyncExternalStore = function(D, W, k) {
     return H.H.useSyncExternalStore(
-      L,
+      D,
       W,
       k
     );
@@ -975,7 +975,7 @@ function sR() {
     method: null,
     action: null
   }, he = [], x = -1;
-  function L(t) {
+  function D(t) {
     return { current: t };
   }
   function W(t) {
@@ -984,7 +984,7 @@ function sR() {
   function k(t, n) {
     x++, he[x] = t.current, t.current = n;
   }
-  var re = L(null), ge = L(null), pe = L(null), _e = L(null);
+  var re = D(null), ge = D(null), pe = D(null), _e = D(null);
   function Ge(t, n) {
     switch (k(pe, n), k(ge, t), k(re, null), n.nodeType) {
       case 9:
@@ -2608,7 +2608,7 @@ Error generating stack: ` + s.message + `
   function fi(t) {
     Qn === null ? Qn = [t] : Qn.push(t);
   }
-  var su = L(null), Oa = null, In = null;
+  var su = D(null), Oa = null, In = null;
   function ea(t, n, l) {
     k(su, n._currentValue), n._currentValue = l;
   }
@@ -2796,7 +2796,7 @@ Error generating stack: ` + s.message + `
   j.S = function(t, n) {
     uS = _t(), typeof n == "object" && n !== null && typeof n.then == "function" && $_(t, n), ky !== null && ky(t, n);
   };
-  var Ia = L(null);
+  var Ia = D(null);
   function fu() {
     var t = Ia.current;
     return t !== null ? t : Ye.pooledCache;
@@ -3404,7 +3404,7 @@ Error generating stack: ` + s.message + `
       for (t.callbacks = null, t = 0; t < l.length; t++)
         Dy(l[t], n);
   }
-  var hr = L(null), Ql = L(0);
+  var hr = D(null), Ql = D(0);
   function Uy(t, n) {
     t = $n, k(Ql, t), k(hr, n), $n = t | n.baseLanes;
   }
@@ -3414,7 +3414,7 @@ Error generating stack: ` + s.message + `
   function Su() {
     $n = Ql.current, W(hr), W(Ql);
   }
-  var Ht = L(null), rn = null;
+  var Ht = D(null), rn = null;
   function ra(t) {
     var n = t.alternate;
     k(nt, nt.current & 1), k(Ht, t), rn === null && (n === null || hr.current !== null || n.memoizedState !== null) && (rn = t);
@@ -3431,7 +3431,7 @@ Error generating stack: ` + s.message + `
   function qt(t) {
     W(Ht), rn === t && (rn = null), W(nt);
   }
-  var nt = L(0);
+  var nt = D(0);
   function Jl(t) {
     for (var n = t; n !== null; ) {
       if (n.tag === 13) {
@@ -12456,13 +12456,13 @@ async function Yc(e, a = {}) {
           console.error("Failed to fetch logo file:", pe);
         }
     }
-    const te = (((w = (_ = Z.relationships) == null ? void 0 : _.field_appverse_topics) == null ? void 0 : w.data) || []).map((re) => ie[re.id]).filter(Boolean).map((re) => ({ id: re.id, name: re.attributes.name })), se = (N = (O = Z.relationships) == null ? void 0 : O.field_license) == null ? void 0 : N.data, he = se && ie[se.id] ? { id: se.id, name: ie[se.id].attributes.name } : null, L = (((U = (B = Z.relationships) == null ? void 0 : B.field_tags) == null ? void 0 : U.data) || []).map((re) => ie[re.id]).filter(Boolean).map((re) => ({ id: re.id, name: re.attributes.name })), W = (H = (C = Z.attributes) == null ? void 0 : C.path) == null ? void 0 : H.alias, k = W ? W.split("/").filter(Boolean).pop() : null;
+    const te = (((w = (_ = Z.relationships) == null ? void 0 : _.field_appverse_topics) == null ? void 0 : w.data) || []).map((re) => ie[re.id]).filter(Boolean).map((re) => ({ id: re.id, name: re.attributes.name })), se = (N = (O = Z.relationships) == null ? void 0 : O.field_license) == null ? void 0 : N.data, he = se && ie[se.id] ? { id: se.id, name: ie[se.id].attributes.name } : null, D = (((U = (B = Z.relationships) == null ? void 0 : B.field_tags) == null ? void 0 : U.data) || []).map((re) => ie[re.id]).filter(Boolean).map((re) => ({ id: re.id, name: re.attributes.name })), W = (H = (C = Z.attributes) == null ? void 0 : C.path) == null ? void 0 : H.alias, k = W ? W.split("/").filter(Boolean).pop() : null;
     return {
       ...Z,
       logoUrl: le,
       topics: te,
       license: he,
-      tags: L,
+      tags: D,
       slug: k
     };
   } catch (X) {
@@ -12514,7 +12514,7 @@ function $N({ config: e, children: a }) {
     apiBaseUrl: (e == null ? void 0 : e.apiBaseUrl) ?? "/api",
     siteBaseUrl: (e == null ? void 0 : e.siteBaseUrl) ?? ""
   };
-  return /* @__PURE__ */ D.jsx(rA.Provider, { value: r, children: a });
+  return /* @__PURE__ */ L.jsx(rA.Provider, { value: r, children: a });
 }
 function ap() {
   return z.useContext(rA);
@@ -12582,7 +12582,7 @@ function PN({ children: e }) {
     refetch: o
     // Allow manual refetch if needed
   };
-  return /* @__PURE__ */ D.jsx(iA.Provider, { value: d, children: e });
+  return /* @__PURE__ */ L.jsx(iA.Provider, { value: d, children: e });
 }
 let Wc = null, Lr = null;
 async function HN(e = "/api", a = "") {
@@ -12759,7 +12759,7 @@ function XN({ children: e }) {
     toggleFlag: N,
     getFlagCountAdjustment: O
   };
-  return /* @__PURE__ */ D.jsx(oA.Provider, { value: B, children: e });
+  return /* @__PURE__ */ L.jsx(oA.Provider, { value: B, children: e });
 }
 function sA() {
   const e = z.useContext(oA);
@@ -13538,11 +13538,11 @@ SA.propTypes = {
   className: ue.string
 };
 function vA({ error: e, onRetry: a }) {
-  return /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col items-center justify-center min-h-[400px] py-12 px-4", children: [
-    /* @__PURE__ */ D.jsx("div", { className: "w-16 h-16 rounded-full bg-appverse-pink flex items-center justify-center mb-4", children: /* @__PURE__ */ D.jsx(fA, { className: "w-8 h-8 text-appverse-red" }) }),
-    /* @__PURE__ */ D.jsx("h2", { className: "text-2xl font-serif text-appverse-black mb-2", children: "Unable to Load Data" }),
-    /* @__PURE__ */ D.jsx("p", { className: "text-appverse-black text-center max-w-md mb-6", children: (e == null ? void 0 : e.message) || "An unexpected error occurred. Please try again." }),
-    a && /* @__PURE__ */ D.jsx(
+  return /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col items-center justify-center min-h-[400px] py-12 px-4", children: [
+    /* @__PURE__ */ L.jsx("div", { className: "w-16 h-16 rounded-full bg-appverse-pink flex items-center justify-center mb-4", children: /* @__PURE__ */ L.jsx(fA, { className: "w-8 h-8 text-appverse-red" }) }),
+    /* @__PURE__ */ L.jsx("h2", { className: "text-2xl font-serif text-appverse-black mb-2", children: "Unable to Load Data" }),
+    /* @__PURE__ */ L.jsx("p", { className: "text-appverse-black text-center max-w-md mb-6", children: (e == null ? void 0 : e.message) || "An unexpected error occurred. Please try again." }),
+    a && /* @__PURE__ */ L.jsx(
       "button",
       {
         onClick: a,
@@ -13557,8 +13557,8 @@ function Hx({
   onChange: a,
   placeholder: r = "Search software..."
 }) {
-  return /* @__PURE__ */ D.jsxs("div", { className: "relative w-full max-w-2xl", children: [
-    /* @__PURE__ */ D.jsx(
+  return /* @__PURE__ */ L.jsxs("div", { className: "relative w-full max-w-2xl", children: [
+    /* @__PURE__ */ L.jsx(
       "input",
       {
         type: "text",
@@ -13568,7 +13568,7 @@ function Hx({
         className: "w-full pl-4 pr-10 py-2 border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 hover:border-gray-400 focus:ring-0 transition-colors rounded-appverse"
       }
     ),
-    /* @__PURE__ */ D.jsx("div", { className: "absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none", children: /* @__PURE__ */ D.jsx(rp, { className: "h-4 w-4 text-gray-600" }) })
+    /* @__PURE__ */ L.jsx("div", { className: "absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none", children: /* @__PURE__ */ L.jsx(rp, { className: "h-4 w-4 text-gray-600" }) })
   ] });
 }
 function TA({ filters: e, onFilterChange: a, filterOptions: r = {}, isInDrawer: i = !1 }) {
@@ -13652,11 +13652,11 @@ function TA({ filters: e, onFilterChange: a, filterOptions: r = {}, isInDrawer: 
       ...e,
       [_]: B.length > 0 ? B : void 0
     });
-  }, h = (_, w) => w === "all" ? !e[_] || e[_].length === 0 : (e[_] || []).includes(w), E = /* @__PURE__ */ D.jsxs(D.Fragment, { children: [
+  }, h = (_, w) => w === "all" ? !e[_] || e[_].length === 0 : (e[_] || []).includes(w), E = /* @__PURE__ */ L.jsxs(L.Fragment, { children: [
     f.map((_) => {
       const w = o[_.key];
-      return /* @__PURE__ */ D.jsxs("div", { className: "mb-6 border border-gray-200 rounded-lg overflow-hidden", children: [
-        /* @__PURE__ */ D.jsxs(
+      return /* @__PURE__ */ L.jsxs("div", { className: "mb-6 border border-gray-200 rounded-lg overflow-hidden", children: [
+        /* @__PURE__ */ L.jsxs(
           "button",
           {
             onClick: () => u({
@@ -13665,13 +13665,13 @@ function TA({ filters: e, onFilterChange: a, filterOptions: r = {}, isInDrawer: 
             }),
             className: "w-full flex items-center justify-between bg-gray-100 px-4 py-2 hover:bg-gray-200 transition-colors",
             children: [
-              /* @__PURE__ */ D.jsxs("h3", { className: "text-base font-serif font-bold text-gray-900", children: [
+              /* @__PURE__ */ L.jsxs("h3", { className: "text-base font-serif font-bold text-gray-900", children: [
                 _.title,
                 " (",
                 _.options.length,
                 ")"
               ] }),
-              /* @__PURE__ */ D.jsx(
+              /* @__PURE__ */ L.jsx(
                 dA,
                 {
                   className: `w-4 h-4 text-gray-600 transition-transform ${w ? "rotate-180" : ""}`
@@ -13680,19 +13680,19 @@ function TA({ filters: e, onFilterChange: a, filterOptions: r = {}, isInDrawer: 
             ]
           }
         ),
-        w && /* @__PURE__ */ D.jsx(
+        w && /* @__PURE__ */ L.jsx(
           "div",
           {
             ref: (O) => d.current[_.key] = O,
             className: `px-4 py-3 space-y-2 ${_.options.length > c ? "max-h-64 overflow-y-auto" : ""}`,
             children: _.options.map((O) => {
               const N = h(_.key, O.value);
-              return /* @__PURE__ */ D.jsxs(
+              return /* @__PURE__ */ L.jsxs(
                 "label",
                 {
                   className: "flex items-center cursor-pointer group",
                   children: [
-                    /* @__PURE__ */ D.jsx(
+                    /* @__PURE__ */ L.jsx(
                       "input",
                       {
                         type: "checkbox",
@@ -13706,7 +13706,7 @@ function TA({ filters: e, onFilterChange: a, filterOptions: r = {}, isInDrawer: 
                         className: "w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                       }
                     ),
-                    /* @__PURE__ */ D.jsx("span", { className: "ml-3 text-sm font-sans text-gray-900", children: O.label })
+                    /* @__PURE__ */ L.jsx("span", { className: "ml-3 text-sm font-sans text-gray-900", children: O.label })
                   ]
                 },
                 O.value
@@ -13719,7 +13719,7 @@ function TA({ filters: e, onFilterChange: a, filterOptions: r = {}, isInDrawer: 
     Object.keys(e).some((_) => {
       var w;
       return ((w = e[_]) == null ? void 0 : w.length) > 0;
-    }) && /* @__PURE__ */ D.jsx(
+    }) && /* @__PURE__ */ L.jsx(
       "button",
       {
         onClick: () => a({}),
@@ -13728,7 +13728,7 @@ function TA({ filters: e, onFilterChange: a, filterOptions: r = {}, isInDrawer: 
       }
     )
   ] });
-  return i ? E : /* @__PURE__ */ D.jsx("aside", { className: "w-64 flex-shrink-0", children: /* @__PURE__ */ D.jsx("div", { className: "sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pr-2", children: E }) });
+  return i ? E : /* @__PURE__ */ L.jsx("aside", { className: "w-64 flex-shrink-0", children: /* @__PURE__ */ L.jsx("div", { className: "sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pr-2", children: E }) });
 }
 const qx = [
   "nav.navbar.fixed-top",
@@ -13772,8 +13772,8 @@ function Yx({
       d.key === "Escape" && e && a();
     };
     return document.addEventListener("keydown", c), () => document.removeEventListener("keydown", c);
-  }, [e, a]), e ? /* @__PURE__ */ D.jsxs(D.Fragment, { children: [
-    /* @__PURE__ */ D.jsx(
+  }, [e, a]), e ? /* @__PURE__ */ L.jsxs(L.Fragment, { children: [
+    /* @__PURE__ */ L.jsx(
       "div",
       {
         className: "lg:hidden fixed inset-0 bg-black/50 z-40",
@@ -13782,25 +13782,25 @@ function Yx({
         "aria-hidden": "true"
       }
     ),
-    /* @__PURE__ */ D.jsxs(
+    /* @__PURE__ */ L.jsxs(
       "div",
       {
         className: "lg:hidden fixed left-0 bottom-0 z-50 w-80 max-w-[85vw] bg-white shadow-xl flex flex-col",
         style: { top: u },
         children: [
-          /* @__PURE__ */ D.jsxs("div", { className: "flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50", children: [
-            /* @__PURE__ */ D.jsx("h2", { className: "text-lg font-serif font-bold text-gray-900", children: "Filters" }),
-            /* @__PURE__ */ D.jsx(
+          /* @__PURE__ */ L.jsxs("div", { className: "flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50", children: [
+            /* @__PURE__ */ L.jsx("h2", { className: "text-lg font-serif font-bold text-gray-900", children: "Filters" }),
+            /* @__PURE__ */ L.jsx(
               "button",
               {
                 onClick: a,
                 className: "p-2 -mr-2 text-gray-500 hover:text-gray-700 transition-colors",
                 "aria-label": "Close filters",
-                children: /* @__PURE__ */ D.jsx(SA, { className: "w-5 h-5" })
+                children: /* @__PURE__ */ L.jsx(SA, { className: "w-5 h-5" })
               }
             )
           ] }),
-          /* @__PURE__ */ D.jsx("div", { className: "flex-1 overflow-y-auto p-4", children: /* @__PURE__ */ D.jsx(
+          /* @__PURE__ */ L.jsx("div", { className: "flex-1 overflow-y-auto p-4", children: /* @__PURE__ */ L.jsx(
             TA,
             {
               filters: r,
@@ -13819,13 +13819,13 @@ function Wx({ software: e, appCount: a = 0 }) {
   const r = ((d = e.attributes) == null ? void 0 : d.title) || "Untitled Software", i = e.logoUrl, o = Qi(r), u = a === 1 ? "app" : "apps", c = (g) => {
     console.error(`Failed to load logo for ${r}:`, i);
   };
-  return /* @__PURE__ */ D.jsx(
+  return /* @__PURE__ */ L.jsx(
     dl,
     {
       to: `/${o}`,
       className: "block group",
-      children: /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col items-center gap-4 border-appverse-black border-2 rounded-lg p-6 bg-white h-[199px] hover:border-red-500 transition-all duration-200", children: [
-        /* @__PURE__ */ D.jsx("div", { className: "h-[60px] w-full flex items-center justify-center", children: i ? /* @__PURE__ */ D.jsx(
+      children: /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col items-center gap-4 border-appverse-black border-2 rounded-lg p-6 bg-white h-[199px] hover:border-red-500 transition-all duration-200", children: [
+        /* @__PURE__ */ L.jsx("div", { className: "h-[60px] w-full flex items-center justify-center", children: i ? /* @__PURE__ */ L.jsx(
           "img",
           {
             src: i,
@@ -13835,10 +13835,10 @@ function Wx({ software: e, appCount: a = 0 }) {
           }
         ) : (
           // Placeholder if no logo
-          /* @__PURE__ */ D.jsx("div", { className: "w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center", children: /* @__PURE__ */ D.jsx("span", { className: "text-4xl font-bold text-gray-600 leading-none", children: r.charAt(0).toUpperCase() }) })
+          /* @__PURE__ */ L.jsx("div", { className: "w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center", children: /* @__PURE__ */ L.jsx("span", { className: "text-4xl font-bold text-gray-600 leading-none", children: r.charAt(0).toUpperCase() }) })
         ) }),
-        /* @__PURE__ */ D.jsx("h3", { className: "text-xl font-semibold text-center text-gray-900 line-clamp-2", children: r }),
-        /* @__PURE__ */ D.jsx("div", { className: "mt-auto", children: /* @__PURE__ */ D.jsxs(
+        /* @__PURE__ */ L.jsx("h3", { className: "text-xl font-semibold text-center text-gray-900 line-clamp-2", children: r }),
+        /* @__PURE__ */ L.jsx("div", { className: "mt-auto", children: /* @__PURE__ */ L.jsxs(
           "span",
           {
             role: a === 0 ? "button" : void 0,
@@ -13847,8 +13847,8 @@ function Wx({ software: e, appCount: a = 0 }) {
             } : void 0,
             className: `inline-flex items-center gap-1.5 text-base font-medium ${a === 0 ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`,
             children: [
-              /* @__PURE__ */ D.jsx("span", { className: `grid place-items-center w-5 h-5 rounded-full ${a === 0 ? "bg-appverse-green" : "bg-appverse-blue"}`, children: a === 0 ? /* @__PURE__ */ D.jsx(ts, { className: "w-2.5 h-2.5 text-white -translate-y-[0.5px]" }) : /* @__PURE__ */ D.jsx("span", { className: "text-[10px] font-bold text-white -translate-y-[2px]", children: a }) }),
-              /* @__PURE__ */ D.jsx("span", { className: a === 0 ? "text-appverse-green" : "text-appverse-black", children: a === 0 ? "Add an app" : u })
+              /* @__PURE__ */ L.jsx("span", { className: `grid place-items-center w-5 h-5 rounded-full ${a === 0 ? "bg-appverse-green" : "bg-appverse-blue"}`, children: a === 0 ? /* @__PURE__ */ L.jsx(ts, { className: "w-2.5 h-2.5 text-white -translate-y-[0.5px]" }) : /* @__PURE__ */ L.jsx("span", { className: "text-[10px] font-bold text-white -translate-y-[2px]", children: a }) }),
+              /* @__PURE__ */ L.jsx("span", { className: a === 0 ? "text-appverse-green" : "text-appverse-black", children: a === 0 ? "Add an app" : u })
             ]
           }
         ) })
@@ -13857,23 +13857,23 @@ function Wx({ software: e, appCount: a = 0 }) {
   );
 }
 function Xx() {
-  return /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col items-center gap-4 border-gray-200 border-2 rounded-lg p-6 bg-white h-[199px] animate-pulse", children: [
-    /* @__PURE__ */ D.jsx("div", { className: "h-[60px] w-full flex items-center justify-center", children: /* @__PURE__ */ D.jsx("div", { className: "w-16 h-16 rounded-lg bg-gray-200" }) }),
-    /* @__PURE__ */ D.jsx("div", { className: "w-3/4 h-6 bg-gray-200 rounded" }),
-    /* @__PURE__ */ D.jsxs("div", { className: "mt-auto flex items-center gap-1.5", children: [
-      /* @__PURE__ */ D.jsx("div", { className: "w-5 h-5 bg-gray-200 rounded-full" }),
-      /* @__PURE__ */ D.jsx("div", { className: "w-16 h-4 bg-gray-200 rounded" })
+  return /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col items-center gap-4 border-gray-200 border-2 rounded-lg p-6 bg-white h-[199px] animate-pulse", children: [
+    /* @__PURE__ */ L.jsx("div", { className: "h-[60px] w-full flex items-center justify-center", children: /* @__PURE__ */ L.jsx("div", { className: "w-16 h-16 rounded-lg bg-gray-200" }) }),
+    /* @__PURE__ */ L.jsx("div", { className: "w-3/4 h-6 bg-gray-200 rounded" }),
+    /* @__PURE__ */ L.jsxs("div", { className: "mt-auto flex items-center gap-1.5", children: [
+      /* @__PURE__ */ L.jsx("div", { className: "w-5 h-5 bg-gray-200 rounded-full" }),
+      /* @__PURE__ */ L.jsx("div", { className: "w-16 h-4 bg-gray-200 rounded" })
     ] })
   ] });
 }
 function Zx({ software: e, appsBySoftwareId: a, loading: r }) {
-  return r ? /* @__PURE__ */ D.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: Array.from({ length: 10 }).map((i, o) => /* @__PURE__ */ D.jsx(Xx, {}, o)) }) : !e || e.length === 0 ? /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
-    /* @__PURE__ */ D.jsx("div", { className: "w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4", children: /* @__PURE__ */ D.jsx(rp, { className: "w-10 h-10 text-gray-400" }) }),
-    /* @__PURE__ */ D.jsx("h3", { className: "text-xl font-serif font-bold text-appverse-black mb-2", children: "No Software Found" }),
-    /* @__PURE__ */ D.jsx("p", { className: "text-gray-600 font-sans text-center max-w-md", children: "No software matches your current filters. Try adjusting your search or clearing filters." })
-  ] }) : /* @__PURE__ */ D.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: e.map((i) => {
+  return r ? /* @__PURE__ */ L.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: Array.from({ length: 10 }).map((i, o) => /* @__PURE__ */ L.jsx(Xx, {}, o)) }) : !e || e.length === 0 ? /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
+    /* @__PURE__ */ L.jsx("div", { className: "w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4", children: /* @__PURE__ */ L.jsx(rp, { className: "w-10 h-10 text-gray-400" }) }),
+    /* @__PURE__ */ L.jsx("h3", { className: "text-xl font-serif font-bold text-appverse-black mb-2", children: "No Software Found" }),
+    /* @__PURE__ */ L.jsx("p", { className: "text-gray-600 font-sans text-center max-w-md", children: "No software matches your current filters. Try adjusting your search or clearing filters." })
+  ] }) : /* @__PURE__ */ L.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: e.map((i) => {
     const o = (a[i.id] || []).length;
-    return /* @__PURE__ */ D.jsx(
+    return /* @__PURE__ */ L.jsx(
       Wx,
       {
         software: i,
@@ -13931,13 +13931,13 @@ function Kx() {
       return U.localeCompare(C);
     }), O;
   }, [_, b, a]);
-  return o ? /* @__PURE__ */ D.jsx(vA, { error: o, onRetry: u }) : /* @__PURE__ */ D.jsxs("div", { className: "min-h-screen bg-white", children: [
-    /* @__PURE__ */ D.jsx("div", { className: "mx-6 mt-6 mb-4", children: /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8", children: [
-      /* @__PURE__ */ D.jsxs("div", { className: "flex-1", children: [
-        /* @__PURE__ */ D.jsx("h2", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "Welcome to the Appverse" }),
-        /* @__PURE__ */ D.jsx("p", { className: "text-base font-sans text-appverse-black max-w-2xl", children: "The Open OnDemand Appverse is a community-driven catalog of scientific software, interactive applications, dashboards, and widgets with shared deployment configurations that HPC centers can use to extend their Open OnDemand portals." })
+  return o ? /* @__PURE__ */ L.jsx(vA, { error: o, onRetry: u }) : /* @__PURE__ */ L.jsxs("div", { className: "min-h-screen bg-white", children: [
+    /* @__PURE__ */ L.jsx("div", { className: "mx-6 mt-6 mb-4", children: /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8", children: [
+      /* @__PURE__ */ L.jsxs("div", { className: "flex-1", children: [
+        /* @__PURE__ */ L.jsx("h2", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "Welcome to the Appverse" }),
+        /* @__PURE__ */ L.jsx("p", { className: "text-base font-sans text-appverse-black max-w-2xl", children: "The Open OnDemand Appverse is a community-driven catalog of scientific software, interactive applications, dashboards, and widgets with shared deployment configurations that HPC centers can use to extend their Open OnDemand portals." })
       ] }),
-      /* @__PURE__ */ D.jsx(
+      /* @__PURE__ */ L.jsx(
         "a",
         {
           href: "/node/add/appverse_app",
@@ -13946,19 +13946,19 @@ function Kx() {
         }
       )
     ] }) }),
-    /* @__PURE__ */ D.jsx("div", { className: "mx-6 my-6 bg-appverse-black px-4 py-3 rounded-appverse", children: /* @__PURE__ */ D.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
-      /* @__PURE__ */ D.jsxs(
+    /* @__PURE__ */ L.jsx("div", { className: "mx-6 my-6 bg-appverse-black px-4 py-3 rounded-appverse", children: /* @__PURE__ */ L.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
+      /* @__PURE__ */ L.jsxs(
         "button",
         {
           onClick: () => S(!E),
           className: "flex items-center gap-2 text-white font-sans font-medium hover:opacity-80 transition-opacity",
           children: [
-            E ? /* @__PURE__ */ D.jsx(pA, { className: "w-4 h-4" }) : /* @__PURE__ */ D.jsx(es, { className: "w-4 h-4" }),
+            E ? /* @__PURE__ */ L.jsx(pA, { className: "w-4 h-4" }) : /* @__PURE__ */ L.jsx(es, { className: "w-4 h-4" }),
             E ? "Hide Filters" : "Show Filters"
           ]
         }
       ),
-      /* @__PURE__ */ D.jsx("div", { className: "w-80", children: /* @__PURE__ */ D.jsx(
+      /* @__PURE__ */ L.jsx("div", { className: "w-80", children: /* @__PURE__ */ L.jsx(
         Hx,
         {
           value: g,
@@ -13967,7 +13967,7 @@ function Kx() {
         }
       ) })
     ] }) }),
-    /* @__PURE__ */ D.jsx(
+    /* @__PURE__ */ L.jsx(
       Yx,
       {
         isOpen: E,
@@ -13977,8 +13977,8 @@ function Kx() {
         filterOptions: r
       }
     ),
-    /* @__PURE__ */ D.jsx("div", { className: "mx-6 mb-6", children: /* @__PURE__ */ D.jsxs("div", { className: "flex gap-8", children: [
-      E && /* @__PURE__ */ D.jsx("div", { className: "hidden lg:block", children: /* @__PURE__ */ D.jsx(
+    /* @__PURE__ */ L.jsx("div", { className: "mx-6 mb-6", children: /* @__PURE__ */ L.jsxs("div", { className: "flex gap-8", children: [
+      E && /* @__PURE__ */ L.jsx("div", { className: "hidden lg:block", children: /* @__PURE__ */ L.jsx(
         TA,
         {
           filters: b,
@@ -13986,7 +13986,7 @@ function Kx() {
           filterOptions: r
         }
       ) }),
-      /* @__PURE__ */ D.jsx("main", { className: "flex-1 min-w-0", children: /* @__PURE__ */ D.jsx(
+      /* @__PURE__ */ L.jsx("main", { className: "flex-1 min-w-0", children: /* @__PURE__ */ L.jsx(
         Zx,
         {
           software: w,
@@ -13998,9 +13998,9 @@ function Kx() {
   ] });
 }
 function Qx({ message: e = "Loading..." }) {
-  return /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col items-center justify-center min-h-[400px] py-12", children: [
-    /* @__PURE__ */ D.jsx("div", { className: "animate-spin rounded-full h-12 w-12 border-4 border-appverse-gray border-t-appverse-red mb-4" }),
-    /* @__PURE__ */ D.jsx("p", { className: "text-appverse-black text-lg font-sans", children: e })
+  return /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col items-center justify-center min-h-[400px] py-12", children: [
+    /* @__PURE__ */ L.jsx("div", { className: "animate-spin rounded-full h-12 w-12 border-4 border-appverse-gray border-t-appverse-red mb-4" }),
+    /* @__PURE__ */ L.jsx("p", { className: "text-appverse-black text-lg font-sans", children: e })
   ] });
 }
 function Jx({ software: e }) {
@@ -14009,18 +14009,18 @@ function Jx({ software: e }) {
     ...d.map((U) => ({ ...U, filterType: "topics" })),
     ...g.map((U) => ({ ...U, filterType: "tags" }))
   ], b = (B = c == null ? void 0 : c.name) == null ? void 0 : B.toLowerCase().includes("open");
-  return /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col", children: [
-    /* @__PURE__ */ D.jsx("div", { className: "flex items-start mb-4", children: i ? /* @__PURE__ */ D.jsx(
+  return /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col", children: [
+    /* @__PURE__ */ L.jsx("div", { className: "flex items-start mb-4", children: i ? /* @__PURE__ */ L.jsx(
       "img",
       {
         src: i,
         alt: `${a} logo`,
         className: "w-20 h-20 object-contain"
       }
-    ) : /* @__PURE__ */ D.jsx("div", { className: "w-20 h-20 rounded-appverse bg-gray-200 flex items-center justify-center", children: /* @__PURE__ */ D.jsx("span", { className: "text-4xl font-bold text-gray-600 leading-none", children: a.charAt(0).toUpperCase() }) }) }),
-    /* @__PURE__ */ D.jsx("h1", { className: "text-3xl font-serif font-bold text-appverse-black mb-3", children: a }),
-    /* @__PURE__ */ D.jsxs("div", { className: "flex items-center gap-4 mb-4 text-sm font-sans", children: [
-      o && /* @__PURE__ */ D.jsxs(
+    ) : /* @__PURE__ */ L.jsx("div", { className: "w-20 h-20 rounded-appverse bg-gray-200 flex items-center justify-center", children: /* @__PURE__ */ L.jsx("span", { className: "text-4xl font-bold text-gray-600 leading-none", children: a.charAt(0).toUpperCase() }) }) }),
+    /* @__PURE__ */ L.jsx("h1", { className: "text-3xl font-serif font-bold text-appverse-black mb-3", children: a }),
+    /* @__PURE__ */ L.jsxs("div", { className: "flex items-center gap-4 mb-4 text-sm font-sans", children: [
+      o && /* @__PURE__ */ L.jsxs(
         "a",
         {
           href: o,
@@ -14028,12 +14028,12 @@ function Jx({ software: e }) {
           rel: "noopener noreferrer",
           className: "inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors",
           children: [
-            /* @__PURE__ */ D.jsx(yA, { className: "w-4 h-4" }),
+            /* @__PURE__ */ L.jsx(yA, { className: "w-4 h-4" }),
             "WWW"
           ]
         }
       ),
-      u && /* @__PURE__ */ D.jsxs(
+      u && /* @__PURE__ */ L.jsxs(
         "a",
         {
           href: u,
@@ -14041,24 +14041,24 @@ function Jx({ software: e }) {
           rel: "noopener noreferrer",
           className: "inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors",
           children: [
-            /* @__PURE__ */ D.jsx(cA, { className: "w-4 h-4" }),
+            /* @__PURE__ */ L.jsx(cA, { className: "w-4 h-4" }),
             "DOCS"
           ]
         }
       ),
-      c && /* @__PURE__ */ D.jsxs("span", { className: "inline-flex items-center gap-1.5 text-appverse-black", children: [
-        b ? /* @__PURE__ */ D.jsx(gA, { className: "w-4 h-4" }) : /* @__PURE__ */ D.jsx(mA, { className: "w-4 h-4" }),
+      c && /* @__PURE__ */ L.jsxs("span", { className: "inline-flex items-center gap-1.5 text-appverse-black", children: [
+        b ? /* @__PURE__ */ L.jsx(gA, { className: "w-4 h-4" }) : /* @__PURE__ */ L.jsx(mA, { className: "w-4 h-4" }),
         b ? "OPEN-SOURCE" : "COMMERCIAL"
       ] })
     ] }),
-    r && /* @__PURE__ */ D.jsx(
+    r && /* @__PURE__ */ L.jsx(
       "div",
       {
         className: "text-sm font-sans text-appverse-black leading-relaxed mb-4 prose prose-sm max-w-none",
         dangerouslySetInnerHTML: { __html: r }
       }
     ),
-    f.length > 0 && /* @__PURE__ */ D.jsx("div", { className: "flex flex-wrap gap-2", children: f.map((U) => /* @__PURE__ */ D.jsx(
+    f.length > 0 && /* @__PURE__ */ L.jsx("div", { className: "flex flex-wrap gap-2", children: f.map((U) => /* @__PURE__ */ L.jsx(
       dl,
       {
         to: `/appverse?${U.filterType}=${encodeURIComponent(U.name)}`,
@@ -17143,7 +17143,7 @@ function GC(e, a, r) {
     return k === null || ye(k) ? ee(k) : xe(k) ? (e.consume(k), Z) : r(k);
   }
   function ee(k) {
-    return k === 45 && o === 2 ? (e.consume(k), j) : k === 60 && o === 1 ? (e.consume(k), te) : k === 62 && o === 4 ? (e.consume(k), L) : k === 63 && o === 3 ? (e.consume(k), x) : k === 93 && o === 5 ? (e.consume(k), he) : ye(k) && (o === 6 || o === 7) ? (e.exit("htmlFlowData"), e.check(FC, W, ie)(k)) : k === null || ye(k) ? (e.exit("htmlFlowData"), ie(k)) : (e.consume(k), ee);
+    return k === 45 && o === 2 ? (e.consume(k), j) : k === 60 && o === 1 ? (e.consume(k), te) : k === 62 && o === 4 ? (e.consume(k), D) : k === 63 && o === 3 ? (e.consume(k), x) : k === 93 && o === 5 ? (e.consume(k), he) : ye(k) && (o === 6 || o === 7) ? (e.exit("htmlFlowData"), e.check(FC, W, ie)(k)) : k === null || ye(k) ? (e.exit("htmlFlowData"), ie(k)) : (e.consume(k), ee);
   }
   function ie(k) {
     return e.check(BC, le, W)(k);
@@ -17163,7 +17163,7 @@ function GC(e, a, r) {
   function se(k) {
     if (k === 62) {
       const re = c.toLowerCase();
-      return aT.includes(re) ? (e.consume(k), L) : ee(k);
+      return aT.includes(re) ? (e.consume(k), D) : ee(k);
     }
     return Nt(k) && c.length < 8 ? (e.consume(k), c += String.fromCharCode(k), se) : ee(k);
   }
@@ -17171,10 +17171,10 @@ function GC(e, a, r) {
     return k === 93 ? (e.consume(k), x) : ee(k);
   }
   function x(k) {
-    return k === 62 ? (e.consume(k), L) : k === 45 && o === 2 ? (e.consume(k), x) : ee(k);
+    return k === 62 ? (e.consume(k), D) : k === 45 && o === 2 ? (e.consume(k), x) : ee(k);
   }
-  function L(k) {
-    return k === null || ye(k) ? (e.exit("htmlFlowData"), W(k)) : (e.consume(k), L);
+  function D(k) {
+    return k === null || ye(k) ? (e.exit("htmlFlowData"), W(k)) : (e.consume(k), D);
   }
   function W(k) {
     return e.exit("htmlFlow"), a(k);
@@ -17226,8 +17226,8 @@ function HC(e, a, r) {
     return x === 62 ? j(x) : x === 45 ? E(x) : h(x);
   }
   function v(x) {
-    const L = "CDATA[";
-    return x === L.charCodeAt(u++) ? (e.consume(x), u === L.length ? R : v) : r(x);
+    const D = "CDATA[";
+    return x === D.charCodeAt(u++) ? (e.consume(x), u === D.length ? R : v) : r(x);
   }
   function R(x) {
     return x === null ? r(x) : x === 93 ? (e.consume(x), _) : ye(x) ? (c = R, te(x)) : (e.consume(x), R);
@@ -17921,8 +17921,8 @@ function C0(e, a, r) {
           /** @type {Construct} */
           le
         ])
-      ) : L(le);
-      function L(pe) {
+      ) : D(le);
+      function D(pe) {
         return _e;
         function _e(Ge) {
           const Me = Ge !== null && pe[Ge], xt = Ge !== null && pe.null, cn = [
@@ -18200,7 +18200,7 @@ function j0(e) {
       paragraph: g(),
       referenceString: re,
       resourceDestinationString: x,
-      resourceTitleString: L,
+      resourceTitleString: D,
       resource: W,
       setextHeading: g(X),
       setextHeadingLineSequence: H,
@@ -18477,7 +18477,7 @@ function j0(e) {
     const Q = this.resume(), ce = this.stack[this.stack.length - 1];
     ce.url = Q;
   }
-  function L() {
+  function D() {
     const Q = this.resume(), ce = this.stack[this.stack.length - 1];
     ce.title = Q;
   }
@@ -20794,11 +20794,11 @@ function d1(e, a) {
   for (const b of o1)
     Object.hasOwn(a, b.from) && ("" + b.from + (b.to ? "use `" + b.to + "` instead" : "remove it") + i1 + b.id, void 0);
   return bp(e, f), kO(e, {
-    Fragment: D.Fragment,
+    Fragment: L.Fragment,
     components: o,
     ignoreInvalidStyle: !0,
-    jsx: D.jsx,
-    jsxs: D.jsxs,
+    jsx: L.jsx,
+    jsxs: L.jsxs,
     passKeys: !0,
     passNode: !0
   });
@@ -23101,7 +23101,7 @@ function jD(e, a, r, i, o, u, c, d, g) {
             h.push(x);
           }
         } else {
-          var L = [ie], W = _(L, ee, C.properties.className);
+          var D = [ie], W = _(D, ee, C.properties.className);
           h.push(W);
         }
       }), E = S;
@@ -23158,8 +23158,8 @@ function HD(e, a) {
     var o, u, c = i.language, d = i.children, g = i.style, f = g === void 0 ? a : g, b = i.customStyle, h = b === void 0 ? {} : b, E = i.codeTagProps, S = E === void 0 ? {
       className: c ? "language-".concat(c) : void 0,
       style: Sa(Sa({}, f['code[class*="language-"]']), f['code[class*="language-'.concat(c, '"]')])
-    } : E, v = i.useInlineStyles, R = v === void 0 ? !0 : v, _ = i.showLineNumbers, w = _ === void 0 ? !1 : _, O = i.showInlineLineNumbers, N = O === void 0 ? !0 : O, B = i.startingLineNumber, U = B === void 0 ? 1 : B, C = i.lineNumberContainerStyle, H = i.lineNumberStyle, X = H === void 0 ? {} : H, V = i.wrapLines, M = i.wrapLongLines, Z = M === void 0 ? !1 : M, ee = i.lineProps, ie = ee === void 0 ? {} : ee, le = i.renderer, ae = i.PreTag, j = ae === void 0 ? "pre" : ae, te = i.CodeTag, se = te === void 0 ? "code" : te, he = i.code, x = he === void 0 ? (Array.isArray(d) ? d[0] : d) || "" : he, L = i.astGenerator, W = AD(i, MD);
-    L = L || e;
+    } : E, v = i.useInlineStyles, R = v === void 0 ? !0 : v, _ = i.showLineNumbers, w = _ === void 0 ? !1 : _, O = i.showInlineLineNumbers, N = O === void 0 ? !0 : O, B = i.startingLineNumber, U = B === void 0 ? 1 : B, C = i.lineNumberContainerStyle, H = i.lineNumberStyle, X = H === void 0 ? {} : H, V = i.wrapLines, M = i.wrapLongLines, Z = M === void 0 ? !1 : M, ee = i.lineProps, ie = ee === void 0 ? {} : ee, le = i.renderer, ae = i.PreTag, j = ae === void 0 ? "pre" : ae, te = i.CodeTag, se = te === void 0 ? "code" : te, he = i.code, x = he === void 0 ? (Array.isArray(d) ? d[0] : d) || "" : he, D = i.astGenerator, W = AD(i, MD);
+    D = D || e;
     var k = w ? /* @__PURE__ */ be.createElement(zD, {
       containerStyle: C,
       codeStyle: S.style || {},
@@ -23168,7 +23168,7 @@ function HD(e, a) {
       codeString: x
     }) : null, re = f.hljs || f['pre[class*="language-"]'] || {
       backgroundColor: "#fff"
-    }, ge = Dw(L) ? "hljs" : "prismjs", pe = R ? Object.assign({}, W, {
+    }, ge = Dw(D) ? "hljs" : "prismjs", pe = R ? Object.assign({}, W, {
       style: Object.assign({}, re, h)
     }) : Object.assign({}, W, {
       className: W.className ? "".concat(ge, " ").concat(W.className) : ge,
@@ -23178,14 +23178,14 @@ function HD(e, a) {
       whiteSpace: "pre-wrap"
     }, S.style) : S.style = Sa({
       whiteSpace: "pre"
-    }, S.style), !L)
+    }, S.style), !D)
       return /* @__PURE__ */ be.createElement(j, pe, k, /* @__PURE__ */ be.createElement(se, S, x));
     (V === void 0 && le || Z) && (V = !0), le = le || $D;
     var _e = [{
       type: "text",
       value: x
     }], Ge = PD({
-      astGenerator: L,
+      astGenerator: D,
       language: c,
       code: x,
       defaultCodeValue: _e
@@ -26574,16 +26574,16 @@ Vr.displayName = "csharp";
 Vr.aliases = ["cs", "dotnet"];
 function Vr(e) {
   e.register(Ie), (function(a) {
-    function r(x, L) {
+    function r(x, D) {
       return x.replace(/<<(\d+)>>/g, function(W, k) {
-        return "(?:" + L[+k] + ")";
+        return "(?:" + D[+k] + ")";
       });
     }
-    function i(x, L, W) {
-      return RegExp(r(x, L), "");
+    function i(x, D, W) {
+      return RegExp(r(x, D), "");
     }
-    function o(x, L) {
-      for (var W = 0; W < L; W++)
+    function o(x, D) {
+      for (var W = 0; W < D; W++)
         x = x.replace(/<<self>>/g, function() {
           return "(?:" + x + ")";
         });
@@ -26897,7 +26897,7 @@ function Vr(e) {
       te,
       le
     ]);
-    function he(x, L) {
+    function he(x, D) {
       return {
         interpolation: {
           pattern: i(/((?:^|[^{])(?:\{\{)*)<<0>>/.source, [x]),
@@ -26905,7 +26905,7 @@ function Vr(e) {
           inside: {
             "format-string": {
               pattern: i(/(^\{(?:(?![}:])<<0>>)*)<<1>>(?=\}$)/.source, [
-                L,
+                D,
                 le
               ]),
               lookbehind: !0,
@@ -44697,7 +44697,7 @@ function EM({ content: e, className: a = "", darkMode: r = !1 }) {
     tableBorder: "border-appverse-gray",
     tableHeaderBg: "bg-gray-100"
   };
-  return /* @__PURE__ */ D.jsx("div", { className: `prose prose-sm max-w-none ${r ? "prose-invert" : ""} ${a}`, children: /* @__PURE__ */ D.jsx(
+  return /* @__PURE__ */ L.jsx("div", { className: `prose prose-sm max-w-none ${r ? "prose-invert" : ""} ${a}`, children: /* @__PURE__ */ L.jsx(
     s1,
     {
       remarkPlugins: [vD],
@@ -44705,14 +44705,14 @@ function EM({ content: e, className: a = "", darkMode: r = !1 }) {
         // Custom code block rendering with syntax highlighting
         code({ node: o, inline: u, className: c, children: d, ...g }) {
           const f = /language-(\w+)/.exec(c || ""), b = f ? f[1] : "";
-          return u ? /* @__PURE__ */ D.jsx(
+          return u ? /* @__PURE__ */ L.jsx(
             "code",
             {
               className: `px-1.5 py-0.5 ${i.codeBg} ${i.codeText} rounded text-sm font-mono`,
               ...g,
               children: d
             }
-          ) : /* @__PURE__ */ D.jsx(
+          ) : /* @__PURE__ */ L.jsx(
             Gw,
             {
               style: yM,
@@ -44726,7 +44726,7 @@ function EM({ content: e, className: a = "", darkMode: r = !1 }) {
         },
         // Style links
         a({ node: o, children: u, href: c, ...d }) {
-          return /* @__PURE__ */ D.jsx(
+          return /* @__PURE__ */ L.jsx(
             "a",
             {
               href: c,
@@ -44740,7 +44740,7 @@ function EM({ content: e, className: a = "", darkMode: r = !1 }) {
         },
         // Style images (for badges, etc.)
         img({ node: o, src: u, alt: c, ...d }) {
-          return /* @__PURE__ */ D.jsx(
+          return /* @__PURE__ */ L.jsx(
             "img",
             {
               src: u,
@@ -44752,31 +44752,31 @@ function EM({ content: e, className: a = "", darkMode: r = !1 }) {
         },
         // Headings
         h1({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("h1", { className: `text-2xl font-bold ${i.heading} border-b ${i.border} pb-2 mb-4`, ...c, children: u });
+          return /* @__PURE__ */ L.jsx("h1", { className: `text-2xl font-bold ${i.heading} border-b ${i.border} pb-2 mb-4`, ...c, children: u });
         },
         h2({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("h2", { className: `text-xl font-bold ${i.heading} border-b ${i.border} pb-2 mb-3 mt-6`, ...c, children: u });
+          return /* @__PURE__ */ L.jsx("h2", { className: `text-xl font-bold ${i.heading} border-b ${i.border} pb-2 mb-3 mt-6`, ...c, children: u });
         },
         h3({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("h3", { className: `text-lg font-bold ${i.heading} mb-2 mt-4`, ...c, children: u });
+          return /* @__PURE__ */ L.jsx("h3", { className: `text-lg font-bold ${i.heading} mb-2 mt-4`, ...c, children: u });
         },
         // Lists
         ul({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("ul", { className: `list-disc list-inside space-y-1 my-3 ${i.text}`, ...c, children: u });
+          return /* @__PURE__ */ L.jsx("ul", { className: `list-disc list-inside space-y-1 my-3 ${i.text}`, ...c, children: u });
         },
         ol({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("ol", { className: `list-decimal list-inside space-y-1 my-3 ${i.text}`, ...c, children: u });
+          return /* @__PURE__ */ L.jsx("ol", { className: `list-decimal list-inside space-y-1 my-3 ${i.text}`, ...c, children: u });
         },
         li({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("li", { className: i.text, ...c, children: u });
+          return /* @__PURE__ */ L.jsx("li", { className: i.text, ...c, children: u });
         },
         // Paragraphs
         p({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("p", { className: "my-3 leading-relaxed", ...c, children: u });
+          return /* @__PURE__ */ L.jsx("p", { className: "my-3 leading-relaxed", ...c, children: u });
         },
         // Blockquotes
         blockquote({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx(
+          return /* @__PURE__ */ L.jsx(
             "blockquote",
             {
               className: `border-l-4 ${i.blockquoteBorder} pl-4 my-4 italic ${i.blockquoteText}`,
@@ -44787,13 +44787,13 @@ function EM({ content: e, className: a = "", darkMode: r = !1 }) {
         },
         // Tables (GFM)
         table({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("div", { className: "overflow-x-auto my-4", children: /* @__PURE__ */ D.jsx("table", { className: `min-w-full border ${i.tableBorder}`, ...c, children: u }) });
+          return /* @__PURE__ */ L.jsx("div", { className: "overflow-x-auto my-4", children: /* @__PURE__ */ L.jsx("table", { className: `min-w-full border ${i.tableBorder}`, ...c, children: u }) });
         },
         th({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("th", { className: `border ${i.tableBorder} px-3 py-2 ${i.tableHeaderBg} text-left font-semibold`, ...c, children: u });
+          return /* @__PURE__ */ L.jsx("th", { className: `border ${i.tableBorder} px-3 py-2 ${i.tableHeaderBg} text-left font-semibold`, ...c, children: u });
         },
         td({ node: o, children: u, ...c }) {
-          return /* @__PURE__ */ D.jsx("td", { className: `border ${i.tableBorder} px-3 py-2`, ...c, children: u });
+          return /* @__PURE__ */ L.jsx("td", { className: `border ${i.tableBorder} px-3 py-2`, ...c, children: u });
         }
       },
       children: e
@@ -44807,7 +44807,7 @@ function FT({ appId: e, nid: a, compact: r = !1, className: i = "" }) {
   const f = c(e), b = d(e), h = (E) => {
     E.preventDefault(), E.stopPropagation(), g(e, a);
   };
-  return /* @__PURE__ */ D.jsxs(
+  return /* @__PURE__ */ L.jsxs(
     "button",
     {
       onClick: h,
@@ -44818,10 +44818,10 @@ function FT({ appId: e, nid: a, compact: r = !1, className: i = "" }) {
       "aria-label": f ? "Remove from my apps" : "Add to my apps",
       title: f ? "Remove from my apps" : "Add to my apps",
       children: [
-        /* @__PURE__ */ D.jsx("span", { className: `grid place-items-center w-5 h-5 rounded transition-colors ${f ? "bg-appverse-green" : "bg-appverse-red"}`, children: b ? (
+        /* @__PURE__ */ L.jsx("span", { className: `grid place-items-center w-5 h-5 rounded transition-colors ${f ? "bg-appverse-green" : "bg-appverse-red"}`, children: b ? (
           // Loading spinner
-          /* @__PURE__ */ D.jsx("span", { className: "w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" })
-        ) : f ? /* @__PURE__ */ D.jsx(hA, { className: "w-3 h-3 text-white" }) : /* @__PURE__ */ D.jsx(EA, { className: "w-4 h-4 text-white" }) }),
+          /* @__PURE__ */ L.jsx("span", { className: "w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" })
+        ) : f ? /* @__PURE__ */ L.jsx(hA, { className: "w-3 h-3 text-white" }) : /* @__PURE__ */ L.jsx(EA, { className: "w-4 h-4 text-white" }) }),
         !r && (f ? "FLAGGED" : "FLAG APP")
       ]
     }
@@ -44841,7 +44841,7 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
     year: "2-digit",
     month: "numeric",
     day: "numeric"
-  }) : null, N = () => u && /* @__PURE__ */ D.jsxs(
+  }) : null, N = () => u && /* @__PURE__ */ L.jsxs(
     "a",
     {
       href: u,
@@ -44849,27 +44849,27 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
       rel: "noopener noreferrer",
       className: "inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap",
       children: [
-        /* @__PURE__ */ D.jsx("span", { className: "grid place-items-center w-5 h-5 rounded-full bg-appverse-red", children: /* @__PURE__ */ D.jsx(es, { className: "w-3 h-3 text-white" }) }),
+        /* @__PURE__ */ L.jsx("span", { className: "grid place-items-center w-5 h-5 rounded-full bg-appverse-red", children: /* @__PURE__ */ L.jsx(es, { className: "w-3 h-3 text-white" }) }),
         "VIEW REPO"
       ]
     }
-  ), B = ({ className: j = "" }) => c && /* @__PURE__ */ D.jsxs(
+  ), B = ({ className: j = "" }) => c && /* @__PURE__ */ L.jsxs(
     "button",
     {
       onClick: r,
       className: `inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap focus:outline-none ${j}`,
       children: [
-        /* @__PURE__ */ D.jsx(
+        /* @__PURE__ */ L.jsx(
           "span",
           {
             className: `grid place-items-center w-5 h-5 rounded-full bg-appverse-red transition-transform duration-200 ${a ? "rotate-90" : ""}`,
-            children: /* @__PURE__ */ D.jsx(es, { className: "w-3 h-3 text-white" })
+            children: /* @__PURE__ */ L.jsx(es, { className: "w-3 h-3 text-white" })
           }
         ),
         a ? "HIDE README" : "SHOW README"
       ]
     }
-  ), U = () => E.length > 0 && /* @__PURE__ */ D.jsx("div", { className: "flex flex-wrap gap-2", children: E.map((j) => /* @__PURE__ */ D.jsx(
+  ), U = () => E.length > 0 && /* @__PURE__ */ L.jsx("div", { className: "flex flex-wrap gap-2", children: E.map((j) => /* @__PURE__ */ L.jsx(
     "span",
     {
       className: "px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded",
@@ -44877,80 +44877,80 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
     },
     j.id
   )) });
-  return /* @__PURE__ */ D.jsxs("div", { className: "border border-appverse-gray rounded-appverse overflow-hidden bg-white", children: [
-    /* @__PURE__ */ D.jsxs("div", { className: "!p-5", children: [
-      /* @__PURE__ */ D.jsxs("div", { className: "hidden md:flex md:gap-6", children: [
-        /* @__PURE__ */ D.jsxs("div", { className: "flex-1 min-w-0 flex flex-col", children: [
-          /* @__PURE__ */ D.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: o }),
-          h && /* @__PURE__ */ D.jsx("p", { className: "text-sm font-sans text-appverse-black", children: h.name }),
-          /* @__PURE__ */ D.jsx("div", { className: "mt-auto pt-3", children: /* @__PURE__ */ D.jsx(B, {}) })
+  return /* @__PURE__ */ L.jsxs("div", { className: "border border-appverse-gray rounded-appverse overflow-hidden bg-white", children: [
+    /* @__PURE__ */ L.jsxs("div", { className: "!p-5", children: [
+      /* @__PURE__ */ L.jsxs("div", { className: "hidden md:flex md:gap-6", children: [
+        /* @__PURE__ */ L.jsxs("div", { className: "flex-1 min-w-0 flex flex-col", children: [
+          /* @__PURE__ */ L.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: o }),
+          h && /* @__PURE__ */ L.jsx("p", { className: "text-sm font-sans text-appverse-black", children: h.name }),
+          /* @__PURE__ */ L.jsx("div", { className: "mt-auto pt-3", children: /* @__PURE__ */ L.jsx(B, {}) })
         ] }),
-        /* @__PURE__ */ D.jsx("div", { className: "w-[180px] flex-shrink-0", children: /* @__PURE__ */ D.jsx(U, {}) }),
-        /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col gap-2 flex-shrink-0 items-start", children: [
-          /* @__PURE__ */ D.jsx(N, {}),
-          /* @__PURE__ */ D.jsxs("div", { className: "bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px]", children: [
-            /* @__PURE__ */ D.jsxs("p", { className: "flex items-center gap-1", children: [
-              b,
+        /* @__PURE__ */ L.jsx("div", { className: "w-[180px] flex-shrink-0", children: /* @__PURE__ */ L.jsx(U, {}) }),
+        /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col gap-2 flex-shrink-0 items-start", children: [
+          /* @__PURE__ */ L.jsx(N, {}),
+          /* @__PURE__ */ L.jsxs("div", { className: "bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px]", children: [
+            /* @__PURE__ */ L.jsxs("p", { className: "flex items-center gap-1", children: [
+              /* @__PURE__ */ L.jsx("span", { className: "font-bold", children: b }),
               " ",
-              /* @__PURE__ */ D.jsx(ts, { className: "w-3 h-3" }),
+              /* @__PURE__ */ L.jsx(ts, { className: "w-3 h-3" }),
               " on GitHub"
             ] }),
-            /* @__PURE__ */ D.jsxs("p", { className: "flex items-center justify-between", children: [
-              /* @__PURE__ */ D.jsxs("span", { children: [
-                f,
+            /* @__PURE__ */ L.jsxs("p", { className: "flex items-center justify-between", children: [
+              /* @__PURE__ */ L.jsxs("span", { children: [
+                /* @__PURE__ */ L.jsx("span", { className: "font-bold", children: f }),
                 " reported usages"
               ] }),
-              v && /* @__PURE__ */ D.jsx(FT, { appId: S, nid: v, compact: !0 })
+              v && /* @__PURE__ */ L.jsx(FT, { appId: S, nid: v, compact: !0 })
             ] }),
-            O && /* @__PURE__ */ D.jsxs("p", { children: [
-              O,
+            O && /* @__PURE__ */ L.jsxs("p", { children: [
+              /* @__PURE__ */ L.jsx("span", { className: "font-bold", children: O }),
               " last commit"
             ] })
           ] })
         ] })
       ] }),
-      /* @__PURE__ */ D.jsx("div", { className: "md:hidden", children: /* @__PURE__ */ D.jsxs("div", { className: "flex gap-4 items-start", children: [
-        /* @__PURE__ */ D.jsxs("div", { className: "flex-1 min-w-0", children: [
-          /* @__PURE__ */ D.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: o }),
-          h && /* @__PURE__ */ D.jsx("p", { className: "text-sm font-sans text-appverse-black mb-2", children: h.name }),
-          E.length > 0 && /* @__PURE__ */ D.jsx("div", { className: "mb-3", children: /* @__PURE__ */ D.jsx(U, {}) }),
-          /* @__PURE__ */ D.jsxs("div", { className: "flex flex-row flex-wrap gap-4", children: [
-            /* @__PURE__ */ D.jsx(N, {}),
-            /* @__PURE__ */ D.jsx(B, {})
+      /* @__PURE__ */ L.jsx("div", { className: "md:hidden", children: /* @__PURE__ */ L.jsxs("div", { className: "flex gap-4 items-start", children: [
+        /* @__PURE__ */ L.jsxs("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ L.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: o }),
+          h && /* @__PURE__ */ L.jsx("p", { className: "text-sm font-sans text-appverse-black mb-2", children: h.name }),
+          E.length > 0 && /* @__PURE__ */ L.jsx("div", { className: "mb-3", children: /* @__PURE__ */ L.jsx(U, {}) }),
+          /* @__PURE__ */ L.jsxs("div", { className: "flex flex-row flex-wrap gap-4", children: [
+            /* @__PURE__ */ L.jsx(N, {}),
+            /* @__PURE__ */ L.jsx(B, {})
           ] })
         ] }),
-        /* @__PURE__ */ D.jsxs("div", { className: "bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px] w-fit flex-shrink-0", children: [
-          /* @__PURE__ */ D.jsxs("p", { className: "flex items-center gap-1", children: [
-            b,
+        /* @__PURE__ */ L.jsxs("div", { className: "bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px] w-fit flex-shrink-0", children: [
+          /* @__PURE__ */ L.jsxs("p", { className: "flex items-center gap-1", children: [
+            /* @__PURE__ */ L.jsx("span", { className: "font-bold", children: b }),
             " ",
-            /* @__PURE__ */ D.jsx(ts, { className: "w-3 h-3" }),
+            /* @__PURE__ */ L.jsx(ts, { className: "w-3 h-3" }),
             " on GitHub"
           ] }),
-          /* @__PURE__ */ D.jsxs("p", { className: "flex items-center justify-between", children: [
-            /* @__PURE__ */ D.jsxs("span", { children: [
-              f,
+          /* @__PURE__ */ L.jsxs("p", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ L.jsxs("span", { children: [
+              /* @__PURE__ */ L.jsx("span", { className: "font-bold", children: f }),
               " reported usages"
             ] }),
-            v && /* @__PURE__ */ D.jsx(FT, { appId: S, nid: v, compact: !0 })
+            v && /* @__PURE__ */ L.jsx(FT, { appId: S, nid: v, compact: !0 })
           ] }),
-          O && /* @__PURE__ */ D.jsxs("p", { children: [
-            O,
+          O && /* @__PURE__ */ L.jsxs("p", { children: [
+            /* @__PURE__ */ L.jsx("span", { className: "font-bold", children: O }),
             " last commit"
           ] })
         ] })
       ] }) })
     ] }),
-    c && /* @__PURE__ */ D.jsx(
+    c && /* @__PURE__ */ L.jsx(
       "div",
       {
         className: "overflow-hidden transition-[max-height] duration-300 ease-in-out",
         style: { maxHeight: a ? `${_}px` : "0px" },
-        children: /* @__PURE__ */ D.jsx(
+        children: /* @__PURE__ */ L.jsx(
           "div",
           {
             ref: R,
             className: "border-t border-gray-700 !p-5 bg-[#1e1e1e] max-h-[350px] overflow-y-auto",
-            children: /* @__PURE__ */ D.jsx(EM, { content: c, className: "font-sans", darkMode: !0 })
+            children: /* @__PURE__ */ L.jsx(EM, { content: c, className: "font-sans", darkMode: !0 })
           }
         )
       }
@@ -44958,11 +44958,11 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
   ] });
 }
 function vM({ apps: e, expandedAppId: a, onToggleApp: r }) {
-  return !e || e.length === 0 ? /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
-    /* @__PURE__ */ D.jsx("div", { className: "w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4", children: /* @__PURE__ */ D.jsx(bA, { className: "w-10 h-10 text-gray-400" }) }),
-    /* @__PURE__ */ D.jsx("h3", { className: "text-xl font-serif font-bold text-appverse-black mb-2", children: "No Apps Found" }),
-    /* @__PURE__ */ D.jsx("p", { className: "text-gray-600 font-sans text-center max-w-md", children: "There are no applications implementing this software yet." })
-  ] }) : /* @__PURE__ */ D.jsx("div", { className: "space-y-4", children: e.map((i) => /* @__PURE__ */ D.jsx(
+  return !e || e.length === 0 ? /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
+    /* @__PURE__ */ L.jsx("div", { className: "w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4", children: /* @__PURE__ */ L.jsx(bA, { className: "w-10 h-10 text-gray-400" }) }),
+    /* @__PURE__ */ L.jsx("h3", { className: "text-xl font-serif font-bold text-appverse-black mb-2", children: "No Apps Found" }),
+    /* @__PURE__ */ L.jsx("p", { className: "text-gray-600 font-sans text-center max-w-md", children: "There are no applications implementing this software yet." })
+  ] }) : /* @__PURE__ */ L.jsx("div", { className: "space-y-4", children: e.map((i) => /* @__PURE__ */ L.jsx(
     SM,
     {
       app: i,
@@ -45026,22 +45026,22 @@ function TM() {
     }
     Yc(U, i).then((C) => d(C)).catch((C) => S(C)).finally(() => h(!1)), Dv(U, i).then((C) => f(C)).catch((C) => console.error("Failed to fetch apps:", C));
   };
-  return b || R && u ? /* @__PURE__ */ D.jsx(Qx, { message: "Loading software details..." }) : E ? /* @__PURE__ */ D.jsx(vA, { error: E, onRetry: B }) : c ? /* @__PURE__ */ D.jsx("div", { className: "min-h-screen bg-white", children: /* @__PURE__ */ D.jsxs("div", { className: "px-6 py-8", children: [
-    /* @__PURE__ */ D.jsxs("div", { className: "flex items-center justify-between mb-6", children: [
-      /* @__PURE__ */ D.jsxs(
+  return b || R && u ? /* @__PURE__ */ L.jsx(Qx, { message: "Loading software details..." }) : E ? /* @__PURE__ */ L.jsx(vA, { error: E, onRetry: B }) : c ? /* @__PURE__ */ L.jsx("div", { className: "min-h-screen bg-white", children: /* @__PURE__ */ L.jsxs("div", { className: "px-6 py-8", children: [
+    /* @__PURE__ */ L.jsxs("div", { className: "flex items-center justify-between mb-6", children: [
+      /* @__PURE__ */ L.jsxs(
         dl,
         {
           to: "/",
           className: "inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors",
           children: [
-            /* @__PURE__ */ D.jsx(
+            /* @__PURE__ */ L.jsx(
               "svg",
               {
                 className: "w-4 h-4",
                 fill: "none",
                 stroke: "currentColor",
                 viewBox: "0 0 24 24",
-                children: /* @__PURE__ */ D.jsx(
+                children: /* @__PURE__ */ L.jsx(
                   "path",
                   {
                     strokeLinecap: "round",
@@ -45056,7 +45056,7 @@ function TM() {
           ]
         }
       ),
-      /* @__PURE__ */ D.jsx(
+      /* @__PURE__ */ L.jsx(
         "a",
         {
           href: "/node/add/appverse_app",
@@ -45065,9 +45065,9 @@ function TM() {
         }
       )
     ] }),
-    /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col lg:flex-row gap-8 lg:gap-12", children: [
-      /* @__PURE__ */ D.jsx("div", { className: "w-full lg:w-[280px] lg:flex-shrink-0", children: /* @__PURE__ */ D.jsx(Jx, { software: c }) }),
-      /* @__PURE__ */ D.jsx("div", { className: "flex-1 min-w-0", children: /* @__PURE__ */ D.jsx(
+    /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col lg:flex-row gap-8 lg:gap-12", children: [
+      /* @__PURE__ */ L.jsx("div", { className: "w-full lg:w-[280px] lg:flex-shrink-0", children: /* @__PURE__ */ L.jsx(Jx, { software: c }) }),
+      /* @__PURE__ */ L.jsx("div", { className: "flex-1 min-w-0", children: /* @__PURE__ */ L.jsx(
         vM,
         {
           apps: g,
@@ -45076,21 +45076,21 @@ function TM() {
         }
       ) })
     ] })
-  ] }) }) : /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col items-center justify-center min-h-[400px] py-12 px-4", children: [
-    /* @__PURE__ */ D.jsx("h2", { className: "text-2xl font-serif text-appverse-black mb-2", children: "Software Not Found" }),
-    /* @__PURE__ */ D.jsx("p", { className: "text-appverse-black text-center max-w-md", children: "The software you're looking for doesn't exist or has been removed." })
+  ] }) }) : /* @__PURE__ */ L.jsxs("div", { className: "flex flex-col items-center justify-center min-h-[400px] py-12 px-4", children: [
+    /* @__PURE__ */ L.jsx("h2", { className: "text-2xl font-serif text-appverse-black mb-2", children: "Software Not Found" }),
+    /* @__PURE__ */ L.jsx("p", { className: "text-appverse-black text-center max-w-md", children: "The software you're looking for doesn't exist or has been removed." })
   ] });
 }
 function AM() {
   const { "*": e } = VT(), a = Tn(), r = `/${e || ""}${a.search}`;
-  return /* @__PURE__ */ D.jsx(XT, { to: r, replace: !0 });
+  return /* @__PURE__ */ L.jsx(XT, { to: r, replace: !0 });
 }
 function wM() {
-  return /* @__PURE__ */ D.jsx(PN, { children: /* @__PURE__ */ D.jsx(XN, { children: /* @__PURE__ */ D.jsx("div", { className: "appverse-container", children: /* @__PURE__ */ D.jsx("main", { children: /* @__PURE__ */ D.jsxs(nN, { children: [
-    /* @__PURE__ */ D.jsx(Ki, { path: "/", element: /* @__PURE__ */ D.jsx(Kx, {}) }),
-    /* @__PURE__ */ D.jsx(Ki, { path: "/:slug", element: /* @__PURE__ */ D.jsx(TM, {}) }),
-    /* @__PURE__ */ D.jsx(Ki, { path: "/appverse/*", element: /* @__PURE__ */ D.jsx(AM, {}) }),
-    /* @__PURE__ */ D.jsx(Ki, { path: "*", element: /* @__PURE__ */ D.jsx(XT, { to: "/", replace: !0 }) })
+  return /* @__PURE__ */ L.jsx(PN, { children: /* @__PURE__ */ L.jsx(XN, { children: /* @__PURE__ */ L.jsx("div", { className: "appverse-container", children: /* @__PURE__ */ L.jsx("main", { children: /* @__PURE__ */ L.jsxs(nN, { children: [
+    /* @__PURE__ */ L.jsx(Ki, { path: "/", element: /* @__PURE__ */ L.jsx(Kx, {}) }),
+    /* @__PURE__ */ L.jsx(Ki, { path: "/:slug", element: /* @__PURE__ */ L.jsx(TM, {}) }),
+    /* @__PURE__ */ L.jsx(Ki, { path: "/appverse/*", element: /* @__PURE__ */ L.jsx(AM, {}) }),
+    /* @__PURE__ */ L.jsx(Ki, { path: "*", element: /* @__PURE__ */ L.jsx(XT, { to: "/", replace: !0 }) })
   ] }) }) }) }) });
 }
 function _M(e, a = {}) {
@@ -45099,7 +45099,7 @@ function _M(e, a = {}) {
     return console.error(`AppVerse: Element with id "${e}" not found`), null;
   const i = cR.createRoot(r);
   return i.render(
-    /* @__PURE__ */ D.jsx(kN, { children: /* @__PURE__ */ D.jsx($N, { config: a, children: /* @__PURE__ */ D.jsx(wM, {}) }) })
+    /* @__PURE__ */ L.jsx(kN, { children: /* @__PURE__ */ L.jsx($N, { config: a, children: /* @__PURE__ */ L.jsx(wM, {}) }) })
   ), {
     unmount: () => {
       i.unmount();
