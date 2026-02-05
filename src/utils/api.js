@@ -3,7 +3,7 @@
  * Handles JSON:API interactions with Drupal backend
  */
 
-// import { logApiResponse } from './apiLogger';
+import { logApiResponse } from './apiLogger';
 
 // Default configuration (can be overridden via config parameter)
 const DEFAULT_API_BASE_URL = '/api';
@@ -436,7 +436,7 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
     }
 
     const data = await response.json();
-    // logApiResponse('APPS_BY_SOFTWARE_ID_WITH_INCLUDES', url, data);
+    logApiResponse('APPS_BY_SOFTWARE_ID_WITH_INCLUDES', url, data);
 
     const apps = data.data || [];
     const included = data.included || [];

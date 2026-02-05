@@ -18,6 +18,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
   // Raw markdown content for README
   const readme = app.attributes?.field_appverse_readme?.value;
   const lastUpdated = app.attributes?.field_appverse_lastupdated;
+  const flagCount = app.attributes?.flag_count || 0;
 
   // Resolved taxonomy terms from API
   const organization = app.organization;
@@ -102,21 +103,19 @@ export default function AppRow({ app, isExpanded, onToggle }) {
       <div className="!p-5">
         {/* Desktop layout - 3 column (hidden on mobile) */}
         <div className="hidden md:flex md:gap-6">
-          {/* Left column: title, org, date */}
-          <div className="flex-1 min-w-0">
+          {/* Left column: title, org, show readme */}
+          <div className="flex-1 min-w-0 flex flex-col">
             <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
               {title}
             </h3>
             {organization && (
-              <p className="text-sm font-sans text-appverse-black mb-2">
+              <p className="text-sm font-sans text-appverse-black">
                 {organization.name}
               </p>
             )}
-            {formattedDate && (
-              <p className="text-sm font-sans text-appverse-black">
-                <span className="font-semibold">LAST COMMIT:</span> {formattedDate}
-              </p>
-            )}
+            <div className="mt-auto pt-3">
+              <ShowReadmeButton />
+            </div>
           </div>
 
           {/* Middle column: tags */}
@@ -124,43 +123,54 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             <TagList />
           </div>
 
-          {/* Right column: action buttons (vertical) */}
-          <div className="flex flex-col gap-2 flex-shrink-0 w-[150px]">
+          {/* Right column: view repo, reported usages, last commit */}
+          <div className="flex flex-col gap-1 flex-shrink-0 items-end">
             <ViewRepoButton />
-            {/* TODO: Uncomment this and/or replace when new UI is specified */}
-            {/* {nid && <FlagButton appId={appId} nid={nid} />} */}
-            <ShowReadmeButton className="mt-auto" />
+            <p className="text-sm font-sans text-appverse-black flex items-center gap-1">
+              {flagCount} reported usages
+              {nid && <FlagButton appId={appId} nid={nid} compact />}
+            </p>
+            {formattedDate && (
+              <p className="text-sm font-sans text-appverse-black">
+                {formattedDate} last commit
+              </p>
+            )}
           </div>
         </div>
 
         {/* Mobile layout - stacked (hidden on desktop) */}
         <div className="md:hidden">
-          {/* Title, org, date */}
+          {/* Title and org */}
           <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
             {title}
           </h3>
           {organization && (
-            <p className="text-sm font-sans text-appverse-black mb-2">
+            <p className="text-sm font-sans text-appverse-black mb-3">
               {organization.name}
-            </p>
-          )}
-          {formattedDate && (
-            <p className="text-sm font-sans text-appverse-black">
-              <span className="font-semibold">LAST COMMIT:</span> {formattedDate}
             </p>
           )}
 
           {/* Tags */}
           {tags.length > 0 && (
-            <div className="mt-4">
+            <div className="mb-3">
               <TagList />
             </div>
           )}
 
-          {/* Action buttons (horizontal row) */}
-          <div className="flex flex-row flex-wrap gap-4 mt-4">
+          {/* Stats row */}
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-sans text-appverse-black mb-3">
+            <span className="flex items-center gap-1">
+              {flagCount} reported usages
+              {nid && <FlagButton appId={appId} nid={nid} compact />}
+            </span>
+            {formattedDate && (
+              <span>{formattedDate} last commit</span>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-row flex-wrap gap-4">
             <ViewRepoButton />
-            {nid && <FlagButton appId={appId} nid={nid} />}
             <ShowReadmeButton />
           </div>
         </div>

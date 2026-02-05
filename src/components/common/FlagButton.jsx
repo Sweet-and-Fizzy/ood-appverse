@@ -5,12 +5,13 @@
  * Props:
  * @param {string} appId - App UUID (used for tracking flag state)
  * @param {number} nid - Drupal node ID (needed for entity_id when creating a flagging)
+ * @param {boolean} compact - If true, show only the icon (no text)
  * @param {string} className - Additional CSS classes
  */
-import { Flag, FlagFill } from 'react-bootstrap-icons';
+import { Plus, FlagFill } from 'react-bootstrap-icons';
 import { useFlag } from '../../contexts/FlagContext';
 
-export default function FlagButton({ appId, nid, className = '' }) {
+export default function FlagButton({ appId, nid, compact = false, className = '' }) {
   const { authenticated, loading, isFlagged, isPending, toggleFlag } = useFlag();
 
   // Don't render for unauthenticated users
@@ -46,10 +47,10 @@ export default function FlagButton({ appId, nid, className = '' }) {
         ) : flagged ? (
           <FlagFill className="w-3 h-3 text-white" />
         ) : (
-          <Flag className="w-3 h-3 text-white" />
+          <Plus className="w-3.5 h-3.5 text-white" />
         )}
       </span>
-      {flagged ? 'FLAGGED' : 'FLAG APP'}
+      {!compact && (flagged ? 'FLAGGED' : 'FLAG APP')}
     </button>
   );
 }
