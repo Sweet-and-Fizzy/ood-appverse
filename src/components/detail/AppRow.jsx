@@ -11,14 +11,19 @@ import { useRef, useEffect, useState } from 'react';
 import { ChevronRight, StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import FlagButton from '../common/FlagButton';
+import { useFlag } from '../../contexts/FlagContext';
 
 export default function AppRow({ app, isExpanded, onToggle }) {
+  const { getFlagCountAdjustment } = useFlag();
+
   const title = app.attributes?.title || 'Untitled App';
   const githubUrl = app.attributes?.field_appverse_github_url?.uri;
   // Raw markdown content for README
   const readme = app.attributes?.field_appverse_readme?.value;
   const lastUpdated = app.attributes?.field_appverse_lastupdated;
-  const flagCount = app.attributes?.flag_count || 0;
+  const baseFlagCount = app.attributes?.flag_count || 0;
+  // Adjust flag count based on user's flag actions (updated after server confirms)
+  const flagCount = baseFlagCount + getFlagCountAdjustment(app.id);
   const githubStars = app.attributes?.field_appverse_stars ?? 0;
 
   // Resolved taxonomy terms from API

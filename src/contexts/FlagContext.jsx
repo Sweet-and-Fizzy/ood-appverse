@@ -28,6 +28,9 @@ export function FlagProvider({ children }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [userUuid, setUserUuid] = useState(null);
   const [pendingIds, setPendingIds] = useState(new Set());
+  // Track flag count adjustments for each app (updated only after server confirms)
+  // Map of appId → number (cumulative delta: +1 for flag, -1 for unflag)
+  const [flagCountAdjustments, setFlagCountAdjustments] = useState({});
 
   // Check authentication and fetch flagged apps on mount
   useEffect(() => {
@@ -50,6 +53,10 @@ export function FlagProvider({ children }) {
   const isPending = useCallback((appId) => {
     return pendingIds.has(appId);
   }, [pendingIds]);
+
+  const getFlagCountAdjustment = useCallback((appId) => {
+    return flagCountAdjustments[appId] || 0;
+  }, [flagCountAdjustments]);
 
   /**
    * Toggle flag state for an app (with optimistic update).
@@ -90,9 +97,19 @@ export function FlagProvider({ children }) {
           delete next[appId];
           return next;
         });
+        // Update flag count adjustment after server confirms unflag
+        setFlagCountAdjustments(prev => ({
+          ...prev,
+          [appId]: (prev[appId] || 0) - 1
+        }));
       } else {
         const result = await flagApp(appId, nid, userUuid, config.apiBaseUrl, config.siteBaseUrl);
         setFlaggingMap(prev => ({ ...prev, [appId]: result.flaggingId }));
+        // Update flag count adjustment after server confirms flag
+        setFlagCountAdjustments(prev => ({
+          ...prev,
+          [appId]: (prev[appId] || 0) + 1
+        }));
       }
     } catch (error) {
       console.error('[FlagContext] toggleFlag failed, rolling back:', error);
@@ -120,7 +137,8 @@ export function FlagProvider({ children }) {
     loading,
     isFlagged,
     isPending,
-    toggleFlag
+    toggleFlag,
+    getFlagCountAdjustment
   };
 
   return (

@@ -206,26 +206,34 @@ export default function SoftwareDetail() {
   return (
     <div className="min-h-screen bg-white">
       <div className="px-6 py-8">
-        {/* Back link */}
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors mb-6"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {/* Header row with back link and add app button */}
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back to Software
-        </Link>
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to Software
+          </Link>
+          <a
+            href="/node/add/appverse_app"
+            className="corner-highlight py-3 px-8 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
+          >
+            Add an app
+          </a>
+        </div>
 
         {/* Two-column layout per mockup - stacks on mobile */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">

@@ -102,7 +102,7 @@ export default function SoftwareHeader({ software }) {
 
       {/* Tags as bordered pills */}
       {allTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2">
           {allTags.map((tag) => (
             <Link
               key={tag.id}
@@ -114,14 +114,6 @@ export default function SoftwareHeader({ software }) {
           ))}
         </div>
       )}
-
-      {/* Add a repo button with corner highlight decoration */}
-      <a
-        href="/node/add/appverse_app"
-        className="corner-highlight w-fit py-3 px-8 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
-      >
-        Add an app
-      </a>
     </div>
   );
 }
