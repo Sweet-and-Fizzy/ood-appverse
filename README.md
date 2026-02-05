@@ -70,13 +70,17 @@ function MyApp() {
 
 **Important:** Widget uses hash-based routing (`/#/...`). The server only needs to serve ONE page—all navigation happens via URL hash.
 
+*Use Drupal "source" mode and add this to end of page (with updated commit hash)*
 ```html
-<div id="appverse"></div>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@1.0.0/dist/appverse.css">
-<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@1.0.0/dist/appverse.umd.js"></script>
-<script>
-  AppVerse.mount('appverse');
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@327e72c/dist/appverse.css">
+<div id="appverse-root">
+    &nbsp;
+</div>
+<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@327e72c/dist/appverse.umd.js"></script><script>
+  AppVerse.mount('appverse-root', {
+    apiBaseUrl: '/jsonapi',
+    siteBaseUrl: ''
+  });
 </script>
 ```
 
@@ -117,17 +121,18 @@ The `#` is required—it tells the browser to let the React widget handle routin
 In Drupal, create a Basic Page at `/appverse` with "Full HTML" text format. Click "Source" in the editor and paste:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@558a0d8/dist/appverse.css">
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@COMMIT_HASH/dist/appverse.css">
+<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@COMMIT_HASH/dist/appverse.umd.js"></script>
 <div id="appverse-root"></div>
-
-<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@558a0d8/dist/appverse.umd.js"></script>
 <script>
   AppVerse.mount('appverse-root', {
-    apiBaseUrl: '/jsonapi'
+    apiBaseUrl: '/jsonapi',
+    siteBaseUrl: ''
   });
 </script>
 ```
+
+Replace `COMMIT_HASH` with the latest commit hash from `git rev-parse --short HEAD` (e.g., `327e72c`).
 
 **Configuration options:**
 
@@ -136,7 +141,7 @@ In Drupal, create a Basic Page at `/appverse` with "Full HTML" text format. Clic
 | `apiBaseUrl` | `'/api'` | Base URL for JSON:API calls. Use `'/jsonapi'` for Drupal. |
 | `siteBaseUrl` | `''` | Base URL for assets (logos). Only needed if assets are on a different domain. |
 
-**Cache busting:** The `@558a0d8` in the URL is a git commit hash. To get the latest version after updates, change it to the new commit hash or use `@main` (not recommended for production).
+**Cache busting:** The `@COMMIT_HASH` in the URL is a git commit hash (e.g., `@327e72c`). To get the latest version after updates, change it to the new commit hash or use `@main` (not recommended for production).
 
 ### Deploying Updates to Drupal
 
@@ -180,13 +185,13 @@ After making changes, follow these steps to deploy to the Drupal-embedded versio
 
 ```twig
 {# templates/page--appverse.html.twig #}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@COMMIT_HASH/dist/appverse.css">
+<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@COMMIT_HASH/dist/appverse.umd.js"></script>
 <div id="appverse-root"></div>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@558a0d8/dist/appverse.css">
-<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@558a0d8/dist/appverse.umd.js"></script>
 <script>
   AppVerse.mount('appverse-root', {
-    apiBaseUrl: '/jsonapi'
+    apiBaseUrl: '/jsonapi',
+    siteBaseUrl: ''
   });
 </script>
 ```
