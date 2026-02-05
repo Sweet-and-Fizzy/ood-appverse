@@ -8,7 +8,7 @@
  * @param {Function} onToggle - Callback when toggle is clicked
  */
 import { useRef, useEffect, useState } from 'react';
-import { StarFill } from 'react-bootstrap-icons';
+import { ChevronRight, StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import FlagButton from '../common/FlagButton';
 
@@ -19,10 +19,12 @@ export default function AppRow({ app, isExpanded, onToggle }) {
   const readme = app.attributes?.field_appverse_readme?.value;
   const lastUpdated = app.attributes?.field_appverse_lastupdated;
   const flagCount = app.attributes?.flag_count || 0;
+  const githubStars = app.attributes?.field_appverse_stars ?? 0;
 
   // Resolved taxonomy terms from API
   const organization = app.organization;
-  const tags = app.tags || [];
+  // TODO: Remove mock tags once real data exists
+  const tags = app.tags?.length ? app.tags : [{ id: 'mock-1', name: 'HPC' }, { id: 'mock-2', name: 'Batch Connect' }];
 
   // App identifiers for flagging
   const appId = app.id; // UUID
@@ -61,8 +63,8 @@ export default function AppRow({ app, isExpanded, onToggle }) {
       rel="noopener noreferrer"
       className="inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
     >
-      <span className="w-5 h-5 rounded-full bg-appverse-red flex items-center justify-center">
-        <StarFill className="w-3 h-3 text-white" />
+      <span className="grid place-items-center w-5 h-5 rounded-full bg-appverse-red">
+        <ChevronRight className="w-3 h-3 text-white" />
       </span>
       VIEW REPO
     </a>
@@ -74,11 +76,11 @@ export default function AppRow({ app, isExpanded, onToggle }) {
       className={`inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap focus:outline-none ${className}`}
     >
       <span
-        className={`w-5 h-5 rounded-full bg-appverse-red flex items-center justify-center transition-transform duration-200 ${
+        className={`grid place-items-center w-5 h-5 rounded-full bg-appverse-red transition-transform duration-200 ${
           isExpanded ? 'rotate-90' : ''
         }`}
       >
-        <span className="w-1.5 h-1.5 border-r-2 border-b-2 border-white rotate-[-45deg] ml-[-2px]" />
+        <ChevronRight className="w-3 h-3 text-white" />
       </span>
       {isExpanded ? 'HIDE README' : 'SHOW README'}
     </button>
@@ -123,55 +125,64 @@ export default function AppRow({ app, isExpanded, onToggle }) {
             <TagList />
           </div>
 
-          {/* Right column: view repo, reported usages, last commit */}
-          <div className="flex flex-col gap-1 flex-shrink-0 items-end">
+          {/* Right column: view repo + stats box */}
+          <div className="flex flex-col gap-2 flex-shrink-0 items-start">
             <ViewRepoButton />
-            <p className="text-sm font-sans text-appverse-black flex items-center gap-1">
-              {flagCount} reported usages
-              {nid && <FlagButton appId={appId} nid={nid} compact />}
-            </p>
-            {formattedDate && (
-              <p className="text-sm font-sans text-appverse-black">
-                {formattedDate} last commit
+            <div className="bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px]">
+              <p className="flex items-center gap-1">
+                {githubStars} <StarFill className="w-3 h-3" /> on GitHub
               </p>
-            )}
+              <p className="flex items-center justify-between">
+                <span>{flagCount} reported usages</span>
+                {nid && <FlagButton appId={appId} nid={nid} compact />}
+              </p>
+              {formattedDate && (
+                <p>{formattedDate} last commit</p>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Mobile layout - stacked (hidden on desktop) */}
         <div className="md:hidden">
-          {/* Title and org */}
-          <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
-            {title}
-          </h3>
-          {organization && (
-            <p className="text-sm font-sans text-appverse-black mb-3">
-              {organization.name}
-            </p>
-          )}
-
-          {/* Tags */}
-          {tags.length > 0 && (
-            <div className="mb-3">
-              <TagList />
+          {/* Two column layout: left content, right stats */}
+          <div className="flex gap-4 items-start">
+            {/* Left: Title, org, tags, buttons */}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
+                {title}
+              </h3>
+              {organization && (
+                <p className="text-sm font-sans text-appverse-black mb-2">
+                  {organization.name}
+                </p>
+              )}
+              {/* Tags */}
+              {tags.length > 0 && (
+                <div className="mb-3">
+                  <TagList />
+                </div>
+              )}
+              {/* Action buttons */}
+              <div className="flex flex-row flex-wrap gap-4">
+                <ViewRepoButton />
+                <ShowReadmeButton />
+              </div>
             </div>
-          )}
 
-          {/* Stats row */}
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-sans text-appverse-black mb-3">
-            <span className="flex items-center gap-1">
-              {flagCount} reported usages
-              {nid && <FlagButton appId={appId} nid={nid} compact />}
-            </span>
-            {formattedDate && (
-              <span>{formattedDate} last commit</span>
-            )}
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex flex-row flex-wrap gap-4">
-            <ViewRepoButton />
-            <ShowReadmeButton />
+            {/* Right: Stats box */}
+            <div className="bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px] w-fit flex-shrink-0">
+              <p className="flex items-center gap-1">
+                {githubStars} <StarFill className="w-3 h-3" /> on GitHub
+              </p>
+              <p className="flex items-center justify-between">
+                <span>{flagCount} reported usages</span>
+                {nid && <FlagButton appId={appId} nid={nid} compact />}
+              </p>
+              {formattedDate && (
+                <p>{formattedDate} last commit</p>
+              )}
+            </div>
           </div>
         </div>
       </div>

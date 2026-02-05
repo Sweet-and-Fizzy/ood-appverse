@@ -436,7 +436,7 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
     }
 
     const data = await response.json();
-    logApiResponse('APPS_BY_SOFTWARE_ID_WITH_INCLUDES', url, data);
+    // logApiResponse('APPS_BY_SOFTWARE_ID_WITH_INCLUDES', url, data);
 
     const apps = data.data || [];
     const included = data.included || [];

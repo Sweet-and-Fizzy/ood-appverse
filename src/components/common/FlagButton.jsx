@@ -38,7 +38,7 @@ export default function FlagButton({ appId, nid, compact = false, className = ''
       aria-label={flagged ? 'Remove from my apps' : 'Add to my apps'}
       title={flagged ? 'Remove from my apps' : 'Add to my apps'}
     >
-      <span className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
+      <span className={`grid place-items-center w-5 h-5 rounded transition-colors ${
         flagged ? 'bg-appverse-green' : 'bg-appverse-red'
       }`}>
         {pending ? (
@@ -47,7 +47,7 @@ export default function FlagButton({ appId, nid, compact = false, className = ''
         ) : flagged ? (
           <FlagFill className="w-3 h-3 text-white" />
         ) : (
-          <Plus className="w-3.5 h-3.5 text-white" />
+          <Plus className="w-4 h-4 text-white" />
         )}
       </span>
       {!compact && (flagged ? 'FLAGGED' : 'FLAG APP')}
