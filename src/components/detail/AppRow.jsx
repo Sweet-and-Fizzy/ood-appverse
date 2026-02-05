@@ -28,8 +28,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
   // Resolved taxonomy terms from API
   const organization = app.organization;
-  // TODO: Remove mock tags once real data exists
-  const tags = app.tags?.length ? app.tags : [{ id: 'mock-1', name: 'HPC' }, { id: 'mock-2', name: 'Batch Connect' }];
+  const tags = app.tags || [];
 
   // App identifiers for flagging
   const appId = app.id; // UUID

@@ -44828,12 +44828,12 @@ function FT({ appId: e, nid: a, compact: r = !1, className: i = "" }) {
   );
 }
 function SM({ app: e, isExpanded: a, onToggle: r }) {
-  var C, H, X, V, M, Z, ee, ie, le, ae;
-  const { getFlagCountAdjustment: i } = sA(), o = ((C = e.attributes) == null ? void 0 : C.title) || "Untitled App", u = (X = (H = e.attributes) == null ? void 0 : H.field_appverse_github_url) == null ? void 0 : X.uri, c = (M = (V = e.attributes) == null ? void 0 : V.field_appverse_readme) == null ? void 0 : M.value, d = (Z = e.attributes) == null ? void 0 : Z.field_appverse_lastupdated, f = (((ee = e.attributes) == null ? void 0 : ee.flag_count) || 0) + i(e.id), b = ((ie = e.attributes) == null ? void 0 : ie.field_appverse_stars) ?? 0, h = e.organization, E = (le = e.tags) != null && le.length ? e.tags : [{ id: "mock-1", name: "HPC" }, { id: "mock-2", name: "Batch Connect" }], S = e.id, v = (ae = e.attributes) == null ? void 0 : ae.drupal_internal__nid, R = z.useRef(null), [_, w] = z.useState(0);
+  var C, H, X, V, M, Z, ee, ie, le;
+  const { getFlagCountAdjustment: i } = sA(), o = ((C = e.attributes) == null ? void 0 : C.title) || "Untitled App", u = (X = (H = e.attributes) == null ? void 0 : H.field_appverse_github_url) == null ? void 0 : X.uri, c = (M = (V = e.attributes) == null ? void 0 : V.field_appverse_readme) == null ? void 0 : M.value, d = (Z = e.attributes) == null ? void 0 : Z.field_appverse_lastupdated, f = (((ee = e.attributes) == null ? void 0 : ee.flag_count) || 0) + i(e.id), b = ((ie = e.attributes) == null ? void 0 : ie.field_appverse_stars) ?? 0, h = e.organization, E = e.tags || [], S = e.id, v = (le = e.attributes) == null ? void 0 : le.drupal_internal__nid, R = z.useRef(null), [_, w] = z.useState(0);
   z.useEffect(() => {
     if (a && R.current) {
-      const j = R.current.scrollHeight;
-      w(Math.min(j, 350));
+      const ae = R.current.scrollHeight;
+      w(Math.min(ae, 350));
     } else
       w(0);
   }, [a, c]);
@@ -44853,11 +44853,11 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
         "VIEW REPO"
       ]
     }
-  ), B = ({ className: j = "" }) => c && /* @__PURE__ */ L.jsxs(
+  ), B = ({ className: ae = "" }) => c && /* @__PURE__ */ L.jsxs(
     "button",
     {
       onClick: r,
-      className: `inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap focus:outline-none ${j}`,
+      className: `inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap focus:outline-none ${ae}`,
       children: [
         /* @__PURE__ */ L.jsx(
           "span",
@@ -44869,13 +44869,13 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
         a ? "HIDE README" : "SHOW README"
       ]
     }
-  ), U = () => E.length > 0 && /* @__PURE__ */ L.jsx("div", { className: "flex flex-wrap gap-2", children: E.map((j) => /* @__PURE__ */ L.jsx(
+  ), U = () => E.length > 0 && /* @__PURE__ */ L.jsx("div", { className: "flex flex-wrap gap-2", children: E.map((ae) => /* @__PURE__ */ L.jsx(
     "span",
     {
       className: "px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded",
-      children: j.name
+      children: ae.name
     },
-    j.id
+    ae.id
   )) });
   return /* @__PURE__ */ L.jsxs("div", { className: "border border-appverse-gray rounded-appverse overflow-hidden bg-white", children: [
     /* @__PURE__ */ L.jsxs("div", { className: "!p-5", children: [
