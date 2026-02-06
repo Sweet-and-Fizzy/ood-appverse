@@ -138,7 +138,8 @@ export function FlagProvider({ children }) {
     isFlagged,
     isPending,
     toggleFlag,
-    getFlagCountAdjustment
+    getFlagCountAdjustment,
+    siteBaseUrl: config.siteBaseUrl,
   };
 
   return (

@@ -12,19 +12,24 @@ import { Plus, FlagFill } from 'react-bootstrap-icons';
 import { useFlag } from '../../contexts/FlagContext';
 
 export default function FlagButton({ appId, nid, compact = false, className = '' }) {
-  const { authenticated, loading, isFlagged, isPending, toggleFlag } = useFlag();
+  const { authenticated, loading, isFlagged, isPending, toggleFlag, siteBaseUrl } = useFlag();
 
-  // Don't render for unauthenticated users
-  if (!authenticated && !loading) {
-    return null;
-  }
-
-  const flagged = isFlagged(appId);
-  const pending = isPending(appId);
+  const flagged = authenticated ? isFlagged(appId) : false;
+  const pending = authenticated ? isPending(appId) : false;
 
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!authenticated) {
+      // Redirect anonymous users to Drupal login with destination back to current page
+      // The hash fragment should survive the redirect since Drupal ignores it
+      const currentPath = window.location.pathname + window.location.hash;
+      const loginUrl = `${siteBaseUrl}/user/login?destination=${encodeURIComponent(currentPath)}`;
+      window.location.href = loginUrl;
+      return;
+    }
+
     toggleFlag(appId, nid);
   };
 
