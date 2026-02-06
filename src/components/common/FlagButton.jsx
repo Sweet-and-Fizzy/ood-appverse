@@ -22,11 +22,10 @@ export default function FlagButton({ appId, nid, compact = false, className = ''
     e.stopPropagation();
 
     if (!authenticated) {
-      // Redirect anonymous users to Drupal login with redirect back to current page
-      // The hash fragment should survive the redirect since Drupal ignores it
-      const currentPath = window.location.pathname + window.location.hash;
-      const loginUrl = `${siteBaseUrl}/user/login?redirect=${encodeURIComponent(currentPath)}`;
-      window.location.href = loginUrl;
+      // Redirect anonymous users to Drupal's Flag module URL
+      // This will prompt login and complete the flag action after authentication
+      const flagUrl = `${siteBaseUrl}/flag/flag/appverse_apps/node/${nid}`;
+      window.location.href = flagUrl;
       return;
     }
 
