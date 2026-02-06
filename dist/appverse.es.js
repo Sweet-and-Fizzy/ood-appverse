@@ -44821,7 +44821,7 @@ function FT({ appId: e, nid: a, compact: r = !1, className: i = "" }) {
         /* @__PURE__ */ L.jsx("span", { className: `grid place-items-center w-5 h-5 rounded transition-colors ${f ? "bg-appverse-green" : "bg-appverse-red"}`, children: b ? (
           // Loading spinner
           /* @__PURE__ */ L.jsx("span", { className: "w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" })
-        ) : f ? /* @__PURE__ */ L.jsx(hA, { className: "w-3 h-3 text-white" }) : /* @__PURE__ */ L.jsx(EA, { className: "w-4 h-4 text-white" }) }),
+        ) : f ? /* @__PURE__ */ L.jsx(hA, { className: "w-3 h-3 text-white" }) : /* @__PURE__ */ L.jsx(EA, { className: "w-3.5 h-3.5 text-white", style: { stroke: "white", strokeWidth: 1 } }) }),
         !r && (f ? "FLAGGED" : "FLAG APP")
       ]
     }
@@ -44849,7 +44849,7 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
       rel: "noopener noreferrer",
       className: "inline-flex items-center gap-2 text-appverse-black visited:text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap",
       children: [
-        /* @__PURE__ */ L.jsx("span", { className: "grid place-items-center w-5 h-5 rounded-full bg-appverse-red", children: /* @__PURE__ */ L.jsx(es, { className: "w-3.5 h-3.5 text-white" }) }),
+        /* @__PURE__ */ L.jsx("span", { className: "grid place-items-center w-5 h-5 rounded-full bg-appverse-red", children: /* @__PURE__ */ L.jsx(es, { className: "w-3.5 h-3 text-white", style: { stroke: "white", strokeWidth: 1, transform: "translateX(0.5px)" } }) }),
         "VIEW REPO"
       ]
     }
@@ -44863,7 +44863,7 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
           "span",
           {
             className: `grid place-items-center w-5 h-5 rounded-full bg-appverse-red transition-transform duration-200 ${a ? "rotate-90" : ""}`,
-            children: /* @__PURE__ */ L.jsx(es, { className: "w-3.5 h-3.5 text-white" })
+            children: /* @__PURE__ */ L.jsx(es, { className: "w-3.5 h-3 text-white", style: { stroke: "white", strokeWidth: 1, transform: "translateX(0.5px)" } })
           }
         ),
         a ? "HIDE README" : "SHOW README"

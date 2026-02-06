@@ -68,7 +68,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
       className="inline-flex items-center gap-2 text-appverse-black visited:text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
     >
       <span className="grid place-items-center w-5 h-5 rounded-full bg-appverse-red">
-        <ChevronRight className="w-3.5 h-3.5 text-white" />
+        <ChevronRight className="w-3.5 h-3 text-white" style={{ stroke: 'white', strokeWidth: 1, transform: 'translateX(0.5px)' }} />
       </span>
       VIEW REPO
     </a>
@@ -84,7 +84,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
           isExpanded ? 'rotate-90' : ''
         }`}
       >
-        <ChevronRight className="w-3.5 h-3.5 text-white" />
+        <ChevronRight className="w-3.5 h-3 text-white" style={{ stroke: 'white', strokeWidth: 1, transform: 'translateX(0.5px)' }} />
       </span>
       {isExpanded ? 'HIDE README' : 'SHOW README'}
     </button>

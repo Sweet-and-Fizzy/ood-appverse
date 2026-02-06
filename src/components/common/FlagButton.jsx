@@ -47,7 +47,7 @@ export default function FlagButton({ appId, nid, compact = false, className = ''
         ) : flagged ? (
           <FlagFill className="w-3 h-3 text-white" />
         ) : (
-          <Plus className="w-4 h-4 text-white" />
+          <Plus className="w-3.5 h-3.5 text-white" style={{ stroke: 'white', strokeWidth: 1 }} />
         )}
       </span>
       {!compact && (flagged ? 'FLAGGED' : 'FLAG APP')}
