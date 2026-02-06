@@ -44815,8 +44815,8 @@ function FT({ appId: e, nid: a, compact: r = !1, className: i = "" }) {
       className: `inline-flex items-center gap-2 text-appverse-black hover:text-gray-600
         transition-colors font-sans font-semibold text-sm whitespace-nowrap
         focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${i}`,
-      "aria-label": f ? "Remove from my apps" : "Add to my apps",
-      title: f ? "Remove from my apps" : "Add to my apps",
+      "aria-label": f ? "Remove from my apps" : "We use this App",
+      title: f ? "Remove from my apps" : "We use this App",
       children: [
         /* @__PURE__ */ L.jsx("span", { className: `grid place-items-center w-5 h-5 rounded transition-colors ${f ? "bg-appverse-green" : "bg-appverse-red"}`, children: b ? (
           // Loading spinner
@@ -44847,9 +44847,9 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
       href: u,
       target: "_blank",
       rel: "noopener noreferrer",
-      className: "inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap",
+      className: "inline-flex items-center gap-2 text-appverse-black visited:text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap",
       children: [
-        /* @__PURE__ */ L.jsx("span", { className: "grid place-items-center w-5 h-5 rounded-full bg-appverse-red", children: /* @__PURE__ */ L.jsx(es, { className: "w-3 h-3 text-white" }) }),
+        /* @__PURE__ */ L.jsx("span", { className: "grid place-items-center w-5 h-5 rounded-full bg-appverse-red", children: /* @__PURE__ */ L.jsx(es, { className: "w-3.5 h-3.5 text-white" }) }),
         "VIEW REPO"
       ]
     }
@@ -44863,7 +44863,7 @@ function SM({ app: e, isExpanded: a, onToggle: r }) {
           "span",
           {
             className: `grid place-items-center w-5 h-5 rounded-full bg-appverse-red transition-transform duration-200 ${a ? "rotate-90" : ""}`,
-            children: /* @__PURE__ */ L.jsx(es, { className: "w-3 h-3 text-white" })
+            children: /* @__PURE__ */ L.jsx(es, { className: "w-3.5 h-3.5 text-white" })
           }
         ),
         a ? "HIDE README" : "SHOW README"
@@ -45060,7 +45060,7 @@ function TM() {
         "a",
         {
           href: "/node/add/appverse_app",
-          className: "corner-highlight py-3 px-8 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors",
+          className: "py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors",
           children: "Add an app"
         }
       )

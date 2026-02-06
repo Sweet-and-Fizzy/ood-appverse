@@ -65,10 +65,10 @@ export default function AppRow({ app, isExpanded, onToggle }) {
       href={githubUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
+      className="inline-flex items-center gap-2 text-appverse-black visited:text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
     >
       <span className="grid place-items-center w-5 h-5 rounded-full bg-appverse-red">
-        <ChevronRight className="w-3 h-3 text-white" />
+        <ChevronRight className="w-3.5 h-3.5 text-white" />
       </span>
       VIEW REPO
     </a>
@@ -84,7 +84,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
           isExpanded ? 'rotate-90' : ''
         }`}
       >
-        <ChevronRight className="w-3 h-3 text-white" />
+        <ChevronRight className="w-3.5 h-3.5 text-white" />
       </span>
       {isExpanded ? 'HIDE README' : 'SHOW README'}
     </button>
