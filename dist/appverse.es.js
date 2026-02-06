@@ -44804,7 +44804,7 @@ function EM({ content: e, className: a = "", darkMode: r = !1 }) {
 function FT({ appId: e, nid: a, compact: r = !1, className: i = "" }) {
   const { authenticated: o, loading: u, isFlagged: c, isPending: d, toggleFlag: f, siteBaseUrl: g } = sA(), b = o ? c(e) : !1, h = o ? d(e) : !1, E = (S) => {
     if (S.preventDefault(), S.stopPropagation(), !o) {
-      const v = window.location.pathname + window.location.hash, R = `${g}/user/login?destination=${encodeURIComponent(v)}`;
+      const v = window.location.pathname + window.location.hash, R = `${g}/user/login?redirect=${encodeURIComponent(v)}`;
       window.location.href = R;
       return;
     }

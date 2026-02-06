@@ -22,10 +22,10 @@ export default function FlagButton({ appId, nid, compact = false, className = ''
     e.stopPropagation();
 
     if (!authenticated) {
-      // Redirect anonymous users to Drupal login with destination back to current page
+      // Redirect anonymous users to Drupal login with redirect back to current page
       // The hash fragment should survive the redirect since Drupal ignores it
       const currentPath = window.location.pathname + window.location.hash;
-      const loginUrl = `${siteBaseUrl}/user/login?destination=${encodeURIComponent(currentPath)}`;
+      const loginUrl = `${siteBaseUrl}/user/login?redirect=${encodeURIComponent(currentPath)}`;
       window.location.href = loginUrl;
       return;
     }
