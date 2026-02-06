@@ -44819,8 +44819,8 @@ function FT({ appId: e, nid: a, compact: r = !1, className: i = "" }) {
       className: `inline-flex items-center gap-2 text-appverse-black hover:text-gray-600
         transition-colors font-sans font-semibold text-sm whitespace-nowrap
         focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${i}`,
-      "aria-label": b ? "Remove from my apps" : "We use this App",
-      title: b ? "Remove from my apps" : "We use this App",
+      "aria-label": o ? b ? "Remove from my apps" : "We use this App" : "Login to say you use this app",
+      title: o ? b ? "Remove from my apps" : "We use this App" : "Login to say you use this app",
       children: [
         /* @__PURE__ */ L.jsx("span", { className: `grid place-items-center w-5 h-5 rounded transition-colors ${b ? "bg-appverse-green" : "bg-appverse-red"}`, children: h ? (
           // Loading spinner

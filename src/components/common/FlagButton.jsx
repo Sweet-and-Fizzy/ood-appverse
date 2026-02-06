@@ -40,8 +40,8 @@ export default function FlagButton({ appId, nid, compact = false, className = ''
       className={`inline-flex items-center gap-2 text-appverse-black hover:text-gray-600
         transition-colors font-sans font-semibold text-sm whitespace-nowrap
         focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-      aria-label={flagged ? 'Remove from my apps' : 'We use this App'}
-      title={flagged ? 'Remove from my apps' : 'We use this App'}
+      aria-label={!authenticated ? 'Login to say you use this app' : flagged ? 'Remove from my apps' : 'We use this App'}
+      title={!authenticated ? 'Login to say you use this app' : flagged ? 'Remove from my apps' : 'We use this App'}
     >
       <span className={`grid place-items-center w-5 h-5 rounded transition-colors ${
         flagged ? 'bg-appverse-green' : 'bg-appverse-red'
