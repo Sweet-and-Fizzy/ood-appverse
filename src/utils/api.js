@@ -178,6 +178,7 @@ export async function fetchAllSoftware(config = {}) {
 
       return {
         ...software,
+        title: software.attributes?.title || '',
         logoUrl,
         topics,
         license,
