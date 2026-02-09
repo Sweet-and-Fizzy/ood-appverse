@@ -12307,23 +12307,26 @@ function UN(e, a) {
   }
 }
 async function aA(e, a, r = dl) {
-  var d, g;
+  var g, f;
   let i = [], o = [], u = e;
   for (; u; ) {
-    const f = await fetch(u);
-    if (!f.ok)
-      throw new Error(`Failed to fetch: ${f.statusText}`);
-    const b = await f.json();
-    i = i.concat(b.data || []), o = o.concat(b.included || []);
-    const h = ((g = (d = b.links) == null ? void 0 : d.next) == null ? void 0 : g.href) || null;
-    u = h ? UN(h, r) : null;
+    const b = await fetch(u);
+    if (!b.ok)
+      throw new Error(`Failed to fetch: ${b.statusText}`);
+    const h = await b.json();
+    i = i.concat(h.data || []), o = o.concat(h.included || []);
+    const S = ((f = (g = h.links) == null ? void 0 : g.next) == null ? void 0 : f.href) || null;
+    u = S ? UN(S, r) : null;
   }
   const c = /* @__PURE__ */ new Map();
-  for (const f of o)
-    c.set(f.id, f);
+  for (const b of i)
+    c.set(b.id, b);
+  const d = /* @__PURE__ */ new Map();
+  for (const b of o)
+    d.set(b.id, b);
   return {
-    data: i,
-    included: Array.from(c.values())
+    data: Array.from(c.values()),
+    included: Array.from(d.values())
   };
 }
 const ss = {
