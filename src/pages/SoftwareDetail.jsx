@@ -204,7 +204,7 @@ export default function SoftwareDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="mb-4 bg-white">
       <div className="px-6 py-8">
         {/* Header row with back link and add app button */}
         <div className="flex items-center justify-between mb-6">

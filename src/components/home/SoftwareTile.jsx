@@ -39,6 +39,7 @@ export default function SoftwareTile({ software, appCount = 0 }) {
               src={logoUrl}
               alt={`${softwareTitle} logo`}
               className="max-h-[60px] max-w-full object-contain"
+              loading="lazy"
               onError={handleImageError}
             />
           ) : (

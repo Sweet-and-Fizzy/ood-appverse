@@ -5,6 +5,7 @@ import { resolve } from 'path'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const isLibBuild = mode === 'lib'
+  const apiTarget = process.env.VITE_API_TARGET || 'https://ondemand.connectci.org'
 
   return {
     plugins: [react()],
@@ -21,14 +22,14 @@ export default defineConfig(({ mode }) => {
       open: true,
       proxy: {
         '/api': {
-          target: 'https://md-2622-accessmatch.pantheonsite.io',
+          target: apiTarget,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '/jsonapi'),
           secure: false,
         },
         // Flag module endpoints (non-JSON:API)
         '/flag': {
-          target: 'https://md-2622-accessmatch.pantheonsite.io',
+          target: apiTarget,
           changeOrigin: true,
           secure: false,
           configure: (proxy) => {
@@ -40,7 +41,7 @@ export default defineConfig(({ mode }) => {
         },
         // Drupal user endpoints (login_status, etc.)
         '/user': {
-          target: 'https://md-2622-accessmatch.pantheonsite.io',
+          target: apiTarget,
           changeOrigin: true,
           secure: false,
           configure: (proxy) => {
@@ -52,7 +53,7 @@ export default defineConfig(({ mode }) => {
         },
         // CSRF session token endpoint
         '/session': {
-          target: 'https://md-2622-accessmatch.pantheonsite.io',
+          target: apiTarget,
           changeOrigin: true,
           secure: false,
           configure: (proxy) => {
