@@ -74,11 +74,10 @@ async function fetchAllPages(initialUrl, _logLabel, apiBaseUrl = DEFAULT_API_BAS
 
 // Endpoint builders (now accept baseUrl parameter)
 const endpoints = {
-  allSoftware: (baseUrl) => `${baseUrl}/node/appverse_software?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`,
+  allSoftware: (baseUrl) => `${baseUrl}/node/appverse_software?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags`,
   allApps: (baseUrl) => `${baseUrl}/node/appverse_app?include=field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type`,
-  softwareById: (baseUrl, id) => `${baseUrl}/node/appverse_software/${id}?include=field_appverse_logo,field_appverse_topics,field_license,field_tags`,
-  appsBySoftwareId: (baseUrl, softwareId) => `${baseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license`,
-  fileById: (baseUrl, fileId) => `${baseUrl}/file/file/${fileId}`
+  softwareById: (baseUrl, id) => `${baseUrl}/node/appverse_software/${id}?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags`,
+  appsBySoftwareId: (baseUrl, softwareId) => `${baseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license`
 };
 
 /**
@@ -103,46 +102,29 @@ export async function fetchAllSoftware(config = {}) {
       includedMap[item.id] = item;
     }
 
-    // Separate media items for logo resolution (both SVG and image types)
-    const mediaMap = {};
+    // Build a map of file--file entities by ID (available via nested includes)
+    const fileMap = {};
     for (const item of included) {
-      if (item.type === 'media--svg' || item.type === 'media--image') {
-        mediaMap[item.id] = item;
+      if (item.type === 'file--file') {
+        fileMap[item.id] = item;
       }
     }
 
-    // Fetch actual file URLs for each media item
-    const mediaFilePromises = Object.keys(mediaMap).map(async (mediaId) => {
-      const media = mediaMap[mediaId];
-      // SVG uses field_media_image_1, image uses field_media_image
-      const fileRelationshipId = media.type === 'media--svg'
-        ? media.relationships?.field_media_image_1?.data?.id
-        : media.relationships?.field_media_image?.data?.id;
-
-      if (!fileRelationshipId) return null;
-
-      try {
-        const fileUrl = endpoints.fileById(apiBaseUrl, fileRelationshipId);
-        const fileResponse = await fetch(fileUrl);
-        const fileData = await fileResponse.json();
-        // logApiResponse('FILE_BY_ID', fileUrl, fileData);
-        return {
-          mediaId,
-          fileUrl: fileData.data?.attributes?.uri?.url || null
-        };
-      } catch (err) {
-        console.error(`Failed to fetch file for media ${mediaId}:`, err);
-        return null;
-      }
-    });
-
-    const mediaFiles = await Promise.all(mediaFilePromises);
-
-    // Create a map of media IDs to file URLs
+    // Resolve logo file URLs from included media + file entities (no extra HTTP requests)
     const mediaFileMap = {};
-    for (const result of mediaFiles) {
-      if (result && result.fileUrl) {
-        mediaFileMap[result.mediaId] = `${siteBaseUrl}${result.fileUrl}`;
+    for (const item of included) {
+      if (item.type === 'media--svg' || item.type === 'media--image') {
+        // SVG uses field_media_image_1, image uses field_media_image
+        const fileRelationshipId = item.type === 'media--svg'
+          ? item.relationships?.field_media_image_1?.data?.id
+          : item.relationships?.field_media_image?.data?.id;
+
+        if (fileRelationshipId && fileMap[fileRelationshipId]) {
+          const fileUrl = fileMap[fileRelationshipId].attributes?.uri?.url;
+          if (fileUrl) {
+            mediaFileMap[item.id] = `${siteBaseUrl}${fileUrl}`;
+          }
+        }
       }
     }
 
@@ -353,7 +335,7 @@ export async function fetchSoftwareById(id, config = {}) {
       includedMap[item.id] = item;
     }
 
-    // Resolve logo URL
+    // Resolve logo URL from included file entities (no extra HTTP request)
     let logoUrl = null;
     const logoMediaId = software.relationships?.field_appverse_logo?.data?.id;
     if (logoMediaId) {
@@ -363,18 +345,10 @@ export async function fetchSoftwareById(id, config = {}) {
         ? logoMedia?.relationships?.field_media_image_1?.data?.id
         : logoMedia?.relationships?.field_media_image?.data?.id;
 
-      if (fileRelationshipId) {
-        try {
-          const fileEndpoint = endpoints.fileById(apiBaseUrl, fileRelationshipId);
-          const fileResponse = await fetch(fileEndpoint);
-          const fileData = await fileResponse.json();
-          // logApiResponse('FILE_BY_ID', fileEndpoint, fileData);
-          const fileUrl = fileData.data?.attributes?.uri?.url;
-          if (fileUrl) {
-            logoUrl = `${siteBaseUrl}${fileUrl}`;
-          }
-        } catch (err) {
-          console.error(`Failed to fetch logo file:`, err);
+      if (fileRelationshipId && includedMap[fileRelationshipId]) {
+        const fileUrl = includedMap[fileRelationshipId].attributes?.uri?.url;
+        if (fileUrl) {
+          logoUrl = `${siteBaseUrl}${fileUrl}`;
         }
       }
     }
