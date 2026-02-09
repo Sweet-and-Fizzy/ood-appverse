@@ -163,7 +163,7 @@ export default function SoftwareHome() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="mb-4 bg-white">
       {/* Header section */}
       <div className="mx-6 mt-6 mb-4">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
