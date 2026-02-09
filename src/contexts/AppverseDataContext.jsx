@@ -71,73 +71,71 @@ export function AppverseDataProvider({ children }) {
     apps: [],
     appsBySoftwareId: {},
     filterOptions: { tags: [], appType: [], topics: [], license: [] },
-    loading: true,
+    softwareLoading: true,
+    appsLoading: true,
     error: null
   });
 
   /**
-   * Fetch all data from API
+   * Merge tags from two filter option sources, deduplicating by ID
    */
-  const fetchData = async () => {
-    // console.log('[AppverseDataContext] Starting fetch...');
-    setData(prev => ({ ...prev, loading: true, error: null }));
+  const mergeTags = (existingTags, newTags) => {
+    const tagMap = {};
+    for (const tag of existingTags) tagMap[tag.id] = tag;
+    for (const tag of newTags) tagMap[tag.id] = tag;
+    return Object.values(tagMap).sort((a, b) => a.name.localeCompare(b.name));
+  };
 
-    try {
-      // Fetch both endpoints in parallel
-      // console.log('[AppverseDataContext] Fetching software and apps...');
-      const [softwareResult, appsResult] = await Promise.all([
-        fetchAllSoftware(config),
-        fetchAllApps(config)
-      ]);
-      // console.log('[AppverseDataContext] Fetch complete - software:', softwareResult.software.length, 'apps:', appsResult.apps.length);
+  /**
+   * Fetch all data from API
+   * Software and apps are fetched concurrently but update state independently
+   * so the grid can render as soon as software arrives.
+   */
+  const fetchData = () => {
+    setData(prev => ({ ...prev, softwareLoading: true, appsLoading: true, error: null }));
 
-      // Extract software and filter options from the result
-      const { software, included: softwareIncluded } = softwareResult;
-      const softwareFilterOptions = extractFilterOptionsFromSoftware(softwareIncluded);
-
-      // Extract apps and filter options from the result
-      const { apps, included: appsIncluded } = appsResult;
-      const appsFilterOptions = extractFilterOptionsFromApps(appsIncluded);
-
-      // Merge filter options from both sources
-      // Tags exist on both Software (field_tags) and Apps (field_add_implementation_tags)
-      // Merge and deduplicate by ID
-      const allTagsMap = {};
-      for (const tag of softwareFilterOptions.tags) {
-        allTagsMap[tag.id] = tag;
-      }
-      for (const tag of appsFilterOptions.tags) {
-        allTagsMap[tag.id] = tag;
-      }
-      const mergedTags = Object.values(allTagsMap).sort((a, b) => a.name.localeCompare(b.name));
-
-      const filterOptions = {
-        topics: softwareFilterOptions.topics,
-        license: softwareFilterOptions.license,
-        appType: appsFilterOptions.appType,
-        tags: mergedTags
-      };
-
-      // Group apps by software ID
-      const appsBySoftwareId = groupAppsBySoftware(apps);
-
-      setData({
-        software,
-        apps,
-        appsBySoftwareId,
-        filterOptions,
-        loading: false,
-        error: null
+    // Fetch software — update state as soon as it resolves
+    fetchAllSoftware(config)
+      .then(({ software, included: softwareIncluded }) => {
+        const softwareFilterOptions = extractFilterOptionsFromSoftware(softwareIncluded);
+        setData(prev => ({
+          ...prev,
+          software,
+          softwareLoading: false,
+          filterOptions: {
+            ...prev.filterOptions,
+            topics: softwareFilterOptions.topics,
+            license: softwareFilterOptions.license,
+            tags: mergeTags(prev.filterOptions.tags, softwareFilterOptions.tags)
+          }
+        }));
+      })
+      .catch(error => {
+        console.error('Failed to fetch software:', error);
+        setData(prev => ({ ...prev, softwareLoading: false, error }));
       });
 
-    } catch (error) {
-      console.error('Failed to fetch AppVerse data:', error);
-      setData(prev => ({
-        ...prev,
-        loading: false,
-        error: error
-      }));
-    }
+    // Fetch apps — update state as soon as it resolves
+    fetchAllApps(config)
+      .then(({ apps, included: appsIncluded }) => {
+        const appsFilterOptions = extractFilterOptionsFromApps(appsIncluded);
+        const appsBySoftwareId = groupAppsBySoftware(apps);
+        setData(prev => ({
+          ...prev,
+          apps,
+          appsBySoftwareId,
+          appsLoading: false,
+          filterOptions: {
+            ...prev.filterOptions,
+            appType: appsFilterOptions.appType,
+            tags: mergeTags(prev.filterOptions.tags, appsFilterOptions.tags)
+          }
+        }));
+      })
+      .catch(error => {
+        console.error('Failed to fetch apps:', error);
+        setData(prev => ({ ...prev, appsLoading: false, error }));
+      });
   };
 
   // Fetch on mount
@@ -166,6 +164,8 @@ export function AppverseDataProvider({ children }) {
 
   const contextValue = {
     ...data,
+    // Backward-compatible loading: true only while software is loading (grid not yet visible)
+    loading: data.softwareLoading,
     slugMap,
     getSoftwareBySlug,
     refetch: fetchData // Allow manual refetch if needed

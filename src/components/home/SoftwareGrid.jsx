@@ -10,7 +10,7 @@ import SoftwareTile from './SoftwareTile';
 import SkeletonTile from './SkeletonTile';
 import { Search } from 'react-bootstrap-icons';
 
-export default function SoftwareGrid({ software, appsBySoftwareId, loading }) {
+export default function SoftwareGrid({ software, appsBySoftwareId, loading, appsLoading }) {
   // Debug: Log render state
   // console.log('[SoftwareGrid] Render - loading:', loading, '| software count:', software?.length ?? 0);
 
@@ -52,6 +52,7 @@ export default function SoftwareGrid({ software, appsBySoftwareId, loading }) {
             key={softwareItem.id}
             software={softwareItem}
             appCount={appCount}
+            appsLoading={appsLoading}
           />
         );
       })}

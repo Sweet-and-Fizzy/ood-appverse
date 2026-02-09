@@ -60,14 +60,19 @@ async function fetchAllPages(initialUrl, _logLabel, apiBaseUrl = DEFAULT_API_BAS
     pageNum++;
   }
 
-  // Deduplicate included items by ID (same item may appear on multiple pages)
+  // Deduplicate data and included items by ID (same item may appear on multiple pages)
+  const dataMap = new Map();
+  for (const item of allData) {
+    dataMap.set(item.id, item);
+  }
+
   const includedMap = new Map();
   for (const item of allIncluded) {
     includedMap.set(item.id, item);
   }
 
   return {
-    data: allData,
+    data: Array.from(dataMap.values()),
     included: Array.from(includedMap.values())
   };
 }

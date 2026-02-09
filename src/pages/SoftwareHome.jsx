@@ -15,7 +15,7 @@ import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
 export default function SoftwareHome() {
   // Get data from context
-  const { software, appsBySoftwareId, filterOptions, loading, error, refetch } = useAppverseData();
+  const { software, appsBySoftwareId, filterOptions, loading, appsLoading, error, refetch } = useAppverseData();
 
   // Debug: Log render timing
   // console.log('[SoftwareHome] Render - loading:', loading, '| software count:', software?.length ?? 0);
@@ -241,6 +241,7 @@ export default function SoftwareHome() {
               software={filteredSoftware}
               appsBySoftwareId={appsBySoftwareId}
               loading={loading}
+              appsLoading={appsLoading}
             />
           </main>
         </div>

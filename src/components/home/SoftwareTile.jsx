@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { StarFill } from 'react-bootstrap-icons';
 import { slugify } from '../../utils/slugify';
 
-export default function SoftwareTile({ software, appCount = 0 }) {
+export default function SoftwareTile({ software, appCount = 0, appsLoading = false }) {
   const softwareTitle = software.attributes?.title || 'Untitled Software';
   const logoUrl = software.logoUrl;
 
@@ -59,32 +59,39 @@ export default function SoftwareTile({ software, appCount = 0 }) {
 
         {/* App count badge or Add Repos button */}
         <div className="mt-auto">
-          <span
-            role={appCount === 0 ? 'button' : undefined}
-            onClick={appCount === 0 ? (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              window.location.href = '/node/add/appverse_app';
-            } : undefined}
-            className={`inline-flex items-center gap-1.5 text-base font-medium ${
-              appCount === 0 ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
-            }`}
-          >
-            <span className={`grid place-items-center w-5 h-5 rounded-full ${
-              appCount === 0 ? 'bg-appverse-green' : 'bg-appverse-blue'
-            }`}>
-              {appCount === 0 ? (
-                <StarFill className="w-2.5 h-2.5 text-white -translate-y-[0.5px]" />
-              ) : (
-                <span className="text-[10px] font-bold text-white -translate-y-[2px]">
-                  {appCount}
-                </span>
-              )}
+          {appsLoading ? (
+            <div className="inline-flex items-center gap-1.5 animate-pulse">
+              <div className="w-5 h-5 bg-gray-200 rounded-full" />
+              <div className="w-12 h-4 bg-gray-200 rounded" />
+            </div>
+          ) : (
+            <span
+              role={appCount === 0 ? 'button' : undefined}
+              onClick={appCount === 0 ? (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = '/node/add/appverse_app';
+              } : undefined}
+              className={`inline-flex items-center gap-1.5 text-base font-medium ${
+                appCount === 0 ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
+              }`}
+            >
+              <span className={`grid place-items-center w-5 h-5 rounded-full ${
+                appCount === 0 ? 'bg-appverse-green' : 'bg-appverse-blue'
+              }`}>
+                {appCount === 0 ? (
+                  <StarFill className="w-2.5 h-2.5 text-white -translate-y-[0.5px]" />
+                ) : (
+                  <span className="text-[10px] font-bold text-white -translate-y-[2px]">
+                    {appCount}
+                  </span>
+                )}
+              </span>
+              <span className={appCount === 0 ? 'text-appverse-green' : 'text-appverse-black'}>
+                {appCount === 0 ? 'Add an app' : appCountText}
+              </span>
             </span>
-            <span className={appCount === 0 ? 'text-appverse-green' : 'text-appverse-black'}>
-              {appCount === 0 ? 'Add an app' : appCountText}
-            </span>
-          </span>
+          )}
         </div>
       </div>
     </Link>
