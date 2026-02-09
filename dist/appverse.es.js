@@ -13924,12 +13924,9 @@ function Kx() {
       return U.localeCompare(C);
     }), x;
   }, [w, b, a]);
-  return o ? /* @__PURE__ */ D.jsx(vA, { error: o, onRetry: u }) : /* @__PURE__ */ D.jsxs("div", { className: "min-h-screen bg-white", children: [
+  return o ? /* @__PURE__ */ D.jsx(vA, { error: o, onRetry: u }) : /* @__PURE__ */ D.jsxs("div", { className: "mb-4 bg-white", children: [
     /* @__PURE__ */ D.jsx("div", { className: "mx-6 mt-6 mb-4", children: /* @__PURE__ */ D.jsxs("div", { className: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8", children: [
-      /* @__PURE__ */ D.jsxs("div", { className: "flex-1", children: [
-        /* @__PURE__ */ D.jsx("h2", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "Welcome to the Appverse" }),
-        /* @__PURE__ */ D.jsx("p", { className: "text-base font-sans text-appverse-black max-w-2xl", children: "The Open OnDemand Appverse is a community-driven catalog of scientific software, interactive applications, dashboards, and widgets with shared deployment configurations that HPC centers can use to extend their Open OnDemand portals." })
-      ] }),
+      /* @__PURE__ */ D.jsx("div", { className: "flex-1", children: /* @__PURE__ */ D.jsx("h2", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "Welcome to Appverse Alpha—sharing apps for all." }) }),
       /* @__PURE__ */ D.jsx(
         "a",
         {
