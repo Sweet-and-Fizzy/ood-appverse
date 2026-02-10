@@ -2,10 +2,11 @@
  * SoftwareHome Page
  * Main landing page showing software grid with search and filters
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppverseData } from '../hooks/useAppverseData';
 import { useSoftwareSearch } from '../hooks/useSoftwareSearch';
+import { useTracking } from '../hooks/useTracking';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
@@ -54,6 +55,14 @@ export default function SoftwareHome() {
     return false;
   }, [searchParams]);
 
+  // Tracking
+  const track = useTracking();
+  const searchTimerRef = useRef(null);
+  const resultCountRef = useRef(0);
+
+  // Clean up search debounce timer on unmount
+  useEffect(() => () => clearTimeout(searchTimerRef.current), []);
+
   // Local state for filter visibility
   // Default to hidden, but show if URL has filter params
   const [showFilters, setShowFilters] = useState(hasFilterParams);
@@ -70,10 +79,47 @@ export default function SoftwareHome() {
       newParams.delete('search');
     }
     setSearchParams(newParams);
+
+    // Debounced search tracking (500ms)
+    clearTimeout(searchTimerRef.current);
+    if (query) {
+      searchTimerRef.current = setTimeout(() => {
+        track('search', {
+          search_query: query,
+          result_count: resultCountRef.current
+        });
+      }, 500);
+    }
   };
 
   // Handle filter change
-  const handleFilterChange = (newFilters) => {
+  const handleFilterChange = useCallback((newFilters) => {
+    // Diff old vs new filters for tracking
+    const oldHadValues = Object.values(filters).some(v => v.length > 0);
+    const newHasValues = Object.values(newFilters).some(v => Array.isArray(v) && v.length > 0);
+
+    if (oldHadValues && !newHasValues) {
+      // All filters cleared
+      track('filter_clear_all');
+    } else {
+      // Find added/removed filter values
+      const allKeys = new Set([...Object.keys(filters), ...Object.keys(newFilters)]);
+      for (const key of allKeys) {
+        const oldVals = filters[key] || [];
+        const newVals = newFilters[key] || [];
+        for (const v of newVals) {
+          if (!oldVals.includes(v)) {
+            track('filter_apply', { filter_type: key, filter_value: v });
+          }
+        }
+        for (const v of oldVals) {
+          if (!newVals.includes(v)) {
+            track('filter_remove', { filter_type: key, filter_value: v });
+          }
+        }
+      }
+    }
+
     const newParams = new URLSearchParams();
 
     // Preserve search query
@@ -91,7 +137,7 @@ export default function SoftwareHome() {
     });
 
     setSearchParams(newParams);
-  };
+  }, [filters, searchQuery, setSearchParams, track]);
 
   // Apply search across software and apps
   // NOTE: To switch to server-side search, replace useSoftwareSearch with a different hook
@@ -157,6 +203,9 @@ export default function SoftwareHome() {
     return filtered;
   }, [searchedSoftware, filters, appsBySoftwareId]);
 
+  // Keep result count ref in sync for debounced search tracking
+  resultCountRef.current = filteredSoftware.length;
+
   // Show error state
   if (error) {
     return <ErrorMessage error={error} onRetry={refetch} />;
@@ -189,7 +238,10 @@ export default function SoftwareHome() {
         <div className="flex items-center justify-between gap-4">
           {/* Toggle filters button */}
           <button
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() => {
+              track('filter_toggle', { action: showFilters ? 'close' : 'open' });
+              setShowFilters(!showFilters);
+            }}
             className="flex items-center gap-2 text-white font-sans font-medium hover:opacity-80 transition-opacity"
           >
             {showFilters ? (

@@ -6,13 +6,17 @@ import { createContext, useContext } from 'react'
 
 const ConfigContext = createContext({
   apiBaseUrl: '/api',
-  siteBaseUrl: ''
+  siteBaseUrl: '',
+  tracking: true,
+  dataLayerName: 'dataLayer'
 })
 
 export function ConfigProvider({ config, children }) {
   const value = {
     apiBaseUrl: config?.apiBaseUrl ?? '/api',
-    siteBaseUrl: config?.siteBaseUrl ?? ''
+    siteBaseUrl: config?.siteBaseUrl ?? '',
+    tracking: config?.tracking !== false,
+    dataLayerName: config?.dataLayerName ?? 'dataLayer'
   }
 
   return (

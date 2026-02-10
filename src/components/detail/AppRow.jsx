@@ -12,9 +12,11 @@ import { ChevronRight, StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import FlagButton from '../common/FlagButton';
 import { useFlag } from '../../contexts/FlagContext';
+import { useTracking } from '../../hooks/useTracking';
 
 export default function AppRow({ app, isExpanded, onToggle }) {
   const { getFlagCountAdjustment } = useFlag();
+  const track = useTracking();
 
   const title = app.attributes?.title || 'Untitled App';
   const githubUrl = app.attributes?.field_appverse_github_url?.uri;
@@ -65,6 +67,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
       href={githubUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => track('view_repo', { app_title: title, github_url: githubUrl })}
       className="inline-flex items-center gap-2 text-appverse-black visited:text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap"
     >
       <span className="grid place-items-center w-5 h-5 rounded-full bg-appverse-red">
@@ -76,7 +79,10 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
   const ShowReadmeButton = ({ className = '' }) => readme && (
     <button
-      onClick={onToggle}
+      onClick={() => {
+        track('readme_toggle', { app_title: title, action: isExpanded ? 'collapse' : 'expand' });
+        onToggle();
+      }}
       className={`inline-flex items-center gap-2 text-appverse-black hover:text-gray-600 transition-colors font-sans font-semibold text-sm whitespace-nowrap focus:outline-none ${className}`}
     >
       <span

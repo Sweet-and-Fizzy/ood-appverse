@@ -9,8 +9,10 @@
 import { Link } from 'react-router-dom';
 import { StarFill } from 'react-bootstrap-icons';
 import { slugify } from '../../utils/slugify';
+import { useTracking } from '../../hooks/useTracking';
 
 export default function SoftwareTile({ software, appCount = 0, appsLoading = false }) {
+  const track = useTracking();
   const softwareTitle = software.attributes?.title || 'Untitled Software';
   const logoUrl = software.logoUrl;
 
@@ -29,6 +31,11 @@ export default function SoftwareTile({ software, appCount = 0, appsLoading = fal
     <Link
       to={`/${slug}`}
       className="block group"
+      onClick={() => track('software_click', {
+        software_title: softwareTitle,
+        software_slug: slug,
+        app_count: appCount
+      })}
     >
       <div className="flex flex-col items-center gap-4 border-appverse-black border-2 rounded-lg p-6 bg-white h-[199px] hover:border-red-500 transition-all duration-200">
 

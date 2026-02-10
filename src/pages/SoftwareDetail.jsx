@@ -7,11 +7,12 @@
  * Query params:
  * - ?app=<slug|uuid> - Expands the README for a specific app
  */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { fetchSoftwareById, fetchAppsBySoftware } from '../utils/api';
 import { useAppverseData } from '../hooks/useAppverseData';
 import { useConfig } from '../contexts/ConfigContext';
+import { useTracking } from '../hooks/useTracking';
 import { slugify } from '../utils/slugify';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -35,6 +36,8 @@ export default function SoftwareDetail() {
 
   // Get slugMap from context (for slug → software lookup)
   const { getSoftwareBySlug, loading: contextLoading } = useAppverseData();
+
+  const track = useTracking();
 
   const [software, setSoftware] = useState(null);
   const [apps, setApps] = useState([]);
@@ -95,6 +98,19 @@ export default function SoftwareDetail() {
       fetchData();
     }
   }, [slug, isSlugLookup, contextLoading, getSoftwareBySlug, config]);
+
+  // Track software detail view once both software and apps have loaded
+  const trackedSoftwareId = useRef(null);
+  useEffect(() => {
+    if (software?.id && !loading && trackedSoftwareId.current !== software.id) {
+      trackedSoftwareId.current = software.id;
+      track('software_detail_view', {
+        software_title: software.attributes?.title,
+        software_slug: slug,
+        app_count: apps.length
+      });
+    }
+  }, [software, apps.length, loading, slug, track]);
 
   // Build app slug maps for URL-friendly ?app= params
   // Format: "org-name--app-title" or just "app-title" if no org

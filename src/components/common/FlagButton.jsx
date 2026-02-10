@@ -10,9 +10,11 @@
  */
 import { Plus, FlagFill } from 'react-bootstrap-icons';
 import { useFlag } from '../../contexts/FlagContext';
+import { useTracking } from '../../hooks/useTracking';
 
 export default function FlagButton({ appId, nid, compact = false, className = '' }) {
   const { authenticated, loading, isFlagged, isPending, toggleFlag, siteBaseUrl } = useFlag();
+  const track = useTracking();
 
   const flagged = authenticated ? isFlagged(appId) : false;
   const pending = authenticated ? isPending(appId) : false;
@@ -30,6 +32,7 @@ export default function FlagButton({ appId, nid, compact = false, className = ''
       return;
     }
 
+    track('flag_app', { app_id: appId, action: flagged ? 'unflag' : 'flag' });
     toggleFlag(appId, nid);
   };
 

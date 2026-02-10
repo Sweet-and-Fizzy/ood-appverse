@@ -5,6 +5,7 @@
 import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
 import { AppverseDataProvider } from './contexts/AppverseDataContext'
 import { FlagProvider } from './contexts/FlagContext'
+import { usePageTracking } from './hooks/usePageTracking'
 import SoftwareHome from './pages/SoftwareHome'
 import SoftwareDetail from './pages/SoftwareDetail'
 
@@ -21,6 +22,8 @@ function LegacyRedirect() {
 }
 
 export default function App() {
+  usePageTracking()
+
   return (
     <AppverseDataProvider>
       <FlagProvider>

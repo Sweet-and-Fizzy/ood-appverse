@@ -16,6 +16,8 @@ import '../index.css'
  * @param {Object} config - Configuration options
  * @param {string} config.apiBaseUrl - Base URL for API calls (default: '/api')
  * @param {string} config.siteBaseUrl - Base URL for site assets (default: '')
+ * @param {boolean} config.tracking - Enable GTM dataLayer event tracking (default: true)
+ * @param {string} config.dataLayerName - Name of the dataLayer array on window (default: 'dataLayer')
  * @returns {Object} - Object with unmount function
  */
 function mount(elementId, config = {}) {

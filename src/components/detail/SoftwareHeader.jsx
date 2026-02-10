@@ -7,8 +7,10 @@
  */
 import { Globe, Book, FileEarmarkLock, FileEarmarkCode } from 'react-bootstrap-icons';
 import { Link } from 'react-router-dom';
+import { useTracking } from '../../hooks/useTracking';
 
 export default function SoftwareHeader({ software }) {
+  const track = useTracking();
   const title = software.attributes?.title || 'Untitled Software';
   const description = software.attributes?.body?.processed || software.attributes?.body?.value || '';
   const logoUrl = software.logoUrl;
@@ -61,6 +63,7 @@ export default function SoftwareHeader({ software }) {
             href={websiteUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track('external_link', { software_title: title, link_type: 'website', link_url: websiteUrl })}
             className="inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors"
           >
             <Globe className="w-4 h-4" />
@@ -73,6 +76,7 @@ export default function SoftwareHeader({ software }) {
             href={docsUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track('external_link', { software_title: title, link_type: 'docs', link_url: docsUrl })}
             className="inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors"
           >
             <Book className="w-4 h-4" />
