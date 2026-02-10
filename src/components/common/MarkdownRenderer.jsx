@@ -9,6 +9,8 @@
  */
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -46,6 +48,7 @@ export default function MarkdownRenderer({ content, className = '', darkMode = f
     <div className={`prose prose-sm max-w-none ${darkMode ? 'prose-invert' : ''} ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, defaultSchema]]}
         components={{
           // Custom code block rendering with syntax highlighting
           code({ node, inline, className, children, ...props }) {
