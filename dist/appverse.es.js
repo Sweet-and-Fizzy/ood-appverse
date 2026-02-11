@@ -14002,7 +14002,7 @@ function TI() {
   }, [Y, E, t]);
   return k.current = q.length, l ? /* @__PURE__ */ B.jsx(n1, { error: l, onRetry: c }) : /* @__PURE__ */ B.jsxs("div", { className: "mb-4 bg-white", children: [
     /* @__PURE__ */ B.jsx("div", { className: "mx-6 mt-6 mb-4", children: /* @__PURE__ */ B.jsxs("div", { className: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8", children: [
-      /* @__PURE__ */ B.jsx("div", { className: "flex-1", children: /* @__PURE__ */ B.jsx("h2", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "Welcome to Appverse Alpha—sharing apps for all." }) }),
+      /* @__PURE__ */ B.jsx("div", { className: "flex-1", children: /* @__PURE__ */ B.jsx("h2", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "The Appverse has launched." }) }),
       /* @__PURE__ */ B.jsx(
         "a",
         {
