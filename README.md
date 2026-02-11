@@ -143,9 +143,9 @@ Replace `COMMIT_HASH` with the latest commit hash from `git rev-parse --short HE
 
 **Cache busting:** The `@COMMIT_HASH` in the URL is a git commit hash (e.g., `@327e72c`). To get the latest version after updates, change it to the new commit hash or use `@main` (not recommended for production).
 
-### Deploying Updates to Drupal
+### Deploying Updates
 
-After making changes, follow these steps to deploy to the Drupal-embedded version:
+After making changes, follow these steps to deploy:
 
 1. **Rebuild the dist files** (this is the step most often forgotten!):
    ```bash
@@ -163,22 +163,18 @@ After making changes, follow these steps to deploy to the Drupal-embedded versio
    git push
    ```
 
-4. **Get the new commit hash**:
+4. **Purge the jsDelivr cache** (required — `@latest` is cached aggressively):
    ```bash
-   git rev-parse --short HEAD
-   ```
-   This returns a 7-character hash like `6dc82c2`.
-
-5. **Update Drupal embed code**: In Drupal, edit the `/appverse` page and update the commit hash in both the CSS and JS URLs:
-   ```
-   @OLD_HASH  →  @NEW_HASH
+   curl https://purge.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@latest/dist/appverse.umd.js
+   curl https://purge.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@latest/dist/appverse.css
+   curl https://purge.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@latest/dist/appverse.umd.js.map
    ```
 
-6. **Clear Drupal cache**: Go to `/admin/config/development/performance` and click "Clear all caches".
+5. **Hard refresh** the site (`Cmd+Shift+R` / `Ctrl+Shift+R`) to bypass browser cache.
 
 **Troubleshooting:** If changes still don't appear:
 - Verify the dist files were included in the commit: `git show HEAD --stat | grep dist`
-- Try purging jsDelivr's cache by visiting: `https://purge.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@YOUR_HASH/dist/appverse.umd.js`
+- Check the purge response — it should return `"status": "finished"`
 - Add a query string to bust browser cache: `?v=2`
 
 **Twig template example (alternative):**
