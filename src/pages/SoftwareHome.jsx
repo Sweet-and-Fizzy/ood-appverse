@@ -165,9 +165,9 @@ export default function SoftwareHome() {
       filtered = filtered.filter(softwareItem => {
         const softwareApps = appsBySoftwareId[softwareItem.id] || [];
         return softwareApps.some(app => {
-          // App type name is resolved in the apps data
-          const appTypeName = app.appType?.name;
-          return appTypeName && filters.appType.includes(appTypeName);
+          // App types is now an array (supports multiple types per app)
+          const appTypeNames = (app.appTypes || []).map(t => t.name);
+          return appTypeNames.some(name => filters.appType.includes(name));
         });
       });
     }

@@ -208,11 +208,13 @@ export async function fetchAllApps(config = {}) {
 
     // Resolve taxonomy terms for each app
     const appsWithTerms = apps.map(app => {
-      // Resolve app type
-      const appTypeRef = app.relationships?.field_appverse_app_type?.data;
-      const appType = appTypeRef && includedMap[appTypeRef.id]
-        ? { id: appTypeRef.id, name: includedMap[appTypeRef.id].attributes.name }
-        : null;
+      // Resolve app types (supports single or multiple)
+      const appTypeData = app.relationships?.field_appverse_app_type?.data;
+      const appTypeRefs = Array.isArray(appTypeData) ? appTypeData : (appTypeData ? [appTypeData] : []);
+      const appTypes = appTypeRefs
+        .map(ref => includedMap[ref.id])
+        .filter(Boolean)
+        .map(term => ({ id: term.id, name: term.attributes.name }));
 
       // Resolve implementation tags
       const tagsData = app.relationships?.field_add_implementation_tags?.data || [];
@@ -223,7 +225,7 @@ export async function fetchAllApps(config = {}) {
 
       return {
         ...app,
-        appType,
+        appTypes,
         tags
       };
     });
@@ -453,11 +455,13 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
 
     // Resolve taxonomy terms for each app
     const appsWithTerms = apps.map(app => {
-      // Resolve app type
-      const appTypeRef = app.relationships?.field_appverse_app_type?.data;
-      const appType = appTypeRef && includedMap[appTypeRef.id]
-        ? { id: appTypeRef.id, name: includedMap[appTypeRef.id].attributes.name }
-        : null;
+      // Resolve app types (supports single or multiple)
+      const appTypeData = app.relationships?.field_appverse_app_type?.data;
+      const appTypeRefs = Array.isArray(appTypeData) ? appTypeData : (appTypeData ? [appTypeData] : []);
+      const appTypes = appTypeRefs
+        .map(ref => includedMap[ref.id])
+        .filter(Boolean)
+        .map(term => ({ id: term.id, name: term.attributes.name }));
 
       // Resolve organization
       const orgRef = app.relationships?.field_appverse_organization?.data;
@@ -480,7 +484,7 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
 
       return {
         ...app,
-        appType,
+        appTypes,
         organization,
         license,
         tags
