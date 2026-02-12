@@ -12,7 +12,7 @@ import '../index.css'
 
 /**
  * Mount the AppVerse browser to a DOM element
- * @param {string} elementId - The ID of the element to mount to
+ * @param {string|HTMLElement} elementOrId - The ID of the element or a DOM element to mount to
  * @param {Object} config - Configuration options
  * @param {string} config.apiBaseUrl - Base URL for API calls (default: '/api')
  * @param {string} config.siteBaseUrl - Base URL for site assets (default: '')
@@ -20,11 +20,13 @@ import '../index.css'
  * @param {string} config.dataLayerName - Name of the dataLayer array on window (default: 'dataLayer')
  * @returns {Object} - Object with unmount function
  */
-function mount(elementId, config = {}) {
-  const container = document.getElementById(elementId)
+function mount(elementOrId, config = {}) {
+  const container = typeof elementOrId === 'string'
+    ? document.getElementById(elementOrId)
+    : elementOrId
 
   if (!container) {
-    console.error(`AppVerse: Element with id "${elementId}" not found`)
+    console.error(`AppVerse: Element with id "${elementOrId}" not found`)
     return null
   }
 

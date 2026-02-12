@@ -2,6 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Scoped preflight resets — only apply within #appverse-root to avoid
+   leaking Tailwind's global resets onto the host page (e.g., Drupal navbar). */
+#appverse-root {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  tab-size: 4;
+}
+
+#appverse-root *,
+#appverse-root *::before,
+#appverse-root *::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: #e5e7eb;
+}
+
+#appverse-root h1,
+#appverse-root h2,
+#appverse-root h3,
+#appverse-root h4,
+#appverse-root h5,
+#appverse-root h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+#appverse-root a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+#appverse-root ol,
+#appverse-root ul,
+#appverse-root menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#appverse-root img,
+#appverse-root svg,
+#appverse-root video,
+#appverse-root canvas,
+#appverse-root audio,
+#appverse-root iframe,
+#appverse-root embed,
+#appverse-root object {
+  display: block;
+  vertical-align: middle;
+}
+
+#appverse-root img,
+#appverse-root video {
+  max-width: 100%;
+  height: auto;
+}
+
+#appverse-root button,
+#appverse-root input,
+#appverse-root optgroup,
+#appverse-root select,
+#appverse-root textarea {
+  font-family: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
 /* AppVerse Browser Styles */
 .appverse-container {
   @apply font-sans text-appverse-black;

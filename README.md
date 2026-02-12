@@ -199,14 +199,45 @@ After making changes, follow these steps to deploy:
 
 **Note:** All navigation happens via hash changes, which never trigger server requests. Drupal is only involved on initial page load.
 
+#### Shadow DOM Embedding (CSS Isolation)
+
+If AppVerse styles conflict with the host page (e.g., Tailwind resets affecting a Bootstrap navbar), use Shadow DOM to fully isolate the widget's CSS:
+
+```html
+<div id="appverse-shadow-host"></div>
+<script src="https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@COMMIT_HASH/dist/appverse.umd.js"></script><script>
+  (function() {
+    var host = document.getElementById('appverse-shadow-host');
+    var shadow = host.attachShadow({ mode: 'open' });
+
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@COMMIT_HASH/dist/appverse.css';
+    shadow.appendChild(link);
+
+    var root = document.createElement('div');
+    root.id = 'appverse-root';
+    shadow.appendChild(root);
+
+    AppVerse.mount(root, {
+      apiBaseUrl: '/jsonapi',
+      siteBaseUrl: ''
+    });
+  })();
+</script>
+```
+
+This loads the CSS inside the Shadow DOM so it cannot affect elements outside the widget.
+
 ### API
 
 ```javascript
 // React Component
 <AppVerseBrowser />
 
-// CDN Mount
-const instance = AppVerse.mount(elementId)
+// CDN Mount — accepts an element ID (string) or a DOM element
+const instance = AppVerse.mount('appverse-root', config)
+const instance = AppVerse.mount(document.getElementById('appverse-root'), config)
 instance.unmount()
 ```
 
