@@ -51728,7 +51728,7 @@ function rB() {
   ] }) }) }) }) });
 }
 function iB(e, t = {}) {
-  const a = document.getElementById(e);
+  const a = typeof e == "string" ? document.getElementById(e) : e;
   if (!a)
     return console.error(`AppVerse: Element with id "${e}" not found`), null;
   const i = IC.createRoot(a);
