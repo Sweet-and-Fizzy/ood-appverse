@@ -179,7 +179,7 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
             {isExpanded && (
               <div
                 ref={el => scrollContainerRefs.current[section.key] = el}
-                className={`px-4 py-3 space-y-2 ${section.options.length > SCROLL_THRESHOLD ? 'max-h-64 overflow-y-auto' : ''}`}
+                className={`px-4 py-3 space-y-2 ${section.options.length > SCROLL_THRESHOLD ? 'max-h-44 overflow-y-auto' : ''}`}
               >
                 {section.options.map((option) => {
                   const checked = isChecked(section.key, option.value);
