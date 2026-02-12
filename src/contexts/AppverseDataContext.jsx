@@ -9,7 +9,7 @@
  *   const { software, apps, appsBySoftwareId, loading, error } = useAppverseData()
  */
 import { createContext, useState, useEffect, useMemo } from 'react';
-import { fetchAllSoftware, fetchAllApps, groupAppsBySoftware, extractFilterOptionsFromApps, extractFilterOptionsFromSoftware } from '../utils/api';
+import { fetchAllSoftware, fetchAllApps, fetchAllAppTypes, groupAppsBySoftware, extractFilterOptionsFromApps, extractFilterOptionsFromSoftware } from '../utils/api';
 import { slugify } from '../utils/slugify';
 import { useConfig } from './ConfigContext';
 
@@ -115,9 +115,9 @@ export function AppverseDataProvider({ children }) {
         setData(prev => ({ ...prev, softwareLoading: false, error }));
       });
 
-    // Fetch apps — update state as soon as it resolves
-    fetchAllApps(config)
-      .then(({ apps, included: appsIncluded }) => {
+    // Fetch apps and all app types concurrently
+    Promise.all([fetchAllApps(config), fetchAllAppTypes(config)])
+      .then(([{ apps, included: appsIncluded }, allAppTypes]) => {
         const appsFilterOptions = extractFilterOptionsFromApps(appsIncluded);
         const appsBySoftwareId = groupAppsBySoftware(apps);
         setData(prev => ({
@@ -127,7 +127,7 @@ export function AppverseDataProvider({ children }) {
           appsLoading: false,
           filterOptions: {
             ...prev.filterOptions,
-            appType: appsFilterOptions.appType,
+            appType: allAppTypes,
             tags: mergeTags(prev.filterOptions.tags, appsFilterOptions.tags)
           }
         }));

@@ -110,7 +110,7 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
     },
     filterOptions.appType?.length > 0 && {
       key: 'appType',
-      title: 'Type',
+      title: 'App Type',
       options: filterOptions.appType.map(item => ({
         value: item.name,  // Use name for URL params
         label: item.name.replace(/_/g, ' ')  // "batch_connect" → "batch connect"

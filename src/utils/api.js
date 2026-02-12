@@ -81,6 +81,7 @@ async function fetchAllPages(initialUrl, _logLabel, apiBaseUrl = DEFAULT_API_BAS
 const endpoints = {
   allSoftware: (baseUrl) => `${baseUrl}/node/appverse_software?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags`,
   allApps: (baseUrl) => `${baseUrl}/node/appverse_app?include=field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type`,
+  allAppTypes: (baseUrl) => `${baseUrl}/taxonomy_term/appverse_app_type?sort=name`,
   softwareById: (baseUrl, id) => `${baseUrl}/node/appverse_software/${id}?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags`,
   appsBySoftwareId: (baseUrl, softwareId) => `${baseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license`
 };
@@ -235,6 +236,29 @@ export async function fetchAllApps(config = {}) {
   } catch (error) {
     console.error('Error fetching apps:', error);
     throw error;
+  }
+}
+
+/**
+ * Fetch all app type taxonomy terms directly
+ * Returns all available app types, not just those referenced by existing apps
+ * @param {Object} config - Configuration object
+ * @param {string} config.apiBaseUrl - Base URL for API calls
+ * @returns {Promise<Array>} Array of {id, name} objects
+ */
+export async function fetchAllAppTypes(config = {}) {
+  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
+  const url = endpoints.allAppTypes(apiBaseUrl);
+
+  try {
+    const { data } = await fetchAllPages(url, 'ALL_APP_TYPES', apiBaseUrl);
+    return data.map(item => ({
+      id: item.id,
+      name: item.attributes.name
+    }));
+  } catch (error) {
+    console.error('Error fetching app types:', error);
+    return [];
   }
 }
 
