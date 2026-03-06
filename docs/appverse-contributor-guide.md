@@ -193,6 +193,34 @@ Inactive apps may be archived, but we prefer revitalizing them with community he
 - Major policy decisions are community-driven
 - Join the [OOD Discourse](https://discourse.openondemand.org/) for community support and monthly Tips & Tricks calls
 
+
+
+## 8. Support
+
+### The Appverse Support Policy: A Shared Responsibility Model
+
+The Open OnDemand Appverse is a community-driven catalog, not a curated set of core-supported products. To ensure the sustainability of the Open OnDemand project and the sanity of its core developers, we follow a clear boundary between Platform Support and App Support.
+
+### The Support Boundary
+
+- **Platform Support (Discourse):** Use the Open OnDemand Discourse for issues related to the OOD platform itself (e.g., installation of the OOD portal, authentication, web server errors, or core Batch Connect functionality).
+- **App Support (GitHub):** For issues specific to an app found in the Appverse (e.g., a Jupyter app won't load a specific module, or an RStudio form has a broken dropdown), support must happen at the source.
+
+### Where to Go for Help
+
+Because every app in the Appverse is hosted in a public GitHub repository, users should leverage the standard GitHub workflow for support:
+
+- **Check the README:** Most deployment issues are covered in the app’s specific documentation.
+- **Open a GitHub Issue:** If you find a bug or need help with an app's configuration, open an issue in that app’s specific repository. This alerts the actual author of the code.
+- **Submit a Pull Request:** If you’ve found a fix for an app, contributing it back via a PR is the best way to help the community.
+
+### A Note to Our Users & Admins
+
+The core Open OnDemand developers provide the "highway" (the platform), but the community provides the "cars" (the apps). If your car has a flat tire, you should contact the manufacturer (the App Contributor), not the highway department.
+
+**Important:** Core OOD developers may decline to troubleshoot issues that are clearly specific to a community-contributed app. In these cases, they will kindly redirect you to the app’s GitHub repository.
+
+
 ## Appendix
 
 ### Open OnDemand References
