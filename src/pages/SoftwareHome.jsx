@@ -224,12 +224,22 @@ export default function SoftwareHome() {
               The Open OnDemand Appverse is a community-driven catalog of scientific software, interactive applications, dashboards, and widgets with shared deployment configurations that HPC centers can use to extend their Open OnDemand portals.
             </p> */}
           </div>
-          <a
-            href="/node/add/appverse_app"
-            className="w-full lg:w-auto text-center lg:flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
-          >
-            Add an app
-          </a>
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            <a
+              href="https://ondemand.connectci.org/appverse-contributor-documentation#8-support"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto text-center lg:flex-shrink-0 py-3 px-6 border-2 border-appverse-red text-appverse-red font-sans font-semibold rounded-appverse hover:bg-appverse-red hover:text-white transition-colors"
+            >
+              App Support
+            </a>
+            <a
+              href="/node/add/appverse_app"
+              className="w-full sm:w-auto text-center lg:flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
+            >
+              Add an app
+            </a>
+          </div>
         </div>
       </div>
 

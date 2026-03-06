@@ -37,7 +37,7 @@ All of these must be met for inclusion. These are pass/fail.
 
 | Check | What to Look For |
 |-------|------------------|
-| `manifest.yml` exists | Has `name`, `category`, `role`, `description` at minimum |
+| `manifest.yml` exists | Has `name`, `category`, `role`, `description` at minimum. **Planned:** `contact` or `support_url` will become required — apps without one won't be listed. |
 | `README.md` exists | Is substantive (not just a title) — see Documentation section |
 | `LICENSE` exists | Open source license present (MIT recommended) |
 
@@ -203,7 +203,7 @@ Copy this template when reviewing a new app submission:
 **Date:** [Date]
 
 ### Required Criteria
-- [ ] manifest.yml with required fields
+- [ ] manifest.yml with required fields (planned: `contact` or `support_url` will be required)
 - [ ] README.md (substantive)
 - [ ] LICENSE (open source)
 - [ ] Standard OOD app structure

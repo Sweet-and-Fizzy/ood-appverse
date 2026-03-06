@@ -111,6 +111,8 @@ metadata:
   field_of_science: Chemistry     # Additional categorization of research domain
 ```
 
+> **Planned requirement:** A `contact` or `support_url` field will be added to `manifest.yml` as a required field. Apps without a contact or support URL will not be listed in the catalog. This ensures deployers always know where to get help or report issues. Details TBD — watch the [Appverse affinity group](https://ondemand.connectci.org/affinity-groups/ood-appverse) for updates.
+
 See the [OOD manifest.yml reference](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/manifest.html) for full details.
 
 ### The README
