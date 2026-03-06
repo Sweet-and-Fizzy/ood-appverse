@@ -193,8 +193,6 @@ Inactive apps may be archived, but we prefer revitalizing them with community he
 - Major policy decisions are community-driven
 - Join the [OOD Discourse](https://discourse.openondemand.org/) for community support and monthly Tips & Tricks calls
 
-
-
 ## 8. Support
 
 ### The Appverse Support Policy: A Shared Responsibility Model
