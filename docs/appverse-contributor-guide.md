@@ -15,7 +15,8 @@ This guide is for developers, HPC admins, and anyone who wants to contribute or 
 
 | Type | Description |
 |------|-------------|
-| **Batch Connect** | Interactive jobs launched through the scheduler (VNC desktops, web servers, etc.) |
+| **Batch Connect - Basic** | Interactive jobs launched through the scheduler (web servers, Jupyter notebooks, etc.) |
+| **Batch Connect - VNC** | Interactive jobs launched through the scheduler using a VNC desktop environment |
 | **Passenger** | Web apps served via Open OnDemand (Ruby Rack, Python WSGI, or Node.js) |
 | **Widgets** | Small UI components embedded in dashboards |
 | **Dashboards** | Structured user interfaces (e.g., classroom portals, monitoring panels, etc.) |
@@ -28,9 +29,15 @@ Good tagging makes your app easier to discover in the catalog.
 
 Implementation tags describe how an app runs:
 
-- Containerized (Docker, Singularity/Apptainer)
+- Apptainer
+- Batch Connect
+- Classroom
+- Containerized
+- Docker
 - GPU-enabled
-- Classroom-ready
+- Modules
+- Passenger 
+- Source Install
 
 ### Topics (for Software)
 
