@@ -5,7 +5,7 @@ import { resolve } from 'path'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const isLibBuild = mode === 'lib'
-  const apiTarget = process.env.VITE_API_TARGET || 'https://ondemand.connectci.org'
+  const apiTarget = process.env.VITE_API_TARGET || 'https://openondemand.connectci.org'
 
   return {
     plugins: [react()],

@@ -14,7 +14,7 @@ import './index.css'
 // Dev/Netlify config: API is proxied, but assets need full URL
 const config = {
   apiBaseUrl: '/api',
-  siteBaseUrl: 'https://ondemand.connectci.org'
+  siteBaseUrl: 'https://openondemand.connectci.org'
 }
 
 createRoot(document.getElementById('root')).render(
