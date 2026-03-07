@@ -13,6 +13,7 @@ import { fetchSoftwareById, fetchAppsBySoftware } from '../utils/api';
 import { useAppverseData } from '../hooks/useAppverseData';
 import { useConfig } from '../contexts/ConfigContext';
 import { useTracking } from '../hooks/useTracking';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { slugify } from '../utils/slugify';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -146,6 +147,44 @@ export default function SoftwareDetail() {
     // Otherwise, look up slug → ID
     return appSlugToId[expandedAppParam] || null;
   }, [expandedAppParam, appSlugToId]);
+
+  // Update document metatags for social sharing
+  const expandedApp = useMemo(() => {
+    if (!expandedAppId || !apps.length) return null;
+    return apps.find(a => a.id === expandedAppId) || null;
+  }, [expandedAppId, apps]);
+
+  const documentMeta = useMemo(() => {
+    if (!software) return null;
+    const siteBaseUrl = config.siteBaseUrl || '';
+    const logoUrl = software.logoUrl || '';
+
+    if (expandedApp) {
+      const appTitle = expandedApp.attributes?.title || '';
+      const appDesc = expandedApp.attributes?.body?.value?.replace(/<[^>]+>/g, '') || '';
+      const appSlug = expandedAppParam || '';
+      return {
+        title: `${appTitle} | Appverse`,
+        description: appDesc,
+        og_title: `${appTitle} | Appverse`,
+        og_description: appDesc,
+        og_image: logoUrl,
+        og_url: `${siteBaseUrl}/appverse/${slug}?app=${appSlug}`,
+      };
+    }
+
+    const title = software.attributes?.title || '';
+    const description = software.attributes?.body?.value?.replace(/<[^>]+>/g, '') || '';
+    return {
+      title: `${title} | Appverse`,
+      description,
+      og_title: `${title} | Appverse`,
+      og_description: description,
+      og_image: logoUrl,
+      og_url: `${siteBaseUrl}/appverse/${slug}`,
+    };
+  }, [software, slug, config.siteBaseUrl, expandedApp, expandedAppParam]);
+  useDocumentMeta(documentMeta);
 
   // Handle app toggle - uses slug in URL
   const handleToggleApp = (appId) => {
