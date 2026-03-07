@@ -5,12 +5,14 @@
  * Props:
  * @param {Object} software - Software object from API with resolved taxonomy terms
  */
-import { Globe, Book, FileEarmarkLock, FileEarmarkCode } from 'react-bootstrap-icons';
+import { useState, useCallback } from 'react';
+import { Globe, Book, FileEarmarkLock, FileEarmarkCode, Link45deg, Check2 } from 'react-bootstrap-icons';
 import { Link } from 'react-router-dom';
 import { useTracking } from '../../hooks/useTracking';
 
-export default function SoftwareHeader({ software }) {
+export default function SoftwareHeader({ software, slug }) {
   const track = useTracking();
+  const [copied, setCopied] = useState(false);
   const title = software.attributes?.title || 'Untitled Software';
   const description = software.attributes?.body?.processed || software.attributes?.body?.value || '';
   const logoUrl = software.logoUrl;
@@ -31,6 +33,19 @@ export default function SoftwareHeader({ software }) {
 
   // Determine license display
   const isOpenSource = license?.name?.toLowerCase().includes('open');
+
+  // Build canonical share URL (Drupal node path, not SPA hash)
+  const shareUrl = slug
+    ? `${window.location.origin}/appverse/${slug}`
+    : window.location.href;
+
+  const handleCopyLink = useCallback(() => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopied(true);
+      track('share_link_copy', { software_title: title, share_url: shareUrl });
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [shareUrl, title, track]);
 
   return (
     <div className="flex flex-col">
@@ -94,6 +109,24 @@ export default function SoftwareHeader({ software }) {
             {isOpenSource ? 'OPEN-SOURCE' : 'COMMERCIAL'}
           </span>
         )}
+
+        <button
+          onClick={handleCopyLink}
+          className="inline-flex items-center gap-1.5 text-appverse-black hover:text-appverse-red transition-colors"
+          title="Copy shareable link"
+        >
+          {copied ? (
+            <>
+              <Check2 className="w-4 h-4 text-green-600" />
+              <span className="text-green-600">COPIED</span>
+            </>
+          ) : (
+            <>
+              <Link45deg className="w-4 h-4" />
+              SHARE
+            </>
+          )}
+        </button>
       </div>
 
       {/* Description */}

@@ -173,7 +173,7 @@ When requesting changes or suggesting improvements, be specific:
 **Poor feedback:**
 > README needs work.
 
-Reference the [Best Practices Guide](https://ondemand.connectci.org/appverse-best-practices) for specific recommendations to share with contributors.
+Reference the [Best Practices Guide](https://openondemand.connectci.org/appverse-best-practices) for specific recommendations to share with contributors.
 
 ## Common Issues Found in Real Apps
 

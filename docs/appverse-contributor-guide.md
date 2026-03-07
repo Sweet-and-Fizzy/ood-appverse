@@ -57,7 +57,7 @@ Apps for software are always encouraged.
 
 If the software already has app implementations, consider:
 
-1. **Modified an existing app?** Contribute changes back to the original repository rather than publishing a new version. Forks that diverge silently create maintenance burden for everyone (see [Best Practices: Avoid Fork Rot](https://ondemand.connectci.org/appverse-best-practices#avoid-fork-rot)).
+1. **Modified an existing app?** Contribute changes back to the original repository rather than publishing a new version. Forks that diverge silently create maintenance burden for everyone (see [Best Practices: Avoid Fork Rot](https://openondemand.connectci.org/appverse-best-practices#avoid-fork-rot)).
 2. **Only changed site-specific configuration?** That likely doesn't warrant a new app — it's working as intended. Document your configuration instead.
 3. **Added significant new functionality?** (e.g., GPU support, containerization, a different execution model) That's a good candidate for a new app.
 
@@ -65,7 +65,7 @@ If the software already has app implementations, consider:
 
 1. Prepare your repository with required files and metadata
 2. Create a new App entry linked to the repository in the Appverse
-3. Review and validation (see [Reviewer Checklist](https://ondemand.connectci.org/appverse-reviewer-checklist))
+3. Review and validation (see [Reviewer Checklist](https://openondemand.connectci.org/appverse-reviewer-checklist))
 4. Ongoing maintenance
 
 > Currently we support repositories containing single apps. In the future we are considering adding packages of apps that work together; these could be distributed via repositories containing multiple apps.
@@ -118,7 +118,7 @@ metadata:
   field_of_science: Chemistry     # Additional categorization of research domain
 ```
 
-> **Planned requirement:** A `contact` or `support_url` field will be added to `manifest.yml` as a required field. Apps without a contact or support URL will not be listed in the catalog. This ensures deployers always know where to get help or report issues. Details TBD — watch the [Appverse affinity group](https://ondemand.connectci.org/affinity-groups/ood-appverse) for updates.
+> **Planned requirement:** A `contact` or `support_url` field will be added to `manifest.yml` as a required field. Apps without a contact or support URL will not be listed in the catalog. This ensures deployers always know where to get help or report issues. Details TBD — watch the [Appverse affinity group](https://openondemand.connectci.org/affinity-groups/ood-appverse) for updates.
 
 See the [OOD manifest.yml reference](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/manifest.html) for full details.
 
@@ -176,7 +176,7 @@ After making changes to your app:
 
 ### Review Process
 
-New apps are evaluated against the [Reviewer Checklist](https://ondemand.connectci.org/appverse-reviewer-checklist) and the [Best Practices Guide](https://ondemand.connectci.org/appverse-best-practices). Reviewers look for:
+New apps are evaluated against the [Reviewer Checklist](https://openondemand.connectci.org/appverse-reviewer-checklist) and the [Best Practices Guide](https://openondemand.connectci.org/appverse-best-practices). Reviewers look for:
 
 - Complete metadata and documentation
 - Clear, portable configuration
@@ -196,7 +196,7 @@ Inactive apps may be archived, but we prefer revitalizing them with community he
 
 ### Community & Governance
 
-- Join the [Appverse Affinity Group](https://ondemand.connectci.org/affinity-groups/ood-appverse) to connect with other contributors and stay informed
+- Join the [Appverse Affinity Group](https://openondemand.connectci.org/affinity-groups/ood-appverse) to connect with other contributors and stay informed
 - Follow contribution guidelines and code of conduct
 - Propose new tags or app types through discussion
 - Major policy decisions are community-driven
@@ -241,7 +241,7 @@ The core Open OnDemand developers provide the "highway" (the platform), but the 
 | submit.yml.erb Reference | https://osc.github.io/ood-documentation/latest/reference/files/submit-yml-erb.html |
 | OOD Discourse Forum | https://discourse.openondemand.org/ |
 | Community App List | https://discourse.openondemand.org/t/list-of-open-ondemand-apps/2107 |
-| Appverse Affinity Group | https://ondemand.connectci.org/affinity-groups/ood-appverse |
+| Appverse Affinity Group | https://openondemand.connectci.org/affinity-groups/ood-appverse |
 | README Template | https://github.com/keeganasmith2003/appverse_readme_template |
 
 ### Standard Batch Connect App Structure

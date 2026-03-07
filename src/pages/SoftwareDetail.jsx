@@ -294,7 +294,7 @@ export default function SoftwareDetail() {
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* Left column - Software info sidebar */}
           <div className="w-full lg:w-[280px] lg:flex-shrink-0">
-            <SoftwareHeader software={software} />
+            <SoftwareHeader software={software} slug={slug} />
           </div>
 
           {/* Right column - App list */}

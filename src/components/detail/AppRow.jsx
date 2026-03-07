@@ -171,8 +171,8 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
         {/* Mobile layout - stacked (hidden on desktop) */}
         <div className="md:hidden">
-          {/* Two column layout: left content, right stats */}
-          <div className="flex gap-4 items-start">
+          {/* Stacked on small screens, side-by-side on sm+ */}
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
             {/* Left: Title, org, tags, buttons */}
             <div className="flex-1 min-w-0">
               <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
@@ -197,8 +197,8 @@ export default function AppRow({ app, isExpanded, onToggle }) {
               </div>
             </div>
 
-            {/* Right: Stats box */}
-            <div className="bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px] w-fit flex-shrink-0">
+            {/* Stats box - full width on small screens, sidebar on sm+ */}
+            <div className="bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black sm:min-w-[160px] sm:w-fit sm:flex-shrink-0">
               <p className="flex items-center gap-1">
                 <span className="font-bold">{githubStars}</span> <StarFill className="w-3 h-3" /> on GitHub
               </p>
