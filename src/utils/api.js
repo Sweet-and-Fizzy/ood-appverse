@@ -77,13 +77,38 @@ async function fetchAllPages(initialUrl, _logLabel, apiBaseUrl = DEFAULT_API_BAS
   };
 }
 
+// Sparse fieldsets reduce payload size by requesting only the fields we use.
+const SOFTWARE_FIELDS = [
+  'fields[node--appverse_software]=title,body,path,field_appverse_software_website,field_appverse_software_doc,drupal_internal__nid,field_appverse_logo,field_appverse_topics,field_license,field_tags',
+  'fields[taxonomy_term--appverse_science_domains]=name',
+  'fields[taxonomy_term--appverse_license]=name',
+  'fields[taxonomy_term--tags]=name',
+  'fields[media--svg]=field_media_image_1',
+  'fields[media--image]=field_media_image',
+  'fields[file--file]=uri',
+].join('&');
+
+const APP_FIELDS = [
+  'fields[node--appverse_app]=title,field_appverse_github_url,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type',
+  'fields[taxonomy_term--appverse_app_type]=name',
+  'fields[taxonomy_term--tags]=name',
+].join('&');
+
+const APP_DETAIL_FIELDS = [
+  'fields[node--appverse_app]=title,body,field_appverse_github_url,field_appverse_readme,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,field_appverse_software_implemen,field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license',
+  'fields[taxonomy_term--appverse_app_type]=name',
+  'fields[taxonomy_term--tags]=name',
+  'fields[taxonomy_term--appverse_organization]=name',
+  'fields[taxonomy_term--appverse_license]=name',
+].join('&');
+
 // Endpoint builders (now accept baseUrl parameter)
 const endpoints = {
-  allSoftware: (baseUrl) => `${baseUrl}/node/appverse_software?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags`,
-  allApps: (baseUrl) => `${baseUrl}/node/appverse_app?include=field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type`,
+  allSoftware: (baseUrl) => `${baseUrl}/node/appverse_software?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags&page[limit]=100&${SOFTWARE_FIELDS}`,
+  allApps: (baseUrl) => `${baseUrl}/node/appverse_app?include=field_add_implementation_tags,field_appverse_app_type&page[limit]=100&${APP_FIELDS}`,
   allAppTypes: (baseUrl) => `${baseUrl}/taxonomy_term/appverse_app_type?sort=name`,
-  softwareById: (baseUrl, id) => `${baseUrl}/node/appverse_software/${id}?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags`,
-  appsBySoftwareId: (baseUrl, softwareId) => `${baseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license`
+  softwareById: (baseUrl, id) => `${baseUrl}/node/appverse_software/${id}?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags&${SOFTWARE_FIELDS}`,
+  appsBySoftwareId: (baseUrl, softwareId) => `${baseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`
 };
 
 /**
