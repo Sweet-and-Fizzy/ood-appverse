@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Purge jsDelivr cache
         run: |
-          curl -s https://purge.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@latest/dist/appverse.umd.js
-          curl -s https://purge.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@latest/dist/appverse.css
-          curl -s https://purge.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@latest/dist/appverse.umd.js.map
+          for ref in main latest; do
+            for file in appverse.umd.js appverse.umd.js.map appverse.es.js appverse.es.js.map appverse.css; do
+              echo "Purging @${ref}/dist/${file}..."
+              curl -s "https://purge.jsdelivr.net/gh/Sweet-and-Fizzy/ood-appverse@${ref}/dist/${file}"
+            done
+          done
