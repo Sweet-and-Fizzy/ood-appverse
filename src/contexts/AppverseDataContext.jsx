@@ -8,7 +8,7 @@
  *   import { useAppverseData } from '../hooks/useAppverseData'
  *   const { software, apps, appsBySoftwareId, loading, error } = useAppverseData()
  */
-import { createContext, useState, useEffect, useMemo } from 'react';
+import { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { fetchAllSoftware, fetchAllApps, fetchAllAppTypes, groupAppsBySoftware, extractFilterOptionsFromApps, extractFilterOptionsFromSoftware } from '../utils/api';
 import { slugify } from '../utils/slugify';
 import { useConfig } from './ConfigContext';
@@ -157,10 +157,10 @@ export function AppverseDataProvider({ children }) {
     return map;
   }, [data.software]);
 
-  // Helper to get software by slug
-  const getSoftwareBySlug = (slug) => {
+  // Helper to get software by slug (memoized to prevent useEffect re-triggers)
+  const getSoftwareBySlug = useCallback((slug) => {
     return slugMap[slug] || null;
-  };
+  }, [slugMap]);
 
   const contextValue = {
     ...data,

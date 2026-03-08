@@ -7,8 +7,9 @@
  * Query params:
  * - ?app=<slug|uuid> - Expands the README for a specific app
  */
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { Link45deg, Check2 } from 'react-bootstrap-icons';
 import { fetchSoftwareById, fetchAppsBySoftware } from '../utils/api';
 import { useAppverseData } from '../hooks/useAppverseData';
 import { useConfig } from '../contexts/ConfigContext';
@@ -44,6 +45,7 @@ export default function SoftwareDetail() {
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   // Get expanded app param from URL (could be UUID or slug)
   const expandedAppParam = searchParams.get('app');
@@ -192,15 +194,26 @@ export default function SoftwareDetail() {
     const appSlug = appIdToSlug[appId];
 
     if (expandedAppId === appId) {
-      // Collapse: remove app param
       newParams.delete('app');
     } else {
-      // Expand: set app param (use slug if available, fallback to UUID)
       newParams.set('app', appSlug || appId);
     }
 
-    setSearchParams(newParams);
+    setSearchParams(newParams, { replace: true });
   };
+
+  // Build canonical share URL (Drupal node path, not SPA hash)
+  const shareUrl = slug
+    ? `${window.location.origin}/appverse/${slug}`
+    : window.location.href;
+
+  const handleCopyLink = useCallback(() => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopied(true);
+      track('share_link_copy', { software_title: software?.attributes?.title, share_url: shareUrl });
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [shareUrl, software, track]);
 
   // Handle retry
   const handleRetry = () => {
@@ -282,19 +295,37 @@ export default function SoftwareDetail() {
             </svg>
             Back to Software
           </Link>
-          <a
-            href="/node/add/appverse_app"
-            className="py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
-          >
-            Add an app
-          </a>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleCopyLink}
+              className="py-3 px-6 border-2 border-appverse-red text-appverse-red font-sans font-semibold rounded-appverse hover:bg-appverse-red hover:text-white transition-colors inline-flex items-center gap-2"
+            >
+              {copied ? (
+                <>
+                  <Check2 className="w-4 h-4" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Link45deg className="w-4 h-4" />
+                  Share
+                </>
+              )}
+            </button>
+            <a
+              href="/node/add/appverse_app"
+              className="py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
+            >
+              Add an app
+            </a>
+          </div>
         </div>
 
         {/* Two-column layout per mockup - stacks on mobile */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* Left column - Software info sidebar */}
           <div className="w-full lg:w-[280px] lg:flex-shrink-0">
-            <SoftwareHeader software={software} slug={slug} />
+            <SoftwareHeader software={software} />
           </div>
 
           {/* Right column - App list */}
