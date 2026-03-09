@@ -10,7 +10,6 @@
  * - Software tags
  * - Software topics
  * - App titles
- * - App organizations
  * - App tags
  *
  * @param {Array} software - Array of software items with resolved data
@@ -38,13 +37,11 @@ export function useSoftwareSearch(software, appsBySoftwareId, searchQuery) {
 
     return software.filter(softwareItem => {
       // 1. Search software title
-      const title = softwareItem.attributes?.title?.toLowerCase() || '';
+      const title = (softwareItem.title || '').toLowerCase();
       if (title.includes(query)) return true;
 
       // 2. Search software description (strip HTML first)
-      const bodyProcessed = softwareItem.attributes?.body?.processed || '';
-      const bodyValue = softwareItem.attributes?.body?.value || '';
-      const description = stripHtml(bodyProcessed || bodyValue).toLowerCase();
+      const description = stripHtml(softwareItem.body || '').toLowerCase();
       if (description.includes(query)) return true;
 
       // 3. Search software tags
@@ -59,12 +56,8 @@ export function useSoftwareSearch(software, appsBySoftwareId, searchQuery) {
       const apps = appsBySoftwareId[softwareItem.id] || [];
       for (const app of apps) {
         // Search app title
-        const appTitle = app.attributes?.title?.toLowerCase() || '';
+        const appTitle = (app.title || '').toLowerCase();
         if (appTitle.includes(query)) return true;
-
-        // Search app organization
-        const orgName = app.organization?.name?.toLowerCase() || '';
-        if (orgName.includes(query)) return true;
 
         // Search app tags
         const appTags = app.tags?.map(t => t.name.toLowerCase()) || [];

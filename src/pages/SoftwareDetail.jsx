@@ -10,7 +10,10 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Link45deg, Check2 } from 'react-bootstrap-icons';
-import { fetchSoftwareById, fetchAppsBySoftware } from '../utils/api';
+import { fetchAppsBySoftware } from '../utils/api';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isUUID(str) { return UUID_RE.test(str); }
 import { useAppverseData } from '../hooks/useAppverseData';
 import { useConfig } from '../contexts/ConfigContext';
 import { useTracking } from '../hooks/useTracking';
@@ -21,99 +24,53 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import SoftwareHeader from '../components/detail/SoftwareHeader';
 import AppList from '../components/detail/AppList';
 
-/**
- * Check if a string looks like a UUID
- */
-function isUUID(str) {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(str);
-}
-
 export default function SoftwareDetail() {
   const { slug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Get config for API calls
   const config = useConfig();
-
-  // Get slugMap from context (for slug → software lookup)
   const { getSoftwareBySlug, loading: contextLoading } = useAppverseData();
-
   const track = useTracking();
 
-  const [software, setSoftware] = useState(null);
+  // Software comes from cache (already loaded in context)
+  const software = contextLoading ? null : getSoftwareBySlug(slug);
+
   const [apps, setApps] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [appsLoading, setAppsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
 
   // Get expanded app param from URL (could be UUID or slug)
   const expandedAppParam = searchParams.get('app');
 
-  // Slug could be a human-readable slug (e.g., "gimp") or a UUID for backward compat
-  const isSlugLookup = slug && !isUUID(slug);
-
-  // Fetch software and apps data
+  // Fetch apps via JSON:API (need README, org, license — not in cache)
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
+    if (!software) return;
 
-      try {
-        let softwareId = slug;
-        let softwareData = null;
+    setAppsLoading(true);
+    setError(null);
 
-        if (isSlugLookup) {
-          // Wait for context to load before looking up slug
-          if (contextLoading) return;
-
-          // Look up software by slug from context
-          const contextSoftware = getSoftwareBySlug(slug);
-          if (!contextSoftware) {
-            setSoftware(null);
-            setApps([]);
-            setLoading(false);
-            return;
-          }
-          softwareId = contextSoftware.id;
-
-          // Fetch full software data (context has basic data, API has full data with resolved fields)
-          softwareData = await fetchSoftwareById(softwareId, config);
-        } else {
-          // Direct UUID - fetch from API
-          softwareData = await fetchSoftwareById(softwareId, config);
-        }
-
-        // Fetch apps
-        const appsData = await fetchAppsBySoftware(softwareId, config);
-
-        setSoftware(softwareData);
-        setApps(appsData);
-      } catch (err) {
-        console.error('Failed to fetch software detail:', err);
+    fetchAppsBySoftware(software.id, config)
+      .then(data => setApps(data))
+      .catch(err => {
+        console.error('Failed to fetch apps:', err);
         setError(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (slug) {
-      fetchData();
-    }
-  }, [slug, isSlugLookup, contextLoading, getSoftwareBySlug, config]);
+      })
+      .finally(() => setAppsLoading(false));
+  }, [software?.id, config]);
 
   // Track software detail view once both software and apps have loaded
   const trackedSoftwareId = useRef(null);
   useEffect(() => {
-    if (software?.id && !loading && trackedSoftwareId.current !== software.id) {
+    if (software?.id && !appsLoading && trackedSoftwareId.current !== software.id) {
       trackedSoftwareId.current = software.id;
       track('software_detail_view', {
-        software_title: software.attributes?.title,
+        software_title: software.title,
         software_slug: slug,
         app_count: apps.length
       });
     }
-  }, [software, apps.length, loading, slug, track]);
+  }, [software, apps.length, appsLoading, slug, track]);
 
   // Build app slug maps for URL-friendly ?app= params
   // Format: "org-name--app-title" or just "app-title" if no org
@@ -122,7 +79,7 @@ export default function SoftwareDetail() {
     const idToSlug = {};
 
     for (const app of apps) {
-      const title = app.attributes?.title || '';
+      const title = app.title || '';
       const orgName = app.organization?.name || '';
 
       // Generate slug: "org--title" or just "title"
@@ -162,8 +119,8 @@ export default function SoftwareDetail() {
     const logoUrl = software.logoUrl || '';
 
     if (expandedApp) {
-      const appTitle = expandedApp.attributes?.title || '';
-      const appDesc = expandedApp.attributes?.body?.value?.replace(/<[^>]+>/g, '') || '';
+      const appTitle = expandedApp.title || '';
+      const appDesc = (expandedApp.body || '').replace(/<[^>]+>/g, '');
       const appSlug = expandedAppParam || '';
       return {
         title: `${appTitle} | Appverse`,
@@ -175,8 +132,8 @@ export default function SoftwareDetail() {
       };
     }
 
-    const title = software.attributes?.title || '';
-    const description = software.attributes?.body?.value?.replace(/<[^>]+>/g, '') || '';
+    const title = software.title || '';
+    const description = (software.body || '').replace(/<[^>]+>/g, '');
     return {
       title: `${title} | Appverse`,
       description,
@@ -210,45 +167,26 @@ export default function SoftwareDetail() {
   const handleCopyLink = useCallback(() => {
     navigator.clipboard.writeText(shareUrl).then(() => {
       setCopied(true);
-      track('share_link_copy', { software_title: software?.attributes?.title, share_url: shareUrl });
+      track('share_link_copy', { software_title: software?.title, share_url: shareUrl });
       setTimeout(() => setCopied(false), 2000);
     });
   }, [shareUrl, software, track]);
 
-  // Handle retry
+  // Handle retry (re-fetch apps)
   const handleRetry = () => {
-    // Re-trigger the fetch by clearing and setting software
-    setSoftware(null);
+    if (!software) return;
     setApps([]);
-    setLoading(true);
+    setAppsLoading(true);
     setError(null);
 
-    // Determine software ID (from slug if needed)
-    let softwareId = slug;
-    if (isSlugLookup) {
-      const contextSoftware = getSoftwareBySlug(slug);
-      if (!contextSoftware) {
-        setError(new Error('Software not found'));
-        setLoading(false);
-        return;
-      }
-      softwareId = contextSoftware.id;
-    }
-
-    // Re-fetch
-    fetchSoftwareById(softwareId, config)
-      .then(data => setSoftware(data))
-      .catch(err => setError(err))
-      .finally(() => setLoading(false));
-
-    fetchAppsBySoftware(softwareId, config)
+    fetchAppsBySoftware(software.id, config)
       .then(data => setApps(data))
-      .catch(err => console.error('Failed to fetch apps:', err));
+      .catch(err => setError(err))
+      .finally(() => setAppsLoading(false));
   };
 
-  // Show loading state
-  // Also show spinner while context is loading for slug routes (needed to resolve slug → UUID)
-  if (loading || (isSlugLookup && contextLoading)) {
+  // Show loading while cache is loading
+  if (contextLoading) {
     return <LoadingSpinner message="Loading software details..." />;
   }
 

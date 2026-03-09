@@ -4,13 +4,12 @@
  *
  * Props:
  * @param {Array} software - Array of software items to display
- * @param {Object} appsBySoftwareId - Apps grouped by software ID
  */
 import SoftwareTile from './SoftwareTile';
 import SkeletonTile from './SkeletonTile';
 import { Search } from 'react-bootstrap-icons';
 
-export default function SoftwareGrid({ software, appsBySoftwareId, loading, appsLoading }) {
+export default function SoftwareGrid({ software, loading }) {
   // Debug: Log render state
   // console.log('[SoftwareGrid] Render - loading:', loading, '| software count:', software?.length ?? 0);
 
@@ -44,18 +43,12 @@ export default function SoftwareGrid({ software, appsBySoftwareId, loading, apps
 
   return (
     <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(199px, 1fr))' }}>
-      {software.map((softwareItem) => {
-        const appCount = (appsBySoftwareId[softwareItem.id] || []).length;
-
-        return (
-          <SoftwareTile
-            key={softwareItem.id}
-            software={softwareItem}
-            appCount={appCount}
-            appsLoading={appsLoading}
-          />
-        );
-      })}
+      {software.map((softwareItem) => (
+        <SoftwareTile
+          key={softwareItem.id}
+          software={softwareItem}
+        />
+      ))}
     </div>
   );
 }

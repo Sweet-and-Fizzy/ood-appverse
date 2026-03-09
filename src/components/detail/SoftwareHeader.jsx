@@ -11,11 +11,11 @@ import { useTracking } from '../../hooks/useTracking';
 
 export default function SoftwareHeader({ software }) {
   const track = useTracking();
-  const title = software.attributes?.title || 'Untitled Software';
-  const description = software.attributes?.body?.processed || software.attributes?.body?.value || '';
+  const title = software.title || 'Untitled Software';
+  const description = software.body || '';
   const logoUrl = software.logoUrl;
-  const websiteUrl = software.attributes?.field_appverse_software_website?.uri;
-  const docsUrl = software.attributes?.field_appverse_software_doc?.uri;
+  const websiteUrl = software.websiteUrl;
+  const docsUrl = software.docsUrl;
 
   // Resolved taxonomy terms from API
   const license = software.license;

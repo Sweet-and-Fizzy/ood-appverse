@@ -1,99 +1,12 @@
 /**
  * API utilities for AppVerse data fetching
- * Handles JSON:API interactions with Drupal backend
  */
 
-import { logApiResponse } from './apiLogger';
-
-// Default configuration (can be overridden via config parameter)
 const DEFAULT_API_BASE_URL = '/api';
 const DEFAULT_SITE_BASE_URL = '';
+const STATIC_CACHE_PATH = '/sites/default/files/appverse-cache/appverse-data.json';
 
-/**
- * Rewrite an absolute Drupal URL to use the local API proxy
- * e.g., https://md-2622-accessmatch.pantheonsite.io/jsonapi/node/... -> /api/node/...
- * @param {string} absoluteUrl - The full URL from links.next.href
- * @param {string} apiBaseUrl - The local API base URL (e.g., '/api')
- * @returns {string} The rewritten URL for local proxy
- */
-function rewriteToProxyUrl(absoluteUrl, apiBaseUrl) {
-  try {
-    const url = new URL(absoluteUrl);
-    // Extract path after /jsonapi (e.g., /jsonapi/node/... -> /node/...)
-    const jsonApiPath = url.pathname.replace('/jsonapi', '');
-    return `${apiBaseUrl}${jsonApiPath}${url.search}`;
-  } catch {
-    // If it's already a relative URL, return as-is
-    return absoluteUrl;
-  }
-}
-
-/**
- * Fetch all pages from a paginated JSON:API endpoint
- * Follows links.next until all data is retrieved
- * @param {string} initialUrl - The starting URL
- * @param {string} logLabel - Label for logging
- * @param {string} apiBaseUrl - The API base URL for rewriting pagination links
- * @returns {Promise<{data: Array, included: Array}>} Merged data and included arrays
- */
-async function fetchAllPages(initialUrl, _logLabel, apiBaseUrl = DEFAULT_API_BASE_URL) {
-  let allData = [];
-  let allIncluded = [];
-  let nextUrl = initialUrl;
-  let pageNum = 1;
-
-  while (nextUrl) {
-    const response = await fetch(nextUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    // logApiResponse(`${logLabel}_PAGE_${pageNum}`, nextUrl, result);
-
-    allData = allData.concat(result.data || []);
-    allIncluded = allIncluded.concat(result.included || []);
-
-    // Get next page URL if it exists, rewriting to use local proxy
-    const rawNextUrl = result.links?.next?.href || null;
-    nextUrl = rawNextUrl ? rewriteToProxyUrl(rawNextUrl, apiBaseUrl) : null;
-    pageNum++;
-  }
-
-  // Deduplicate data and included items by ID (same item may appear on multiple pages)
-  const dataMap = new Map();
-  for (const item of allData) {
-    dataMap.set(item.id, item);
-  }
-
-  const includedMap = new Map();
-  for (const item of allIncluded) {
-    includedMap.set(item.id, item);
-  }
-
-  return {
-    data: Array.from(dataMap.values()),
-    included: Array.from(includedMap.values())
-  };
-}
-
-// Sparse fieldsets reduce payload size by requesting only the fields we use.
-const SOFTWARE_FIELDS = [
-  'fields[node--appverse_software]=title,body,path,field_appverse_software_website,field_appverse_software_doc,drupal_internal__nid,field_appverse_logo,field_appverse_topics,field_license,field_tags',
-  'fields[taxonomy_term--appverse_science_domains]=name',
-  'fields[taxonomy_term--appverse_license]=name',
-  'fields[taxonomy_term--tags]=name',
-  'fields[media--svg]=field_media_image_1',
-  'fields[media--image]=field_media_image',
-  'fields[file--file]=uri',
-].join('&');
-
-const APP_FIELDS = [
-  'fields[node--appverse_app]=title,field_appverse_github_url,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,field_appverse_software_implemen,field_add_implementation_tags,field_appverse_app_type',
-  'fields[taxonomy_term--appverse_app_type]=name',
-  'fields[taxonomy_term--tags]=name',
-].join('&');
-
+// Sparse fieldsets for app detail view (still fetched via JSON:API for README, org, license)
 const APP_DETAIL_FIELDS = [
   'fields[node--appverse_app]=title,body,field_appverse_github_url,field_appverse_readme,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,field_appverse_software_implemen,field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license',
   'fields[taxonomy_term--appverse_app_type]=name',
@@ -102,364 +15,54 @@ const APP_DETAIL_FIELDS = [
   'fields[taxonomy_term--appverse_license]=name',
 ].join('&');
 
-// Endpoint builders (now accept baseUrl parameter)
-const endpoints = {
-  allSoftware: (baseUrl) => `${baseUrl}/node/appverse_software?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags&page[limit]=100&${SOFTWARE_FIELDS}`,
-  allApps: (baseUrl) => `${baseUrl}/node/appverse_app?include=field_add_implementation_tags,field_appverse_app_type&page[limit]=100&${APP_FIELDS}`,
-  allAppTypes: (baseUrl) => `${baseUrl}/taxonomy_term/appverse_app_type?sort=name`,
-  softwareById: (baseUrl, id) => `${baseUrl}/node/appverse_software/${id}?include=field_appverse_logo.field_media_image_1,field_appverse_logo.field_media_image,field_appverse_topics,field_license,field_tags&${SOFTWARE_FIELDS}`,
-  appsBySoftwareId: (baseUrl, softwareId) => `${baseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`
-};
-
 /**
- * Fetch all software items with logos, topics, and license
- * @param {Object} config - Configuration object
- * @param {string} config.apiBaseUrl - Base URL for API calls
- * @param {string} config.siteBaseUrl - Base URL for site assets
- * @returns {Promise<{software: Array, included: Array}>} Software with resolved data + included for filtering
+ * Fetch all appverse data from the static JSON cache.
+ * Returns software (with nested apps) and filter options in flat shape.
  */
-export async function fetchAllSoftware(config = {}) {
-  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
+export async function fetchStaticCache(config = {}) {
   const siteBaseUrl = config.siteBaseUrl ?? DEFAULT_SITE_BASE_URL;
-  const url = endpoints.allSoftware(apiBaseUrl);
+  const url = `${siteBaseUrl}${STATIC_CACHE_PATH}`;
 
-  try {
-    // Fetch all pages of software (handles JSON:API pagination)
-    const { data: softwareList, included } = await fetchAllPages(url, 'ALL_SOFTWARE', apiBaseUrl);
-
-    // Build a lookup map of all included items by ID
-    const includedMap = {};
-    for (const item of included) {
-      includedMap[item.id] = item;
-    }
-
-    // Build a map of file--file entities by ID (available via nested includes)
-    const fileMap = {};
-    for (const item of included) {
-      if (item.type === 'file--file') {
-        fileMap[item.id] = item;
-      }
-    }
-
-    // Resolve logo file URLs from included media + file entities (no extra HTTP requests)
-    const mediaFileMap = {};
-    for (const item of included) {
-      if (item.type === 'media--svg' || item.type === 'media--image') {
-        // SVG uses field_media_image_1, image uses field_media_image
-        const fileRelationshipId = item.type === 'media--svg'
-          ? item.relationships?.field_media_image_1?.data?.id
-          : item.relationships?.field_media_image?.data?.id;
-
-        if (fileRelationshipId && fileMap[fileRelationshipId]) {
-          const fileUrl = fileMap[fileRelationshipId].attributes?.uri?.url;
-          if (fileUrl) {
-            mediaFileMap[item.id] = `${siteBaseUrl}${fileUrl}`;
-          }
-        }
-      }
-    }
-
-    // Attach resolved data to each software item
-    const softwareWithData = softwareList.map(software => {
-      // Resolve logo URL
-      const logoMediaId = software.relationships?.field_appverse_logo?.data?.id;
-      const logoUrl = logoMediaId ? mediaFileMap[logoMediaId] : null;
-
-      // Resolve topics (science domains)
-      const topicsData = software.relationships?.field_appverse_topics?.data || [];
-      const topics = topicsData
-        .map(ref => includedMap[ref.id])
-        .filter(Boolean)
-        .map(term => ({ id: term.id, name: term.attributes.name }));
-
-      // Resolve license
-      const licenseRef = software.relationships?.field_license?.data;
-      const license = licenseRef && includedMap[licenseRef.id]
-        ? { id: licenseRef.id, name: includedMap[licenseRef.id].attributes.name }
-        : null;
-
-      // Resolve tags
-      const tagsData = software.relationships?.field_tags?.data || [];
-      const tags = tagsData
-        .map(ref => includedMap[ref.id])
-        .filter(Boolean)
-        .map(term => ({ id: term.id, name: term.attributes.name }));
-
-      // Extract slug from path.alias (e.g., "/appverse/abaqus" -> "abaqus")
-      const pathAlias = software.attributes?.path?.alias;
-      const slug = pathAlias ? pathAlias.split('/').filter(Boolean).pop() : null;
-
-      return {
-        ...software,
-        title: software.attributes?.title || '',
-        logoUrl,
-        topics,
-        license,
-        tags,
-        slug
-      };
-    });
-
-    return {
-      software: softwareWithData,
-      included
-    };
-
-  } catch (error) {
-    console.error('Error fetching software:', error);
-    throw error;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch static cache: ${response.statusText}`);
   }
-}
 
-/**
- * Fetch all apps with their software relationships and taxonomy terms resolved
- * @param {Object} config - Configuration object
- * @param {string} config.apiBaseUrl - Base URL for API calls
- * @returns {Promise<{apps: Array, included: Array}>} Apps with resolved terms + included for filter extraction
- */
-export async function fetchAllApps(config = {}) {
-  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
-  const url = endpoints.allApps(apiBaseUrl);
+  const cache = await response.json();
 
-  try {
-    // Fetch all pages of apps (handles JSON:API pagination)
-    const { data: apps, included } = await fetchAllPages(url, 'ALL_APPS', apiBaseUrl);
+  // Prepend siteBaseUrl to logo URLs
+  const software = cache.software.map(sw => ({
+    ...sw,
+    logoUrl: sw.logoUrl ? `${siteBaseUrl}${sw.logoUrl}` : null,
+  }));
 
-    // Build a lookup map of included items by ID
-    const includedMap = {};
-    for (const item of included) {
-      includedMap[item.id] = item;
-    }
-
-    // Resolve taxonomy terms for each app
-    const appsWithTerms = apps.map(app => {
-      // Resolve app types (supports single or multiple)
-      const appTypeData = app.relationships?.field_appverse_app_type?.data;
-      const appTypeRefs = Array.isArray(appTypeData) ? appTypeData : (appTypeData ? [appTypeData] : []);
-      const appTypes = appTypeRefs
-        .map(ref => includedMap[ref.id])
-        .filter(Boolean)
-        .map(term => ({ id: term.id, name: term.attributes.name }));
-
-      // Resolve implementation tags
-      const tagsData = app.relationships?.field_add_implementation_tags?.data || [];
-      const tags = tagsData
-        .map(ref => includedMap[ref.id])
-        .filter(Boolean)
-        .map(term => ({ id: term.id, name: term.attributes.name }));
-
-      return {
-        ...app,
-        appTypes,
-        tags
-      };
-    });
-
-    return {
-      apps: appsWithTerms,
-      included
-    };
-
-  } catch (error) {
-    console.error('Error fetching apps:', error);
-    throw error;
+  // Flatten apps from nested software and build grouping map
+  const appsBySoftwareId = {};
+  for (const sw of software) {
+    appsBySoftwareId[sw.id] = sw.apps || [];
   }
-}
 
-/**
- * Fetch all app type taxonomy terms directly
- * Returns all available app types, not just those referenced by existing apps
- * @param {Object} config - Configuration object
- * @param {string} config.apiBaseUrl - Base URL for API calls
- * @returns {Promise<Array>} Array of {id, name} objects
- */
-export async function fetchAllAppTypes(config = {}) {
-  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
-  const url = endpoints.allAppTypes(apiBaseUrl);
-
-  try {
-    const { data } = await fetchAllPages(url, 'ALL_APP_TYPES', apiBaseUrl);
-    return data.map(item => ({
-      id: item.id,
-      name: item.attributes.name
-    }));
-  } catch (error) {
-    console.error('Error fetching app types:', error);
-    return [];
-  }
-}
-
-/**
- * Extract filter options from included taxonomy terms (Apps response)
- * @param {Array} included - Included array from JSON:API response
- * @returns {Object} Filter options keyed by taxonomy type
- */
-export function extractFilterOptionsFromApps(included) {
-  const filterOptions = {
-    tags: [],
-    appType: []
+  return {
+    software,
+    appsBySoftwareId,
+    filterOptions: {
+      topics: cache.filterOptions.topics || [],
+      license: cache.filterOptions.licenses || [],
+      tags: cache.filterOptions.tags || [],
+      appType: cache.filterOptions.appTypes || [],
+    },
   };
-
-  for (const item of included) {
-    if (item.type === 'taxonomy_term--tags') {
-      filterOptions.tags.push({
-        id: item.id,
-        name: item.attributes.name
-      });
-    } else if (item.type === 'taxonomy_term--appverse_app_type') {
-      filterOptions.appType.push({
-        id: item.id,
-        name: item.attributes.name
-      });
-    }
-  }
-
-  // Sort alphabetically
-  filterOptions.tags.sort((a, b) => a.name.localeCompare(b.name));
-  filterOptions.appType.sort((a, b) => a.name.localeCompare(b.name));
-
-  return filterOptions;
 }
 
 /**
- * Extract filter options from included taxonomy terms (Software response)
- * @param {Array} included - Included array from JSON:API response
- * @returns {Object} Filter options keyed by taxonomy type
- */
-export function extractFilterOptionsFromSoftware(included) {
-  const filterOptions = {
-    topics: [],
-    license: [],
-    tags: []  // Software also has tags (field_tags)
-  };
-
-  for (const item of included) {
-    if (item.type === 'taxonomy_term--appverse_science_domains') {
-      filterOptions.topics.push({
-        id: item.id,
-        name: item.attributes.name
-      });
-    } else if (item.type === 'taxonomy_term--appverse_license') {
-      filterOptions.license.push({
-        id: item.id,
-        name: item.attributes.name
-      });
-    } else if (item.type === 'taxonomy_term--tags') {
-      filterOptions.tags.push({
-        id: item.id,
-        name: item.attributes.name
-      });
-    }
-  }
-
-  // Sort alphabetically
-  filterOptions.topics.sort((a, b) => a.name.localeCompare(b.name));
-  filterOptions.license.sort((a, b) => a.name.localeCompare(b.name));
-  filterOptions.tags.sort((a, b) => a.name.localeCompare(b.name));
-
-  return filterOptions;
-}
-
-/**
- * Fetch a single software item by ID with logo and taxonomy terms
- * @param {string} id - Software UUID
- * @param {Object} config - Configuration object
- * @param {string} config.apiBaseUrl - Base URL for API calls
- * @param {string} config.siteBaseUrl - Base URL for site assets
- * @returns {Promise<Object>} Software object with logo URL and resolved taxonomy terms
- */
-export async function fetchSoftwareById(id, config = {}) {
-  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
-  const siteBaseUrl = config.siteBaseUrl ?? DEFAULT_SITE_BASE_URL;
-
-  try {
-    const url = endpoints.softwareById(apiBaseUrl, id);
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch software: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    // logApiResponse('SOFTWARE_BY_ID_WITH_INCLUDES', url, data);
-    const software = data.data;
-    const included = data.included || [];
-
-    // Build a lookup map of included items by ID
-    const includedMap = {};
-    for (const item of included) {
-      includedMap[item.id] = item;
-    }
-
-    // Resolve logo URL from included file entities (no extra HTTP request)
-    let logoUrl = null;
-    const logoMediaId = software.relationships?.field_appverse_logo?.data?.id;
-    if (logoMediaId) {
-      const logoMedia = includedMap[logoMediaId];
-      // SVG uses field_media_image_1, image uses field_media_image
-      const fileRelationshipId = logoMedia?.type === 'media--svg'
-        ? logoMedia?.relationships?.field_media_image_1?.data?.id
-        : logoMedia?.relationships?.field_media_image?.data?.id;
-
-      if (fileRelationshipId && includedMap[fileRelationshipId]) {
-        const fileUrl = includedMap[fileRelationshipId].attributes?.uri?.url;
-        if (fileUrl) {
-          logoUrl = `${siteBaseUrl}${fileUrl}`;
-        }
-      }
-    }
-
-    // Resolve taxonomy terms: topics (science domains)
-    const topicsData = software.relationships?.field_appverse_topics?.data || [];
-    const topics = topicsData
-      .map(ref => includedMap[ref.id])
-      .filter(Boolean)
-      .map(term => ({ id: term.id, name: term.attributes.name }));
-
-    // Resolve taxonomy terms: license
-    const licenseRef = software.relationships?.field_license?.data;
-    const license = licenseRef && includedMap[licenseRef.id]
-      ? { id: licenseRef.id, name: includedMap[licenseRef.id].attributes.name }
-      : null;
-
-    // Resolve taxonomy terms: tags
-    const tagsData = software.relationships?.field_tags?.data || [];
-    const tags = tagsData
-      .map(ref => includedMap[ref.id])
-      .filter(Boolean)
-      .map(term => ({ id: term.id, name: term.attributes.name }));
-
-    // Extract slug from path.alias
-    const pathAlias = software.attributes?.path?.alias;
-    const slug = pathAlias ? pathAlias.split('/').filter(Boolean).pop() : null;
-
-    return {
-      ...software,
-      logoUrl,
-      topics,
-      license,
-      tags,
-      slug
-    };
-
-  } catch (error) {
-    console.error('Error fetching software by ID:', error);
-    throw error;
-  }
-}
-
-/**
- * Fetch apps for a specific software with taxonomy terms resolved
- * @param {string} softwareId - Software UUID
- * @param {Object} config - Configuration object
- * @param {string} config.apiBaseUrl - Base URL for API calls
- * @returns {Promise<Array>} Array of app objects with resolved taxonomy terms
+ * Fetch apps for a specific software with taxonomy terms resolved.
+ * Used by detail page — fetches from JSON:API for full data (README, org, license).
  */
 export async function fetchAppsBySoftware(softwareId, config = {}) {
   const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
+  const url = `${apiBaseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
 
   try {
-    const url = endpoints.appsBySoftwareId(apiBaseUrl, softwareId);
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -467,20 +70,15 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
     }
 
     const data = await response.json();
-    // logApiResponse('APPS_BY_SOFTWARE_ID_WITH_INCLUDES', url, data);
-
     const apps = data.data || [];
     const included = data.included || [];
 
-    // Build a lookup map of included items by ID
     const includedMap = {};
     for (const item of included) {
       includedMap[item.id] = item;
     }
 
-    // Resolve taxonomy terms for each app
-    const appsWithTerms = apps.map(app => {
-      // Resolve app types (supports single or multiple)
+    return apps.map(app => {
       const appTypeData = app.relationships?.field_appverse_app_type?.data;
       const appTypeRefs = Array.isArray(appTypeData) ? appTypeData : (appTypeData ? [appTypeData] : []);
       const appTypes = appTypeRefs
@@ -488,19 +86,16 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
         .filter(Boolean)
         .map(term => ({ id: term.id, name: term.attributes.name }));
 
-      // Resolve organization
       const orgRef = app.relationships?.field_appverse_organization?.data;
       const organization = orgRef && includedMap[orgRef.id]
         ? { id: orgRef.id, name: includedMap[orgRef.id].attributes.name }
         : null;
 
-      // Resolve license
       const licenseRef = app.relationships?.field_license?.data;
       const license = licenseRef && includedMap[licenseRef.id]
         ? { id: licenseRef.id, name: includedMap[licenseRef.id].attributes.name }
         : null;
 
-      // Resolve implementation tags
       const tagsData = app.relationships?.field_add_implementation_tags?.data || [];
       const tags = tagsData
         .map(ref => includedMap[ref.id])
@@ -508,40 +103,25 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
         .map(term => ({ id: term.id, name: term.attributes.name }));
 
       return {
-        ...app,
+        id: app.id,
+        title: app.attributes?.title || '',
+        nid: app.attributes?.drupal_internal__nid,
+        githubUrl: app.attributes?.field_appverse_github_url?.uri || null,
+        readme: app.attributes?.field_appverse_readme?.value || null,
+        body: app.attributes?.body?.processed || app.attributes?.body?.value || null,
+        stars: app.attributes?.field_appverse_stars ?? 0,
+        flagCount: app.attributes?.flag_count || 0,
+        lastUpdated: app.attributes?.field_appverse_lastupdated || null,
+        softwareId: app.relationships?.field_appverse_software_implemen?.data?.id || null,
         appTypes,
         organization,
         license,
-        tags
+        tags,
       };
     });
-
-    return appsWithTerms;
 
   } catch (error) {
     console.error('Error fetching apps by software:', error);
     throw error;
   }
-}
-
-/**
- * Group apps by their software relationship ID
- * @param {Array} apps - Array of app objects
- * @returns {Object} Object keyed by software UUID, values are arrays of apps
- */
-export function groupAppsBySoftware(apps) {
-  const grouped = {};
-
-  for (const app of apps) {
-    const softwareId = app.relationships?.field_appverse_software_implemen?.data?.id;
-
-    if (softwareId) {
-      if (!grouped[softwareId]) {
-        grouped[softwareId] = [];
-      }
-      grouped[softwareId].push(app);
-    }
-  }
-
-  return grouped;
 }

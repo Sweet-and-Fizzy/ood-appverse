@@ -18,15 +18,15 @@ export default function AppRow({ app, isExpanded, onToggle }) {
   const { getFlagCountAdjustment } = useFlag();
   const track = useTracking();
 
-  const title = app.attributes?.title || 'Untitled App';
-  const githubUrl = app.attributes?.field_appverse_github_url?.uri;
+  const title = app.title || 'Untitled App';
+  const githubUrl = app.githubUrl;
   // Raw markdown content for README
-  const readme = app.attributes?.field_appverse_readme?.value;
-  const lastUpdated = app.attributes?.field_appverse_lastupdated;
-  const baseFlagCount = app.attributes?.flag_count || 0;
+  const readme = app.readme;
+  const lastUpdated = app.lastUpdated;
+  const baseFlagCount = app.flagCount || 0;
   // Adjust flag count based on user's flag actions (updated after server confirms)
   const flagCount = baseFlagCount + getFlagCountAdjustment(app.id);
-  const githubStars = app.attributes?.field_appverse_stars ?? 0;
+  const githubStars = app.stars ?? 0;
 
   // Resolved taxonomy terms from API
   const organization = app.organization;
@@ -34,7 +34,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
   // App identifiers for flagging
   const appId = app.id; // UUID
-  const nid = app.attributes?.drupal_internal__nid; // needed for entity_id when creating a flagging
+  const nid = app.nid; // needed for entity_id when creating a flagging
 
   // For smooth height animation of README panel
   const readmeRef = useRef(null);

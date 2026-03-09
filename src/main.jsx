@@ -11,10 +11,10 @@ import { ConfigProvider } from './contexts/ConfigContext'
 import './fonts.css'
 import './index.css'
 
-// Dev/Netlify config: API is proxied, but assets need full URL
+// Dev config: API and static files are proxied to the Drupal backend
 const config = {
   apiBaseUrl: '/api',
-  siteBaseUrl: 'https://openondemand.connectci.org'
+  siteBaseUrl: ''
 }
 
 createRoot(document.getElementById('root')).render(
