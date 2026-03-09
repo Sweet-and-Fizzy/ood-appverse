@@ -206,7 +206,7 @@ Inactive apps may be archived, but we prefer revitalizing them with community he
 
 ### The Appverse Support Policy: A Shared Responsibility Model
 
-The Open OnDemand Appverse is a community-driven catalog, not a curated set of core-supported products. To ensure the sustainability of the Open OnDemand project and the sanity of its core developers, we follow a clear boundary between Platform Support and App Support.
+The Open OnDemand Appverse is a community-driven catalog, not a curated set of core-supported products. We follow a clear boundary between Platform Support and App Support.
 
 ### The Support Boundary
 
