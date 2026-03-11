@@ -1,5 +1,10 @@
 # Appverse App Best Practices
 
+> **Related Docs:**
+> [Contributor Guide](appverse-contributor-guide.md) |
+> [Reviewer Checklist](app-review-checklist.md) |
+> [README Template](appverse-readme-template.md)
+
 Best practices for developing Open OnDemand apps for the Appverse catalog, based on analysis of community apps and OOD documentation.
 
 ## Repository & Metadata

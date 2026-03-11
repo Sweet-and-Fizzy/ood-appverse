@@ -1,5 +1,10 @@
 # Appverse App Review Checklist
 
+> **Related Docs:**
+> [Contributor Guide](appverse-contributor-guide.md) |
+> [Best Practices](app-best-practices.md) |
+> [README Template](appverse-readme-template.md)
+
 A guide for reviewers evaluating whether a new app should be included in the Appverse catalog.
 
 ## Overview

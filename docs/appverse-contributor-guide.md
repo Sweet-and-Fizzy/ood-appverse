@@ -1,5 +1,10 @@
 # Appverse Contributor Guide
 
+> **Related Docs:**
+> [Best Practices](app-best-practices.md) |
+> [Reviewer Checklist](app-review-checklist.md) |
+> [README Template](appverse-readme-template.md)
+
 ## 1. What Is the Appverse?
 
 The Appverse is a shared catalog of Open OnDemand app configurations for HPC environments. The goal is to improve reuse and share deployment patterns instead of rebuilding them from scratch.
