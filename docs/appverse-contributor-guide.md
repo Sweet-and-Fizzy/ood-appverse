@@ -93,6 +93,28 @@ Each app must live in a **public repository** (GitHub; GitLab support may be add
 | `template/` | Job template scripts |
 | Screenshots | Visual documentation of the running app |
 
+### Naming Your App and Repository
+
+Your app name appears in the Appverse catalog and in the OOD dashboard. A good name helps deployers find your app and understand what it does at a glance.
+
+**Conventions:**
+- Start with the **software name** (e.g., "Jupyter", "RStudio", "MATLAB")
+- Add a **differentiator** if there are multiple apps for the same software — describe what makes yours different (e.g., containerized, GPU-enabled, classroom mode)
+- Keep it concise — aim for 2-4 words
+
+**Good names:**
+- `Jupyter Notebook` — clear, simple, no ambiguity
+- `Jupyter (Apptainer)` — differentiates from a module-based version
+- `RStudio Server (GPU)` — tells deployers this variant needs GPU nodes
+- `MATLAB (Classroom)` — signals a specific use case
+
+**Avoid:**
+- Generic names that don't mention the software: `My HPC App`, `Interactive Job`
+- Institution-specific names: `OSC Jupyter`, `TACC RStudio` — the catalog is for the whole community
+- Redundant prefixes: `OOD Jupyter`, `Batch Connect Jupyter` — everything in the Appverse is an OOD app
+
+**Repository naming:** Follow the OOD convention of prefixing with `bc_` for Batch Connect apps (e.g., `bc_jupyter`, `bc_rstudio_gpu`). This makes it immediately clear what type of app the repo contains.
+
 ### The manifest.yml
 
 This file defines how your app appears in the catalog. It must include:
