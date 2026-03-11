@@ -1,9 +1,9 @@
 # Appverse Contributor Guide
 
 > **Related Docs:**
-> [Best Practices](app-best-practices.md) |
-> [Reviewer Checklist](app-review-checklist.md) |
-> [README Template](appverse-readme-template.md)
+> [Best Practices](https://openondemand.connectci.org/appverse-best-practices) |
+> [Reviewer Checklist](https://openondemand.connectci.org/appverse-reviewer-checklist) |
+> [README Template](https://github.com/keeganasmith2003/appverse_readme_template)
 
 ## 1. What Is the Appverse?
 

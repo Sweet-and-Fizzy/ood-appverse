@@ -1,9 +1,9 @@
 # Appverse App Best Practices
 
 > **Related Docs:**
-> [Contributor Guide](appverse-contributor-guide.md) |
-> [Reviewer Checklist](app-review-checklist.md) |
-> [README Template](appverse-readme-template.md)
+> [Contributor Guide](https://openondemand.connectci.org/appverse-contributor-documentation) |
+> [Reviewer Checklist](https://openondemand.connectci.org/appverse-reviewer-checklist) |
+> [README Template](https://github.com/keeganasmith2003/appverse_readme_template)
 
 Best practices for developing Open OnDemand apps for the Appverse catalog, based on analysis of community apps and OOD documentation.
 

@@ -1,9 +1,9 @@
 # Appverse App Review Checklist
 
 > **Related Docs:**
-> [Contributor Guide](appverse-contributor-guide.md) |
-> [Best Practices](app-best-practices.md) |
-> [README Template](appverse-readme-template.md)
+> [Contributor Guide](https://openondemand.connectci.org/appverse-contributor-documentation) |
+> [Best Practices](https://openondemand.connectci.org/appverse-best-practices) |
+> [README Template](https://github.com/keeganasmith2003/appverse_readme_template)
 
 A guide for reviewers evaluating whether a new app should be included in the Appverse catalog.
 
