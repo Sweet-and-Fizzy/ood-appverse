@@ -28,17 +28,15 @@ export default function App() {
     <AppverseDataProvider>
       <FlagProvider>
         <div className="appverse-container">
-          <main>
-            <Routes>
-              <Route path="/" element={<SoftwareHome />} />
-              {/* Slug route: /gimp → looks up "gimp" in slugMap */}
-              <Route path="/:slug" element={<SoftwareDetail />} />
-              {/* Legacy route redirects: /appverse/* → /* */}
-              <Route path="/appverse/*" element={<LegacyRedirect />} />
-              {/* Catch-all: redirect any unmatched route to main page */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
+          <Routes>
+            <Route path="/" element={<SoftwareHome />} />
+            {/* Slug route: /gimp → looks up "gimp" in slugMap */}
+            <Route path="/:slug" element={<SoftwareDetail />} />
+            {/* Legacy route redirects: /appverse/* → /* */}
+            <Route path="/appverse/*" element={<LegacyRedirect />} />
+            {/* Catch-all: redirect any unmatched route to main page */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </div>
       </FlagProvider>
     </AppverseDataProvider>
