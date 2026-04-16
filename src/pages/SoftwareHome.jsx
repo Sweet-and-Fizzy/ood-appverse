@@ -297,13 +297,13 @@ export default function SoftwareHome() {
           )}
 
           {/* Software grid */}
-          <main className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0">
             {/* Grid */}
             <SoftwareGrid
               software={filteredSoftware}
               loading={loading}
             />
-          </main>
+          </div>
         </div>
       </div>
     </div>
