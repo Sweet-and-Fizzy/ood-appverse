@@ -172,24 +172,16 @@ export default function SoftwareHome() {
       });
     }
 
-    // Apply Tags filter with OR logic:
-    // Show software if Software has the tag (field_tags) OR any App has the tag (field_add_implementation_tags)
-    // Filter values are term names, not UUIDs
+    // Apply Tags filter with AND logic:
+    // Every selected tag must appear somewhere in the Software's tags
+    // (field_tags) or any of its apps' tags (field_add_implementation_tags).
     if (filters.tags && filters.tags.length > 0) {
       filtered = filtered.filter(softwareItem => {
-        // Check Software's own tags (resolved names)
         const softwareTagNames = softwareItem.tags?.map(t => t.name) || [];
-        const softwareHasTag = filters.tags.some(tagName => softwareTagNames.includes(tagName));
-        if (softwareHasTag) return true;
-
-        // Check Apps' tags (resolved names)
         const softwareApps = appsBySoftwareId[softwareItem.id] || [];
-        const appHasTag = softwareApps.some(app => {
-          const appTagNames = app.tags?.map(t => t.name) || [];
-          return filters.tags.some(tagName => appTagNames.includes(tagName));
-        });
-
-        return appHasTag;
+        const appTagNames = softwareApps.flatMap(app => app.tags?.map(t => t.name) || []);
+        const allTagNames = new Set([...softwareTagNames, ...appTagNames]);
+        return filters.tags.every(tagName => allTagNames.has(tagName));
       });
     }
 
