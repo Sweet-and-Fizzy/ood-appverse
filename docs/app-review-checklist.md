@@ -3,7 +3,7 @@
 > **Related Docs:**
 > [Appverse Contributor Guide](https://openondemand.connectci.org/appverse-contributor-documentation) |
 > [Appverse Best Practices](https://openondemand.connectci.org/appverse-best-practices) |
-> [Appverse README Template](https://github.com/keeganasmith2003/appverse_readme_template)
+> [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template)
 
 A guide for reviewers evaluating whether a new app should be included in the Appverse catalog.
 
@@ -50,7 +50,7 @@ For Batch Connect Apps: standard OOD structure with expected files (`form.yml`, 
 
 ### 2. Documentation Minimum
 
-The README should follow the [Appverse README Template](https://github.com/keeganasmith2003/appverse_readme_template) structure (see also the [filled-in example](https://github.com/keeganasmith2003/appverse_readme_template)). At minimum, it must answer these questions for an HPC admin who has never seen the app:
+The README should follow the [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template) structure (see also the [filled-in example](https://github.com/tamu-edu/appverse_readme_template)). At minimum, it must answer these questions for an HPC admin who has never seen the app:
 
 | Question | Where to Find It |
 |----------|-----------------|

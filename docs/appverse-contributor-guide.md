@@ -3,7 +3,7 @@
 > **Related Docs:**
 > [Appverse Best Practices](https://openondemand.connectci.org/appverse-best-practices) |
 > [Appverse Reviewer Checklist](https://openondemand.connectci.org/appverse-reviewer-checklist) |
-> [Appverse README Template](https://github.com/keeganasmith2003/appverse_readme_template)
+> [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template)
 
 ## 1. What Is the Appverse?
 
@@ -20,8 +20,9 @@ This guide is for developers, HPC admins, and anyone who wants to contribute or 
 
 | Type | Description |
 |------|-------------|
-| **Batch Connect - Basic** | Interactive jobs launched through the scheduler (web servers, Jupyter notebooks, etc.) |
-| **Batch Connect - VNC** | Interactive jobs launched through the scheduler using a VNC desktop environment |
+| **Batch Connect - Basic** | Interactive jobs that run an HTTP server on a compute node (Jupyter, RStudio, etc.) — set `template: "basic"` in `submit.yml.erb` |
+| **Batch Connect - VNC** | Interactive jobs that run a VNC desktop on a compute node (MATLAB, Abaqus, remote desktops) — set `template: "vnc"` in `submit.yml.erb` |
+| **Batch Connect - VNC Container** | Same as VNC but runs inside a container, for sites that don't install X11/XFCE on compute nodes — set `template: "vnc_container"` |
 | **Passenger** | Web apps served via Open OnDemand (Ruby Rack, Python WSGI, or Node.js) |
 | **Widgets** | Small UI components embedded in dashboards |
 | **Dashboards** | Structured user interfaces (e.g., classroom portals, monitoring panels, etc.) |
@@ -153,7 +154,7 @@ See the [OOD manifest.yml reference](https://osc.github.io/ood-documentation/lat
 
 Write for **HPC administrators** who need to deploy your app on their system.
 
-Use the [Appverse README Template](https://github.com/keeganasmith2003/appverse_readme_template) as your starting point. It provides the standard section structure. A good README should cover:
+Use the [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template) as your starting point. It provides the standard section structure. A good README should cover:
 
 1. **Overview** — what the app launches and who it's for
 2. **Features** — key capabilities of this OOD app (not just the upstream software)
@@ -164,7 +165,7 @@ Use the [Appverse README Template](https://github.com/keeganasmith2003/appverse_
 7. **Testing** — where it's been deployed and how to verify installation
 8. **Known limitations** — what doesn't work, what's untested
 
-See the [README template with examples](https://github.com/keeganasmith2003/appverse_readme_template) for a filled-in version showing what good content looks like in each section.
+See the [README template with examples](https://github.com/tamu-edu/appverse_readme_template) for a filled-in version showing what good content looks like in each section.
 
 **Example of a strong README in the wild:** [EpiGenomicsCode/ProteinStructure-OOD](https://github.com/EpiGenomicsCode/ProteinStructure-OOD) — includes features, prerequisites, installation, usage for multiple engines, monitoring, and troubleshooting.
 
@@ -177,7 +178,98 @@ See the [README template with examples](https://github.com/keeganasmith2003/appv
 - **Use release versions** — tag releases with semantic versioning (e.g., `v1.2.0`) so others can pin to stable versions.
 - **Include a CHANGELOG** — helps deployers understand what changed between versions and whether they need to update.
 
-## 6. How Apps Get Synced
+## 6. How Batch Connect Apps Work
+
+If you're building or modifying a Batch Connect app, it helps to understand how the pieces fit together at runtime. OOD uses ERB (Embedded Ruby) templates to wire form values into job scripts and session views.
+
+### The execution flow
+
+When a user fills out the form and clicks Launch:
+
+1. **`form.yml`** (or `form.yml.erb`) renders the form and collects user input
+2. **`submit.yml.erb`** translates form values into scheduler directives
+3. **`template/before.sh.erb`** runs setup before the main script (ports, passwords, environment)
+4. **`template/script.sh.erb`** launches the application
+5. **`template/after.sh.erb`** runs cleanup when the session ends (not when the job ends)
+
+### The `context` and `session` objects
+
+Inside any `.erb` file, you have access to two objects that OOD populates for you:
+
+**`context`** — every form field becomes a method on `context`. If your `form:` array includes `version` and `bc_num_hours`, you can use them in your scripts:
+
+```bash
+# In script.sh.erb
+module load rstudio/<%= context.version %>
+
+<%- if context.version == "4.3" -%>
+  # Version-specific setup
+<%- end -%>
+```
+
+**`session`** — runtime information about the batch connect session:
+
+| Attribute | What it gives you |
+|-----------|-------------------|
+| `session.id` | Unique session identifier |
+| `session.job_id` | The scheduler job ID |
+| `session.cluster` | Cluster name (matches your `clusters.d/` config) |
+| `session.staged_root` | Path to the session's staging directory |
+
+### Built-in helper methods
+
+OOD provides helpers that you should use instead of rolling your own:
+
+**`find_port`** — finds an available port on the compute node:
+```bash
+port=$(find_port ${host})
+```
+
+**`create_passwd`** — generates a secure random password:
+```bash
+password="$(create_passwd 16)"
+export RSTUDIO_PASSWORD="${password}"
+```
+
+### The `connection.yml` pattern
+
+Apps that need to pass runtime data (like generated passwords or tokens) back to the session card use `connection.yml` together with `conn_params` in `submit.yml.erb`. This is how RStudio passes its generated password without exposing it.
+
+In `before.sh.erb`, generate the data:
+```bash
+password="$(create_passwd 16)"
+export RSTUDIO_PASSWORD="${password}"
+```
+
+In `submit.yml.erb`, declare what gets passed through:
+```yaml
+batch_connect:
+  template: "basic"
+  conn_params:
+    - csrf_token
+```
+
+In `view.html.erb`, use it to build the connection UI:
+```html
+<form action="/rnode/<%= host %>/<%= port %>/auth-do-sign-in" method="post" target="_blank">
+  <input type="hidden" name="username" value="<%= ENV["USER"] %>">
+  <input type="hidden" name="password" value="<%= password %>">
+  <button class="btn btn-primary" type="submit">Connect to RStudio</button>
+</form>
+```
+
+This way the user never sees a login prompt — OOD handles it. See the [OSC Contributor Jam Guide](https://github.com/OSC/contributor_guide/blob/main/contributor_jam_guide.md) for more detail on these patterns.
+
+### ERB syntax reminder
+
+```erb
+<%= expression %>     ← Renders the result as a string in the file
+<%- statement -%>     ← Executes Ruby code but renders nothing (variables, conditionals)
+```
+
+The `=` means "output this." The `-` means "run this silently." Getting these mixed up is a common source of bugs.
+
+## 7. How Apps Get Synced
 
 The catalog pulls information from your repository **daily**. The sync can also be triggered manually if needed.
 
@@ -199,7 +291,7 @@ After making changes to your app:
 3. Create a new release tag if it's a significant update
 4. The catalog will pick up changes on the next sync cycle
 
-## 7. Review, Maintenance & Community
+## 8. Review, Maintenance & Community
 
 ### Review Process
 
@@ -229,7 +321,7 @@ Inactive apps may be archived, but we prefer revitalizing them with community he
 - Major policy decisions are community-driven
 - Join the [OOD Discourse](https://discourse.openondemand.org/) for community support and monthly Tips & Tricks calls
 
-## 8. Support
+## 9. Support
 
 ### The Appverse Support Policy: A Shared Responsibility Model
 
@@ -269,7 +361,8 @@ The core Open OnDemand developers provide the "highway" (the platform), but the 
 | OOD Discourse Forum | https://discourse.openondemand.org/ |
 | Community App List | https://discourse.openondemand.org/t/list-of-open-ondemand-apps/2107 |
 | Appverse Affinity Group | https://openondemand.connectci.org/affinity-groups/ood-appverse |
-| README Template | https://github.com/keeganasmith2003/appverse_readme_template |
+| README Template | https://github.com/tamu-edu/appverse_readme_template |
+| OSC Contributor Jam Guide | https://github.com/OSC/contributor_guide/blob/main/contributor_jam_guide.md |
 
 ### Standard Batch Connect App Structure
 
@@ -282,8 +375,9 @@ my-app/
 ├── README.md             # Documentation (required)
 ├── LICENSE               # Open source license (required)
 ├── CHANGELOG.md          # Version history (recommended)
-├── view.html.erb         # Connection view template
-├── info.md.erb           # Pre-launch info panel
+├── connection.yml        # Passes runtime data (ports, tokens) to the session card
+├── view.html.erb         # Connection view — the "Connect" button and any auth setup
+├── info.md.erb           # Pre-launch info panel shown to users before they submit
 ├── completed.md.erb      # Post-completion message
 ├── form.js               # Client-side form logic (optional)
 ├── template/
@@ -298,9 +392,12 @@ my-app/
 | Term | Definition |
 |------|------------|
 | **Batch Connect** | OOD framework for launching interactive HPC jobs through a web form |
+| **connection.yml** | Declares runtime parameters (ports, tokens) to pass from job scripts to the session card |
+| **context** | ERB object available in `.erb` files — gives access to every form field the user submitted |
 | **ERB** | Embedded Ruby — templating language used in OOD scripts |
 | **Lmod** | Lua-based module system for managing software environments |
 | **manifest.yml** | YAML file defining app metadata for the OOD dashboard |
 | **Passenger** | Phusion Passenger — app server used by OOD for web applications |
+| **session** | ERB object available in `.erb` files — runtime info like job ID, cluster, and staged_root |
 | **Slug** | URL-friendly identifier derived from a name (e.g., "AlphaFold" → `alphafold`) |
 | **VNC** | Virtual Network Computing — protocol for remote desktop access |

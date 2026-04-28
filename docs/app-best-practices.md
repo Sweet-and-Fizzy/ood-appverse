@@ -3,7 +3,7 @@
 > **Related Docs:**
 > [Appverse Contributor Guide](https://openondemand.connectci.org/appverse-contributor-documentation) |
 > [Appverse Reviewer Checklist](https://openondemand.connectci.org/appverse-reviewer-checklist) |
-> [Appverse README Template](https://github.com/keeganasmith2003/appverse_readme_template)
+> [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template)
 
 Best practices for developing Open OnDemand apps for the Appverse catalog, based on analysis of community apps and OOD documentation.
 
@@ -45,7 +45,7 @@ A CHANGELOG helps deployers decide whether to update and what to watch for.
 
 Your README is the first thing a potential deployer sees. A sparse README signals an app that will be hard to deploy and maintain.
 
-Start with the [Appverse README Template](https://github.com/keeganasmith2003/appverse_readme_template) and fill in every section with real content. See the [filled-in template with examples](https://github.com/keeganasmith2003/appverse_readme_template) for guidance on what good content looks like.
+Start with the [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template) and fill in every section with real content. See the [filled-in template with examples](https://github.com/tamu-edu/appverse_readme_template) for guidance on what good content looks like.
 
 **Must include:**
 1. Overview — what it launches and who it's for
