@@ -13898,12 +13898,11 @@ function RI() {
       return b.topics.some((ae) => K.includes(ae));
     })), b.appType && b.appType.length > 0 && (G = G.filter((B) => (t[B.id] || []).some((te) => (te.appTypes || []).map((F) => F.name).some((F) => b.appType.includes(F))))), b.tags && b.tags.length > 0 && (G = G.filter((B) => {
       var Q;
-      const K = ((Q = B.tags) == null ? void 0 : Q.map((re) => re.name)) || [];
-      return b.tags.some((re) => K.includes(re)) ? !0 : (t[B.id] || []).some((re) => {
-        var pe;
-        const de = ((pe = re.tags) == null ? void 0 : pe.map((ue) => ue.name)) || [];
-        return b.tags.some((ue) => de.includes(ue));
-      });
+      const K = ((Q = B.tags) == null ? void 0 : Q.map((re) => re.name)) || [], ae = (t[B.id] || []).flatMap((re) => {
+        var de;
+        return ((de = re.tags) == null ? void 0 : de.map((pe) => pe.name)) || [];
+      }), F = /* @__PURE__ */ new Set([...K, ...ae]);
+      return b.tags.every((re) => F.has(re));
     })), G.sort((B, K) => {
       const te = (B.title || "").toLowerCase(), ae = (K.title || "").toLowerCase();
       return te.localeCompare(ae);
