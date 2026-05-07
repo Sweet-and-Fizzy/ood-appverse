@@ -218,7 +218,7 @@ export default function SoftwareHome() {
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <a
-              href="https://openondemand.connectci.org/appverse-contributor-documentation#8-support"
+              href="https://openondemand.connectci.org/appverse-contributor-documentation#9-support"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto text-center lg:flex-shrink-0 py-3 px-6 border-2 border-appverse-red text-appverse-red font-sans font-semibold rounded-appverse hover:bg-appverse-red hover:text-white transition-colors"
