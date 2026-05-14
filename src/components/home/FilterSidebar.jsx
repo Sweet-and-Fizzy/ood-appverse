@@ -18,7 +18,8 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
   const [expandedSections, setExpandedSections] = useState({
     topics: true,
     appType: true,
-    tags: true
+    tags: true,
+    organizations: true
   });
 
   // Number of items before we make the list scrollable
@@ -120,6 +121,14 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
       key: 'tags',
       title: 'Tags',
       options: filterOptions.tags.map(item => ({
+        value: item.name,  // Use name for URL params
+        label: item.name
+      }))
+    },
+    filterOptions.organizations?.length > 0 && {
+      key: 'organizations',
+      title: 'Organization',
+      options: filterOptions.organizations.map(item => ({
         value: item.name,  // Use name for URL params
         label: item.name
       }))

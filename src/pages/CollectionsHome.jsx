@@ -1,100 +1,64 @@
-/**
- * SoftwareHome Page
- * Main landing page showing software grid with search and filters
- */
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppverseData } from '../hooks/useAppverseData';
 import { useBrowseFilters } from '../hooks/useBrowseFilters';
 import { useTracking } from '../hooks/useTracking';
 import ErrorMessage from '../components/common/ErrorMessage';
+import BrowseTabs from '../components/common/BrowseTabs';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
 import FilterDrawer from '../components/home/FilterDrawer';
-import SoftwareGrid from '../components/home/SoftwareGrid';
-import BrowseTabs from '../components/common/BrowseTabs';
+import CollectionGrid from '../components/home/CollectionGrid';
 import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
-export default function SoftwareHome() {
-  // Get data from context
-  const { software, collections, filterOptions, loading, error, refetch } = useAppverseData();
-
-  // Debug: Log render timing
-  // console.log('[SoftwareHome] Render - loading:', loading, '| software count:', software?.length ?? 0);
-
-  // URL params for filter persistence
+export default function CollectionsHome() {
+  const { collections, filterOptions, loading, error, refetch } = useAppverseData();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Local state for search
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get('search') || ''
-  );
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
 
-  // Parse filters from URL params
   const filters = useMemo(() => {
     const parsed = {};
     for (const [key, value] of searchParams.entries()) {
       if (key !== 'search') {
-        // Support multiple values: ?tags=docker&tags=gpu
-        if (parsed[key]) {
-          parsed[key].push(value);
-        } else {
-          parsed[key] = [value];
-        }
+        if (parsed[key]) parsed[key].push(value);
+        else parsed[key] = [value];
       }
     }
     return parsed;
   }, [searchParams]);
 
-  // Check if any filter params exist in URL (excluding search)
   const hasFilterParams = useMemo(() => {
     for (const [key] of searchParams.entries()) {
-      if (key !== 'search') {
-        return true;
-      }
+      if (key !== 'search') return true;
     }
     return false;
   }, [searchParams]);
 
-  // Tracking
   const track = useTracking();
   const searchTimerRef = useRef(null);
   const resultCountRef = useRef(0);
 
-  // Clean up search debounce timer on unmount
   useEffect(() => () => clearTimeout(searchTimerRef.current), []);
+  useEffect(() => { track('collections_view'); }, [track]);
 
-  // Local state for filter visibility
-  // Default to hidden, but show if URL has filter params
   const [showFilters, setShowFilters] = useState(hasFilterParams);
 
-  // Handle search change
   const handleSearchChange = (query) => {
     setSearchQuery(query);
-
-    // Update URL params
     const newParams = new URLSearchParams(searchParams);
-    if (query) {
-      newParams.set('search', query);
-    } else {
-      newParams.delete('search');
-    }
+    if (query) newParams.set('search', query);
+    else newParams.delete('search');
     setSearchParams(newParams);
 
-    // Debounced search tracking (500ms)
     clearTimeout(searchTimerRef.current);
     if (query) {
       searchTimerRef.current = setTimeout(() => {
-        track('search', {
-          search_query: query,
-          result_count: resultCountRef.current,
-          scope: 'software'
-        });
+        track('search', { search_query: query, result_count: resultCountRef.current, scope: 'collections' });
       }, 500);
     }
   };
 
-  // Handle filter change
   const handleFilterChange = useCallback((newFilters) => {
     // Diff old vs new filters for tracking
     const oldHadValues = Object.values(filters).some(v => v.length > 0);
@@ -141,10 +105,8 @@ export default function SoftwareHome() {
     setSearchParams(newParams);
   }, [filters, searchQuery, setSearchParams, track]);
 
-  // Apply search and filters via the unified hook.
-  // The hook reads software[].apps[] which the static cache now nests inline.
-  const filteredSoftware = useBrowseFilters(software, {
-    kind: 'software',
+  const filteredCollections = useBrowseFilters(collections, {
+    kind: 'collection',
     searchQuery,
     filters: {
       topics: filters.topics || [],
@@ -152,56 +114,22 @@ export default function SoftwareHome() {
       tags: filters.tags || [],
       organizations: filters.organizations || [],
     },
-    // Pass the Collection list so the org filter can join through
-    // app.collectionId → Collection's organization (per spec §4 —
-    // Collections are the authoritative org-bearer).
-    collections,
   });
+  resultCountRef.current = filteredCollections.length;
 
-  // Keep result count ref in sync for debounced search tracking
-  resultCountRef.current = filteredSoftware.length;
-
-  // Show error state
-  if (error) {
-    return <ErrorMessage error={error} onRetry={refetch} />;
-  }
+  if (error) return <ErrorMessage error={error} onRetry={refetch} />;
 
   return (
     <div className="mb-4 bg-white">
-      {/* Header section */}
       <div className="mx-6 mt-6 mb-4">
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
-          <div className="flex-1">
-            <h2 className="text-3xl font-serif font-bold text-appverse-black mb-2">
-              The Appverse has launched.
-            </h2>
-          {/*  <p className="text-base font-sans text-appverse-black max-w-2xl">
-              The Open OnDemand Appverse is a community-driven catalog of scientific software, interactive applications, dashboards, and widgets with shared deployment configurations that HPC centers can use to extend their Open OnDemand portals.
-            </p> */}
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-            <a
-              href="https://openondemand.connectci.org/appverse-contributor-documentation#9-support"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto text-center lg:flex-shrink-0 py-3 px-6 border-2 border-appverse-red text-appverse-red font-sans font-semibold rounded-appverse hover:bg-appverse-red hover:text-white transition-colors"
-            >
-              App Support
-            </a>
-            <a
-              href="/node/add/appverse_app"
-              className="w-full sm:w-auto text-center lg:flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
-            >
-              Add an app
-            </a>
-          </div>
-        </div>
+        <h2 className="text-3xl font-serif font-bold text-appverse-black mb-2">Collections</h2>
+        <p className="text-base font-sans text-appverse-black max-w-2xl">
+          Browse Appverse apps by their source repository. Each Collection groups apps that ship together from one place.
+        </p>
       </div>
 
-      {/* Search and filter toggle section */}
       <div className="mx-6 my-6 bg-appverse-black px-4 py-3 rounded-appverse">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          {/* Toggle filters button */}
           <button
             onClick={() => {
               track('filter_toggle', { action: showFilters ? 'close' : 'open' });
@@ -209,29 +137,16 @@ export default function SoftwareHome() {
             }}
             className="flex items-center gap-2 text-white font-sans font-medium hover:opacity-80 transition-opacity"
           >
-            {showFilters ? (
-              <ChevronLeft className="w-4 h-4" />
-            ) : (
-              <ChevronRight className="w-4 h-4" />
-            )}
+            {showFilters ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
-
-          {/* Browse tabs */}
           <BrowseTabs />
-
-          {/* Search bar */}
           <div className="w-80">
-            <SearchBar
-              value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder="Search for apps"
-            />
+            <SearchBar value={searchQuery} onChange={handleSearchChange} placeholder="Search Collections" />
           </div>
         </div>
       </div>
 
-      {/* Mobile filter drawer */}
       <FilterDrawer
         isOpen={showFilters}
         onClose={() => setShowFilters(false)}
@@ -240,10 +155,8 @@ export default function SoftwareHome() {
         filterOptions={filterOptions}
       />
 
-      {/* Main content: Sidebar + Grid */}
       <div className="mx-6 mb-6">
         <div className="flex gap-8">
-          {/* Filter sidebar - desktop only (hidden on mobile, drawer handles it) */}
           {showFilters && (
             <div className="hidden lg:block">
               <FilterSidebar
@@ -253,14 +166,8 @@ export default function SoftwareHome() {
               />
             </div>
           )}
-
-          {/* Software grid */}
           <div className="flex-1 min-w-0">
-            {/* Grid */}
-            <SoftwareGrid
-              software={filteredSoftware}
-              loading={loading}
-            />
+            <CollectionGrid collections={filteredCollections} loading={loading} />
           </div>
         </div>
       </div>
