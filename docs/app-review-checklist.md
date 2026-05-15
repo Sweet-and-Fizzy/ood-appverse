@@ -135,6 +135,10 @@ These are evaluated on a scale. An app doesn't need to be perfect, but the more 
 
 ## Review Process
 
+### Where to Find Pending Submissions
+
+Apps awaiting review appear in the Manage Appverse Apps view in Drupal: [openondemand.connectci.org/appverse/manage-apps](https://openondemand.connectci.org/appverse/manage-apps). The view shows the submitter's name and email so you can follow up with questions, the moderation state, and a link to edit the app node.
+
 ### Step 1: Quick Scan (5 minutes)
 
 1. Open the repository
