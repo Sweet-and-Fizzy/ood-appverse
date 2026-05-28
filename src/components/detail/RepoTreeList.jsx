@@ -1,10 +1,10 @@
 import AppRow from './AppRow';
-import CollectionMainRepoCard from './CollectionMainRepoCard';
+import RepoMainCard from './RepoMainCard';
 
 /**
- * CollectionTreeList
+ * RepoTreeList
  *
- * Renders the Main Repo card at the top of a Collection detail page with a
+ * Renders the Main Repo card at the top of a Repo detail page with a
  * CSS-only tree connector descending into each member AppRow.
  *
  * AppRow expects `app`, `isExpanded`, and `onToggle`. Since `isExpanded` and
@@ -13,15 +13,15 @@ import CollectionMainRepoCard from './CollectionMainRepoCard';
  * `AppList` — and we'll wire them per AppRow.
  *
  * Props:
- * @param {Object} collection - Collection with `repoUrl`, `maintainer`, and `apps`
+ * @param {Object} repo - Repo with `repoUrl`, `maintainer`, and `apps`
  * @param {string} expandedAppId - ID of the currently expanded app (or null)
  * @param {Function} onToggleApp - Callback invoked with appId when an app is toggled
  */
-export default function CollectionTreeList({ collection, expandedAppId, onToggleApp }) {
-  const apps = collection.apps || [];
+export default function RepoTreeList({ repo, expandedAppId, onToggleApp }) {
+  const apps = repo.apps || [];
   return (
     <div className="relative">
-      <CollectionMainRepoCard collection={collection} />
+      <RepoMainCard repo={repo} />
 
       {apps.length > 0 && (
         <div className="ml-6 mt-0">

@@ -15,10 +15,10 @@ export default function ClassroomsPlaceholder() {
 
       <div className="mx-6 mb-12 mt-12 text-center">
         <p className="text-lg font-sans text-appverse-black mb-4">
-          Curated app collections for teaching are coming soon.
+          Curated app repos for teaching are coming soon.
         </p>
         <p className="text-base font-sans text-appverse-black">
-          In the meantime, explore <a href="#/" className="text-appverse-red hover:underline">Software</a> or <a href="#/collections" className="text-appverse-red hover:underline">Collections</a>.
+          In the meantime, explore <a href="#/" className="text-appverse-red hover:underline">Software</a> or <a href="#/repos" className="text-appverse-red hover:underline">Repos</a>.
         </p>
       </div>
     </div>

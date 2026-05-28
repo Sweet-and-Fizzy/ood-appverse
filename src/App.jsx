@@ -8,8 +8,8 @@ import { FlagProvider } from './contexts/FlagContext'
 import { usePageTracking } from './hooks/usePageTracking'
 import SoftwareHome from './pages/SoftwareHome'
 import SoftwareDetail from './pages/SoftwareDetail'
-import CollectionsHome from './pages/CollectionsHome'
-import CollectionDetail from './pages/CollectionDetail'
+import ReposHome from './pages/ReposHome'
+import RepoDetail from './pages/RepoDetail'
 import BundlesPlaceholder from './pages/BundlesPlaceholder'
 import ClassroomsPlaceholder from './pages/ClassroomsPlaceholder'
 
@@ -34,10 +34,10 @@ export default function App() {
         <div className="appverse-container">
           <Routes>
             <Route path="/" element={<SoftwareHome />} />
-            <Route path="/collections" element={<CollectionsHome />} />
+            <Route path="/repos" element={<ReposHome />} />
             <Route path="/bundles" element={<BundlesPlaceholder />} />
             <Route path="/for-classrooms" element={<ClassroomsPlaceholder />} />
-            <Route path="/collection/:slug" element={<CollectionDetail />} />
+            <Route path="/repo/:slug" element={<RepoDetail />} />
             {/* Slug route: /gimp → looks up "gimp" in slugMap */}
             <Route path="/:slug" element={<SoftwareDetail />} />
             {/* Legacy route redirects: /appverse/* → /* */}

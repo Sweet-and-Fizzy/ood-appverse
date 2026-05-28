@@ -8,11 +8,11 @@ import BrowseTabs from '../components/common/BrowseTabs';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
 import FilterDrawer from '../components/home/FilterDrawer';
-import CollectionGrid from '../components/home/CollectionGrid';
+import RepoGrid from '../components/home/RepoGrid';
 import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
-export default function CollectionsHome() {
-  const { collections, filterOptions, loading, error, refetch } = useAppverseData();
+export default function ReposHome() {
+  const { repos, filterOptions, loading, error, refetch } = useAppverseData();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
@@ -40,7 +40,7 @@ export default function CollectionsHome() {
   const resultCountRef = useRef(0);
 
   useEffect(() => () => clearTimeout(searchTimerRef.current), []);
-  useEffect(() => { track('collections_view'); }, [track]);
+  useEffect(() => { track('repos_view'); }, [track]);
 
   const [showFilters, setShowFilters] = useState(hasFilterParams);
 
@@ -54,7 +54,7 @@ export default function CollectionsHome() {
     clearTimeout(searchTimerRef.current);
     if (query) {
       searchTimerRef.current = setTimeout(() => {
-        track('search', { search_query: query, result_count: resultCountRef.current, scope: 'collections' });
+        track('search', { search_query: query, result_count: resultCountRef.current, scope: 'repos' });
       }, 500);
     }
   };
@@ -105,8 +105,8 @@ export default function CollectionsHome() {
     setSearchParams(newParams);
   }, [filters, searchQuery, setSearchParams, track]);
 
-  const filteredCollections = useBrowseFilters(collections, {
-    kind: 'collection',
+  const filteredRepos = useBrowseFilters(repos, {
+    kind: 'repo',
     searchQuery,
     filters: {
       topics: filters.topics || [],
@@ -115,16 +115,16 @@ export default function CollectionsHome() {
       organizations: filters.organizations || [],
     },
   });
-  resultCountRef.current = filteredCollections.length;
+  resultCountRef.current = filteredRepos.length;
 
   if (error) return <ErrorMessage error={error} onRetry={refetch} />;
 
   return (
     <div className="mb-4 bg-white">
       <div className="mx-6 mt-6 mb-4">
-        <h2 className="text-3xl font-serif font-bold text-appverse-black mb-2">Collections</h2>
+        <h2 className="text-3xl font-serif font-bold text-appverse-black mb-2">Repos</h2>
         <p className="text-base font-sans text-appverse-black max-w-2xl">
-          Browse Appverse apps by their source repository. Each Collection groups apps that ship together from one place.
+          Browse Appverse apps by their source repository. Each Repo groups apps that ship together from one place.
         </p>
       </div>
 
@@ -142,7 +142,7 @@ export default function CollectionsHome() {
           </button>
           <BrowseTabs />
           <div className="w-80">
-            <SearchBar value={searchQuery} onChange={handleSearchChange} placeholder="Search Collections" />
+            <SearchBar value={searchQuery} onChange={handleSearchChange} placeholder="Search Repos" />
           </div>
         </div>
       </div>
@@ -167,7 +167,7 @@ export default function CollectionsHome() {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <CollectionGrid collections={filteredCollections} loading={loading} />
+            <RepoGrid repos={filteredRepos} loading={loading} />
           </div>
         </div>
       </div>

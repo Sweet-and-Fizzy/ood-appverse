@@ -18,7 +18,7 @@ export default function BundlesPlaceholder() {
           Curator-recommended app groupings are coming soon.
         </p>
         <p className="text-base font-sans text-appverse-black">
-          In the meantime, explore <a href="#/" className="text-appverse-red hover:underline">Software</a> or <a href="#/collections" className="text-appverse-red hover:underline">Collections</a>.
+          In the meantime, explore <a href="#/" className="text-appverse-red hover:underline">Software</a> or <a href="#/repos" className="text-appverse-red hover:underline">Repos</a>.
         </p>
       </div>
     </div>

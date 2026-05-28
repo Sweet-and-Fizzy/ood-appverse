@@ -4,19 +4,19 @@ import MarkdownRenderer from '../common/MarkdownRenderer';
 import OrgLink from '../common/OrgLink';
 import { useTracking } from '../../hooks/useTracking';
 
-export default function CollectionMainRepoCard({ collection }) {
+export default function RepoMainCard({ repo }) {
   const track = useTracking();
   const [isReadmeExpanded, setReadmeExpanded] = useState(false);
   const readmeRef = useRef(null);
   const [readmeHeight, setReadmeHeight] = useState(0);
 
-  const repoUrl = collection.repoUrl;
-  const readme = collection.readme;
-  const stars = typeof collection.stars === 'number' ? collection.stars : null;
-  const lastUpdated = collection.lastUpdated;
-  const orgName = collection.organization?.name;
-  const maintainerName = collection.maintainer?.name;
-  const tags = collection.tags || [];
+  const repoUrl = repo.repoUrl;
+  const readme = repo.readme;
+  const stars = typeof repo.stars === 'number' ? repo.stars : null;
+  const lastUpdated = repo.lastUpdated;
+  const orgName = repo.organization?.name;
+  const maintainerName = repo.maintainer?.name;
+  const tags = repo.tags || [];
 
   // field_appverse_lastupdated is a Unix timestamp in SECONDS; JS needs ms.
   const formattedDate = lastUpdated
@@ -61,8 +61,8 @@ export default function CollectionMainRepoCard({ collection }) {
               <button
                 onClick={() => {
                   track('readme_toggle', {
-                    scope: 'collection',
-                    collection_slug: collection.slug,
+                    scope: 'repo',
+                    repo_slug: repo.slug,
                     action: isReadmeExpanded ? 'collapse' : 'expand',
                   });
                   setReadmeExpanded(!isReadmeExpanded);
@@ -84,7 +84,7 @@ export default function CollectionMainRepoCard({ collection }) {
             )}
           </div>
 
-          {/* Middle: Collection-level tag chips */}
+          {/* Middle: Repo-level tag chips */}
           {tags.length > 0 && (
             <div className="w-[180px] flex-shrink-0 flex flex-wrap gap-2 items-start">
               {tags.map((tag) => (
@@ -107,8 +107,8 @@ export default function CollectionMainRepoCard({ collection }) {
                 rel="noopener noreferrer"
                 onClick={() =>
                   track('view_repo', {
-                    scope: 'collection',
-                    collection_slug: collection.slug,
+                    scope: 'repo',
+                    repo_slug: repo.slug,
                     github_url: repoUrl,
                   })
                 }

@@ -17,7 +17,7 @@ const APP_DETAIL_FIELDS = [
 
 /**
  * Fetch all appverse data from the static JSON cache.
- * Returns software (with nested apps), collections, and filter options.
+ * Returns software (with nested apps), repos, and filter options.
  */
 export async function fetchStaticCache(config = {}) {
   const siteBaseUrl = config.siteBaseUrl ?? DEFAULT_SITE_BASE_URL;
@@ -42,10 +42,10 @@ export async function fetchStaticCache(config = {}) {
     appsBySoftwareId[sw.id] = sw.apps || [];
   }
 
-  // Collections come pre-resolved from the cache. Member apps are already
-  // nested inside each collection. No URL transformation needed at this
+  // Repos come pre-resolved from the cache. Member apps are already
+  // nested inside each repo. No URL transformation needed at this
   // level — Task 17/19 will resolve display logo paths if/when added.
-  const collections = (cache.collections || []).map(c => ({
+  const repos = (cache.repos || []).map(c => ({
     ...c,
     apps: (c.apps || []).map(app => ({ ...app })),
   }));
@@ -53,7 +53,7 @@ export async function fetchStaticCache(config = {}) {
   return {
     software,
     appsBySoftwareId,
-    collections,
+    repos,
     filterOptions: {
       topics: cache.filterOptions?.topics || [],
       license: cache.filterOptions?.licenses || cache.filterOptions?.license || [],
@@ -138,13 +138,13 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
 }
 
 /**
- * Fetch apps for a specific collection with taxonomy terms resolved.
- * Mirrors fetchAppsBySoftware — used by CollectionDetail to get full per-app
+ * Fetch apps for a specific repo with taxonomy terms resolved.
+ * Mirrors fetchAppsBySoftware — used by RepoDetail to get full per-app
  * data (README, organization, license) that isn't in the static cache.
  */
-export async function fetchAppsByCollection(collectionId, config = {}) {
+export async function fetchAppsByRepo(repoId, config = {}) {
   const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
-  const url = `${apiBaseUrl}/node/appverse_app?filter[field_appverse_collection.id]=${collectionId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
+  const url = `${apiBaseUrl}/node/appverse_app?filter[field_appverse_repo.id]=${repoId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
 
   try {
     const response = await fetch(url);
@@ -206,7 +206,7 @@ export async function fetchAppsByCollection(collectionId, config = {}) {
     });
 
   } catch (error) {
-    console.error('Error fetching apps by collection:', error);
+    console.error('Error fetching apps by repo:', error);
     throw error;
   }
 }

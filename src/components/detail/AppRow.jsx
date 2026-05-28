@@ -19,13 +19,13 @@ import { useAppverseData } from '../../hooks/useAppverseData';
 
 export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = false }) {
   const { getFlagCountAdjustment } = useFlag();
-  const { collections } = useAppverseData();
+  const { repos } = useAppverseData();
   const track = useTracking();
 
-  // Resolve the parent Collection for the "Part of X Collection" link
-  // (cache stores collectionId/collectionTitle; slug requires runtime lookup)
-  const parentCollection = app.collectionId
-    ? collections.find((c) => c.id === app.collectionId)
+  // Resolve the parent Repo for the "Part of X Repo" link
+  // (cache stores repoId/repoTitle; slug requires runtime lookup)
+  const parentRepo = app.repoId
+    ? repos.find((c) => c.id === app.repoId)
     : null;
 
   const title = app.title || 'Untitled App';
@@ -241,16 +241,16 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
         </div>
       </div>
 
-      {/* Expansion metadata - "Part of X Collection" link */}
-      {isExpanded && parentCollection && (
+      {/* Expansion metadata - "Part of X Repo" link */}
+      {isExpanded && parentRepo && (
         <div className="border-t border-appverse-gray !px-5 !py-3 bg-white">
           <p className="text-sm font-sans text-appverse-black mt-2">
             Part of{' '}
             <Link
-              to={`/collection/${parentCollection.slug}`}
+              to={`/repo/${parentRepo.slug}`}
               className="text-appverse-red hover:underline"
             >
-              {parentCollection.title} Collection
+              {parentRepo.title} Repo
             </Link>
           </p>
         </div>

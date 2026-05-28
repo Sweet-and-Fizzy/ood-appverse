@@ -17,7 +17,7 @@ import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
 export default function SoftwareHome() {
   // Get data from context
-  const { software, collections, filterOptions, loading, error, refetch } = useAppverseData();
+  const { software, repos, filterOptions, loading, error, refetch } = useAppverseData();
 
   // Debug: Log render timing
   // console.log('[SoftwareHome] Render - loading:', loading, '| software count:', software?.length ?? 0);
@@ -152,10 +152,10 @@ export default function SoftwareHome() {
       tags: filters.tags || [],
       organizations: filters.organizations || [],
     },
-    // Pass the Collection list so the org filter can join through
-    // app.collectionId → Collection's organization (per spec §4 —
-    // Collections are the authoritative org-bearer).
-    collections,
+    // Pass the Repo list so the org filter can join through
+    // app.repoId → Repo's organization (per spec §4 —
+    // Repos are the authoritative org-bearer).
+    repos,
   });
 
   // Keep result count ref in sync for debounced search tracking

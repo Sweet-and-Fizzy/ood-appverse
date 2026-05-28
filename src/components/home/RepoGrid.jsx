@@ -1,15 +1,15 @@
 /**
- * CollectionGrid Component
- * Displays a grid of Collection tiles with skeleton loading and empty state.
+ * RepoGrid Component
+ * Displays a grid of Repo tiles with skeleton loading and empty state.
  *
  * Props:
- * @param {Array} collections - Array of Collection items to display
+ * @param {Array} repos - Array of Repo items to display
  * @param {boolean} loading - Whether data is still loading
  */
-import CollectionTile from './CollectionTile';
+import RepoTile from './RepoTile';
 import SkeletonTile from './SkeletonTile';
 
-export default function CollectionGrid({ collections, loading }) {
+export default function RepoGrid({ repos, loading }) {
   if (loading) {
     return (
       <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(199px, 1fr))' }}>
@@ -17,16 +17,16 @@ export default function CollectionGrid({ collections, loading }) {
       </div>
     );
   }
-  if (!collections || collections.length === 0) {
+  if (!repos || repos.length === 0) {
     return (
       <div className="text-center py-12 text-appverse-black font-sans">
-        No collections match your filters.
+        No repos match your filters.
       </div>
     );
   }
   return (
     <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(199px, 1fr))' }}>
-      {collections.map(c => <CollectionTile key={c.id} collection={c} />)}
+      {repos.map(c => <RepoTile key={c.id} repo={c} />)}
     </div>
   );
 }

@@ -1,12 +1,12 @@
 /**
  * AppverseDataContext
  *
- * Provides global data for software, apps, and collections throughout the
+ * Provides global data for software, apps, and repos throughout the
  * application. Fetches from static JSON cache on mount.
  *
  * Usage:
  *   import { useAppverseData } from '../hooks/useAppverseData'
- *   const { software, collections, appsBySoftwareId, loading, error } = useAppverseData()
+ *   const { software, repos, appsBySoftwareId, loading, error } = useAppverseData()
  */
 import { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { fetchStaticCache } from '../utils/api';
@@ -20,7 +20,7 @@ export function AppverseDataProvider({ children }) {
   const [data, setData] = useState({
     software: [],
     appsBySoftwareId: {},
-    collections: [],
+    repos: [],
     filterOptions: { tags: [], appType: [], topics: [], license: [], organizations: [] },
     loading: true,
     error: null
@@ -30,11 +30,11 @@ export function AppverseDataProvider({ children }) {
     setData(prev => ({ ...prev, loading: true, error: null }));
 
     fetchStaticCache(config)
-      .then(({ software, appsBySoftwareId, collections, filterOptions }) => {
+      .then(({ software, appsBySoftwareId, repos, filterOptions }) => {
         setData({
           software,
           appsBySoftwareId,
-          collections,
+          repos,
           filterOptions,
           loading: false,
           error: null,
@@ -67,20 +67,20 @@ export function AppverseDataProvider({ children }) {
     return map;
   }, [data.software]);
 
-  // Collection slug map: prefer server-provided `slug` (from pathauto in
+  // Repo slug map: prefer server-provided `slug` (from pathauto in
   // Drupal), fall back to slugify(title) defensively for items that
   // somehow lack a slug.
-  const collectionSlugMap = useMemo(() => {
+  const repoSlugMap = useMemo(() => {
     const map = {};
-    for (const c of data.collections) {
+    for (const c of data.repos) {
       const key = c.slug || (c.title ? slugify(c.title) : null);
       if (key) map[key] = c;
     }
     return map;
-  }, [data.collections]);
+  }, [data.repos]);
 
   const getSoftwareBySlug = useCallback((slug) => softwareSlugMap[slug] || null, [softwareSlugMap]);
-  const getCollectionBySlug = useCallback((slug) => collectionSlugMap[slug] || null, [collectionSlugMap]);
+  const getRepoBySlug = useCallback((slug) => repoSlugMap[slug] || null, [repoSlugMap]);
 
   // Backward-compatible alias.
   const slugMap = softwareSlugMap;
@@ -89,9 +89,9 @@ export function AppverseDataProvider({ children }) {
     ...data,
     slugMap,
     softwareSlugMap,
-    collectionSlugMap,
+    repoSlugMap,
     getSoftwareBySlug,
-    getCollectionBySlug,
+    getRepoBySlug,
     refetch: fetchData,
   };
 

@@ -4,14 +4,14 @@ import { useTracking } from '../../hooks/useTracking';
 const TABS = [
   { key: 'software', label: 'Software', to: '/' },
   { key: 'bundles', label: 'Bundles', to: '/bundles' },
-  { key: 'collections', label: 'Collections', to: '/collections' },
+  { key: 'repos', label: 'Repos', to: '/repos' },
   { key: 'classrooms', label: 'For Classrooms', to: '/for-classrooms' },
 ];
 
 function activeKey(pathname) {
   if (pathname === '/' || pathname === '') return 'software';
   if (pathname.startsWith('/bundles') || pathname.startsWith('/bundle/')) return 'bundles';
-  if (pathname.startsWith('/collections') || pathname.startsWith('/collection/')) return 'collections';
+  if (pathname.startsWith('/repos') || pathname.startsWith('/repo/')) return 'repos';
   if (pathname.startsWith('/for-classrooms')) return 'classrooms';
   // Anything else (e.g., /:slug software detail) is treated as software-context.
   return 'software';

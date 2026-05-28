@@ -1,5 +1,5 @@
 /**
- * CollectionIcon — the official monorepo icon supplied by design.
+ * RepoIcon — the official monorepo icon supplied by design.
  * Top bar (blue, narrower) sits flush left; three wider bars below
  * (magenta, green, purple) extend further right; a single vertical
  * trunk on the left descends through the lower three bars.
@@ -11,7 +11,7 @@
  * roughly square (59x55); rendering at equal width/height matches the
  * design mockup.
  */
-export default function CollectionIcon({ size = 60, className = '' }) {
+export default function RepoIcon({ size = 60, className = '' }) {
   return (
     <svg
       width={size}
