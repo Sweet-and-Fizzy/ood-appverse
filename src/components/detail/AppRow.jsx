@@ -10,6 +10,8 @@
 import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import OrgLink from '../common/OrgLink';
+import { slugify } from '../../utils/slugify';
+import { repoLabel } from '../../utils/repoLabel';
 import { ChevronRight, People, StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import FlagButton from '../common/FlagButton';
@@ -19,13 +21,18 @@ import { useAppverseData } from '../../hooks/useAppverseData';
 
 export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = false }) {
   const { getFlagCountAdjustment } = useFlag();
-  const { repos } = useAppverseData();
+  const { repos, software } = useAppverseData();
   const track = useTracking();
 
   // Resolve the parent Repo for the "Part of X Repo" link
   // (cache stores repoId/repoTitle; slug requires runtime lookup)
   const parentRepo = app.repoId
     ? repos.find((c) => c.id === app.repoId)
+    : null;
+
+  // Resolve the software this app implements, for the logo + Software detail link.
+  const implementedSoftware = app.softwareId
+    ? (software || []).find((s) => s.id === app.softwareId)
     : null;
 
   const title = app.title || 'Untitled App';
@@ -122,6 +129,27 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
     </button>
   );
 
+  const SoftwareLink = () => implementedSoftware && (
+    <Link
+      to={`/${slugify(implementedSoftware.title)}`}
+      onClick={() => track('software_click_from_app', {
+        app_title: title,
+        software_title: implementedSoftware.title,
+      })}
+      className="inline-flex items-center gap-1.5 text-sm font-sans text-appverse-black hover:text-gray-600 transition-colors"
+    >
+      {implementedSoftware.logoUrl && (
+        <img
+          src={implementedSoftware.logoUrl}
+          alt=""
+          className="h-4 w-4 object-contain"
+          loading="lazy"
+        />
+      )}
+      <span>{implementedSoftware.title}</span>
+    </Link>
+  );
+
   const TagList = () => tags.length > 0 && (
     <div className="flex flex-wrap gap-2">
       {tags.map((tag) => (
@@ -141,11 +169,16 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
       <div className="!p-5">
         {/* Desktop layout - 3 column (hidden on mobile) */}
         <div className="hidden md:flex md:gap-6">
-          {/* Left column: title, org, show readme */}
+          {/* Left column: title, software, org, show readme */}
           <div className="flex-1 min-w-0 flex flex-col">
             <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
               {title}
             </h3>
+            {hideRepoLevel && implementedSoftware && (
+              <div className="mb-1">
+                <SoftwareLink />
+              </div>
+            )}
             {!hideRepoLevel && organization && (
               <p className="text-sm font-sans text-appverse-black">
                 <OrgLink name={organization.name} />
@@ -197,6 +230,11 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
               <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
                 {title}
               </h3>
+              {hideRepoLevel && implementedSoftware && (
+                <div className="mb-2">
+                  <SoftwareLink />
+                </div>
+              )}
               {!hideRepoLevel && organization && (
                 <p className="text-sm font-sans text-appverse-black mb-2">
                   <OrgLink name={organization.name} />
@@ -241,8 +279,11 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
         </div>
       </div>
 
-      {/* Expansion metadata - "Part of X Repo" link */}
-      {isExpanded && parentRepo && (
+      {/* Expansion metadata - "Part of X Repo" link.
+          Only shown on Software detail (hideRepoLevel=false); on the Repo
+          detail page the user is already viewing the parent, so the line
+          is redundant. */}
+      {isExpanded && parentRepo && !hideRepoLevel && (
         <div className="border-t border-appverse-gray !px-5 !py-3 bg-white">
           <p className="text-sm font-sans text-appverse-black mt-2">
             Part of{' '}
@@ -250,7 +291,7 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
               to={`/repo/${parentRepo.slug}`}
               className="text-appverse-red hover:underline"
             >
-              {parentRepo.title} Repo
+              {parentRepo.title} {repoLabel(parentRepo)}
             </Link>
           </p>
         </div>
