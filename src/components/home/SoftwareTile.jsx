@@ -72,7 +72,7 @@ export default function SoftwareTile({ software }) {
             onClick={appCount === 0 ? (e) => {
               e.preventDefault();
               e.stopPropagation();
-              window.location.href = '/node/add/appverse_app';
+              window.location.href = '/appverse/add-repo';
             } : undefined}
             className={`inline-flex items-center gap-1.5 text-base font-medium ${
               appCount === 0 ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''

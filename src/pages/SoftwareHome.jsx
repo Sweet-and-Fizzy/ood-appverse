@@ -189,7 +189,7 @@ export default function SoftwareHome() {
               App Support
             </a>
             <a
-              href="/node/add/appverse_app"
+              href="/appverse/add-repo"
               className="w-full sm:w-auto text-center lg:flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
             >
               Add an app

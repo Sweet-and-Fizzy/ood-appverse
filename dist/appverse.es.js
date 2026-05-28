@@ -14024,7 +14024,7 @@ function Vk({ software: e }) {
           {
             role: o === 0 ? "button" : void 0,
             onClick: o === 0 ? (f) => {
-              f.preventDefault(), f.stopPropagation(), window.location.href = "/node/add/appverse_app";
+              f.preventDefault(), f.stopPropagation(), window.location.href = "/appverse/add-repo";
             } : void 0,
             className: `inline-flex items-center gap-1.5 text-base font-medium ${o === 0 ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`,
             children: [
@@ -14158,7 +14158,7 @@ function Zk() {
         /* @__PURE__ */ _.jsx(
           "a",
           {
-            href: "/node/add/appverse_app",
+            href: "/appverse/add-repo",
             className: "w-full sm:w-auto text-center lg:flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors",
             children: "Add an app"
           }
@@ -51943,7 +51943,7 @@ function UB() {
         /* @__PURE__ */ _.jsx(
           "a",
           {
-            href: "/node/add/appverse_app",
+            href: "/appverse/add-repo",
             className: "py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors",
             children: "Add an app"
           }
