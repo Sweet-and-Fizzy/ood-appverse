@@ -30,6 +30,12 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
     ? repos.find((c) => c.id === app.repoId)
     : null;
 
+  // Show a Monorepo affiliation under the title in the software listing.
+  // Only for multi-app repos (repoLabel returns 'Monorepo'); single-app
+  // repos get no line. Suppressed on the Repo detail page (hideRepoLevel),
+  // where the parent is already the page context.
+  const isMonorepo = parentRepo && repoLabel(parentRepo) === 'Monorepo';
+
   // Resolve the software this app implements, for the logo + Software detail link.
   const implementedSoftware = app.softwareId
     ? (software || []).find((s) => s.id === app.softwareId)
@@ -184,6 +190,14 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
                 <OrgLink name={organization.name} />
               </p>
             )}
+            {!hideRepoLevel && isMonorepo && (
+              <p className="text-sm font-sans text-appverse-black">
+                Part of{' '}
+                <Link to={`/repo/${parentRepo.slug}`} className="text-appverse-red hover:underline">
+                  {parentRepo.title} Monorepo
+                </Link>
+              </p>
+            )}
             {hideRepoLevel && maintainerName && (
               <p className="flex items-center gap-1 text-sm font-sans text-appverse-black">
                 <People className="w-3.5 h-3.5" />
@@ -238,6 +252,14 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
               {!hideRepoLevel && organization && (
                 <p className="text-sm font-sans text-appverse-black mb-2">
                   <OrgLink name={organization.name} />
+                </p>
+              )}
+              {!hideRepoLevel && isMonorepo && (
+                <p className="text-sm font-sans text-appverse-black mb-2">
+                  Part of{' '}
+                  <Link to={`/repo/${parentRepo.slug}`} className="text-appverse-red hover:underline">
+                    {parentRepo.title} Monorepo
+                  </Link>
                 </p>
               )}
               {hideRepoLevel && maintainerName && (
