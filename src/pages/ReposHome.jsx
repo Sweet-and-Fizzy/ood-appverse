@@ -115,6 +115,8 @@ export default function ReposHome() {
       organizations: filters.organizations || [],
     },
   });
+  // Monorepos display: only repos with more than one app. Single-app repos stay in the cache for other consumers (RepoDetail, AppRow), so this filter is display-only here.
+  const monorepos = filteredRepos.filter((r) => (r.apps?.length ?? 0) > 1);
   resultCountRef.current = filteredRepos.length;
 
   if (error) return <ErrorMessage error={error} onRetry={refetch} />;
@@ -122,9 +124,9 @@ export default function ReposHome() {
   return (
     <div className="mb-4 bg-white">
       <div className="mx-6 mt-6 mb-4">
-        <h2 className="text-3xl font-serif font-bold text-appverse-black mb-2">Repos</h2>
+        <h2 className="text-3xl font-serif font-bold text-appverse-black mb-2">Monorepos</h2>
         <p className="text-base font-sans text-appverse-black max-w-2xl">
-          Browse Appverse apps by their source repository. Each Repo groups apps that ship together from one place.
+          Browse Appverse apps grouped into Monorepos — source repositories that ship more than one app from one place.
         </p>
       </div>
 
@@ -142,7 +144,7 @@ export default function ReposHome() {
           </button>
           <BrowseTabs />
           <div className="w-80">
-            <SearchBar value={searchQuery} onChange={handleSearchChange} placeholder="Search Repos" />
+            <SearchBar value={searchQuery} onChange={handleSearchChange} placeholder="Search Monorepos" />
           </div>
         </div>
       </div>
@@ -167,7 +169,7 @@ export default function ReposHome() {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <RepoGrid repos={filteredRepos} loading={loading} />
+            <RepoGrid repos={monorepos} loading={loading} />
           </div>
         </div>
       </div>

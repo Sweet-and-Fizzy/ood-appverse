@@ -20,7 +20,7 @@ export default function RepoGrid({ repos, loading }) {
   if (!repos || repos.length === 0) {
     return (
       <div className="text-center py-12 text-appverse-black font-sans">
-        No repos match your filters.
+        No monorepos match your filters.
       </div>
     );
   }

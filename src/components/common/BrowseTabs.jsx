@@ -4,7 +4,7 @@ import { useTracking } from '../../hooks/useTracking';
 const TABS = [
   { key: 'software', label: 'Software', to: '/' },
   { key: 'bundles', label: 'Bundles', to: '/bundles' },
-  { key: 'repos', label: 'Repos', to: '/repos' },
+  { key: 'repos', label: 'Monorepos', to: '/repos' },
   { key: 'classrooms', label: 'For Classrooms', to: '/for-classrooms' },
 ];
 
