@@ -18,14 +18,16 @@ This guide is for developers, HPC admins, and anyone who wants to contribute or 
 
 ## 2. App Types
 
-| Type | Description |
-|------|-------------|
-| **Batch Connect - Basic** | Interactive jobs that run an HTTP server on a compute node (Jupyter, RStudio, etc.) — set `template: "basic"` in `submit.yml.erb` |
-| **Batch Connect - VNC** | Interactive jobs that run a VNC desktop on a compute node (MATLAB, Abaqus, remote desktops) — set `template: "vnc"` in `submit.yml.erb` |
-| **Batch Connect - VNC Container** | Same as VNC but runs inside a container, for sites that don't install X11/XFCE on compute nodes — set `template: "vnc_container"` |
-| **Passenger** | Web apps served via Open OnDemand (Ruby Rack, Python WSGI, or Node.js) |
-| **Widgets** | Small UI components embedded in dashboards |
-| **Dashboards** | Structured user interfaces (e.g., classroom portals, monitoring panels, etc.) |
+Set one of these as your app's `app_type` in `appverse.yml`. The value must
+match exactly (case-insensitive, but keep the hyphens):
+
+| `app_type` value | Description |
+|------------------|-------------|
+| `batch-connect-basic` | Interactive jobs that run an HTTP server on a compute node (Jupyter, RStudio, etc.) — set `template: "basic"` in `submit.yml.erb` |
+| `batch-connect-VNC` | Interactive jobs that run a VNC desktop on a compute node (MATLAB, Abaqus, remote desktops) — set `template: "vnc"` in `submit.yml.erb` |
+| `companion_app` | A Passenger-style web app served via Open OnDemand (Ruby Rack, Python WSGI, or Node.js) |
+| `widgets` | Small UI components embedded in dashboards |
+| `dashboards` | Structured user interfaces (e.g., classroom portals, monitoring panels) |
 
 ## 3. Tags & Discoverability
 
@@ -76,12 +78,16 @@ If the software already has app implementations, consider:
 
 ### High-Level Workflow
 
-1. Prepare your repository with required files and metadata
-2. Create a new App entry linked to the repository in the Appverse
+1. Prepare your repository with the required files and metadata (an
+   `appverse.yml` is the easiest way)
+2. Register it in the Appverse through the add-a-repo form, where you paste your
+   repository URL
 3. Review and validation (see [Reviewer Checklist](https://openondemand.connectci.org/appverse-reviewer-checklist))
 4. Ongoing maintenance
 
-> Currently we support repositories containing single apps. In the future we are considering adding packages of apps that work together; these could be distributed via repositories containing multiple apps.
+> Most repositories contain a single app. A repository can also bundle several
+> related apps that ship together, which the catalog presents as a Monorepo.
+> The next section covers both.
 
 ## 5. Repository Essentials
 
@@ -149,10 +155,10 @@ A single-app repo describes its one app with top-level fields:
 ```yaml
 title: "RStudio Server"
 description: "RStudio Server on HPC via Open OnDemand."
-software: "RStudio"            # must match a Software in the catalog
-app_type: "Batch Connect"      # must match an App Type
+software: "RStudio"               # must match a Software in the catalog
+app_type: "batch-connect-basic"   # must match an App Type (see §2)
 tags:
-  - "GPU-enabled"
+  - "gpu-enabled"                 # must match an implementation tag (see §3)
 maintainer:
   name: "OSC User Support"
   support_url: "https://example.org/support"
@@ -171,7 +177,7 @@ apps:
     name: "Jupyter (Example)"
     description: "Example Jupyter."
     software: "Jupyter"
-    app_type: "Batch Connect"
+    app_type: "batch-connect-basic"
     maintainer:
       name: "Example Team"
       support_url: "https://example.org/support"
@@ -179,7 +185,7 @@ apps:
     name: "RStudio (Example)"
     description: "Example RStudio."
     software: "RStudio"
-    app_type: "Batch Connect"
+    app_type: "batch-connect-basic"
     maintainer:
       name: "Example Team"
       support_url: "https://example.org/support"
@@ -198,9 +204,9 @@ You don't set `organization`, `stars`, last commit, `readme`, or any of the
 sync and validation fields. Appverse fills those in from GitHub.
 
 For the complete field list, including types, defaults, and how values are
-resolved when you declare them in more than one place, see
-[`docs/appverse.yml`](appverse.yml). It's a fully annotated example you can copy
-as a starting point.
+resolved when you declare them in more than one place, see the
+[annotated `appverse.yml` reference](https://github.com/Sweet-and-Fizzy/ood-appverse/blob/main/docs/appverse.yml).
+It's a fully annotated example you can copy as a starting point.
 
 Once you've edited `appverse.yml`, re-sync from the maintenance hub to bring
 your changes into the catalog.

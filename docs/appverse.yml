@@ -85,10 +85,11 @@ software: "RStudio"
 # ("did you mean …?"). It does NOT create new Software — ask an admin if your
 # software isn't in the catalog yet.
 
-app_type: "Batch Connect"
-# REQUIRED. Must match an existing term in the App Type vocabulary
-# (case-insensitive). One value only. Unknown values are rejected with a
-# suggestion. See the contributor guide for the current valid app types.
+app_type: "batch-connect-basic"
+# REQUIRED. Must match an App Type exactly (case-insensitive, but keep the
+# hyphens). One value only. Current values: batch-connect-basic,
+# batch-connect-VNC, companion_app, widgets, dashboards. Unknown values are
+# rejected with a suggestion.
 
 tags:
   - "GPU-enabled"
@@ -150,7 +151,7 @@ docs: "https://example.org/rstudio/docs"
 #     name: "Jupyter (Example)"       # REQUIRED. App display name.
 #     description: "Example Jupyter."  # REQUIRED. App description (markdown ok).
 #     software: "Jupyter"              # Required-for-acceptance. Match catalog Software.
-#     app_type: "Batch Connect"        # REQUIRED. Match App Type vocabulary.
+#     app_type: "batch-connect-basic"  # REQUIRED. Match App Type (see top of file).
 #     tags:                            # Optional. Match implementation-tags vocab.
 #       - "Containerized"
 #     maintainer:
@@ -161,7 +162,7 @@ docs: "https://example.org/rstudio/docs"
 #     name: "RStudio (Example)"
 #     description: "Example RStudio."
 #     software: "RStudio"
-#     app_type: "Batch Connect"
+#     app_type: "batch-connect-basic"
 #     maintainer:
 #       name: "Example Team"
 #       support_url: "https://example.org/support"
