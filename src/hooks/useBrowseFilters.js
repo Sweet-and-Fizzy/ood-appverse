@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { KIND_ACCESSORS } from '../utils/browseKinds';
 
 /**
  * Apply search + filters to a list of items (software, repos, or bundles).
@@ -15,43 +16,51 @@ import { useMemo } from 'react';
  *   org-bearer once they exist).
  * @returns {Array} Filtered, alphabetically sorted items.
  */
-export function useBrowseFilters(items, { kind, searchQuery, filters, repos = [] }) {
-  return useMemo(() => {
-    if (!items || items.length === 0) return [];
-    let working = [...items];
+export function useBrowseFilters(items, { kind, searchQuery, filters, repos = [], software = [] }) {
+  return useMemo(
+    () => applyBrowseFilters(items, { kind, searchQuery, filters, repos, software }),
+    [items, kind, searchQuery, filters, repos, software]
+  );
+}
 
-    if (searchQuery && searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      working = working.filter(item => matchesSearch(item, q, kind));
-    }
+/**
+ * Pure filter transform extracted from the hook so it can be unit-tested
+ * without a React render. Same behavior; the hook just memoizes this.
+ */
+export function applyBrowseFilters(items, { kind, searchQuery, filters, repos = [], software = [] }) {
+  if (!items || items.length === 0) return [];
+  let working = [...items];
 
-    if (filters.topics?.length) {
-      working = working.filter(item => itemMatchesTopics(item, filters.topics, kind));
-    }
-    if (filters.appType?.length) {
-      working = working.filter(item => itemMatchesAppType(item, filters.appType, kind));
-    }
-    if (filters.tags?.length) {
-      working = working.filter(item => itemMatchesTags(item, filters.tags, kind));
-    }
-    if (filters.organizations?.length) {
-      // Build a one-shot index of repoId → organization.name so the
-      // software-kind matcher can join through app.repoId without
-      // doing a linear scan of `repos` for every app.
-      const repoOrgByRepoId = {};
-      for (const c of repos) {
-        if (c?.id && c.organization?.name) {
-          repoOrgByRepoId[c.id] = c.organization.name;
-        }
-      }
-      working = working.filter(item =>
-        itemMatchesOrganization(item, filters.organizations, kind, repoOrgByRepoId)
-      );
-    }
+  if (searchQuery && searchQuery.trim()) {
+    const q = searchQuery.toLowerCase().trim();
+    working = working.filter(item => matchesSearch(item, q, kind));
+  }
 
-    working.sort((a, b) => (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase()));
-    return working;
-  }, [items, kind, searchQuery, filters, repos]);
+  if (filters.topics?.length) {
+    const topicsBySoftwareId = {};
+    for (const sw of software) {
+      if (sw?.id) topicsBySoftwareId[sw.id] = sw.topics || [];
+    }
+    working = working.filter(item => itemMatchesTopics(item, filters.topics, kind, topicsBySoftwareId));
+  }
+  if (filters.appType?.length) {
+    working = working.filter(item => itemMatchesAppType(item, filters.appType, kind));
+  }
+  if (filters.tags?.length) {
+    working = working.filter(item => itemMatchesTags(item, filters.tags, kind));
+  }
+  if (filters.organizations?.length) {
+    const repoOrgByRepoId = {};
+    for (const c of repos) {
+      if (c?.id && c.organization?.name) repoOrgByRepoId[c.id] = c.organization.name;
+    }
+    working = working.filter(item =>
+      itemMatchesOrganization(item, filters.organizations, kind, repoOrgByRepoId)
+    );
+  }
+
+  working.sort((a, b) => (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase()));
+  return working;
 }
 
 function matchesSearch(item, q, kind) {
@@ -95,34 +104,25 @@ function matchesSearch(item, q, kind) {
   return haystack.some(s => s.toLowerCase().includes(q));
 }
 
-function itemMatchesTopics(item, topicNames, kind) {
-  // Topics live on Software at the catalog level. Repos and Bundles do
-  // not carry their own Topics in this spec — they match through their member
-  // apps' parent Software (not yet resolvable client-side without a join).
-  // For phase 1, Topics filter is software-only; Repos/Bundles return
-  // false (empty result) when Topics is the active filter. Documented in the
-  // spec at §2 cross-cutting decisions.
-  if (kind === 'software') {
-    return (item.topics || []).some(t => topicNames.includes(t.name));
+function itemMatchesTopics(item, topicNames, kind, topicsBySoftwareId = {}) {
+  const accessors = KIND_ACCESSORS[kind];
+  if (!accessors) return false;
+  if (accessors.ownTopics(item).some(t => topicNames.includes(t.name))) {
+    return true;
   }
-  return false;
+  return accessors.memberApps(item).some(app => {
+    if (!app.softwareId) return false;
+    const swTopics = topicsBySoftwareId[app.softwareId] || [];
+    return swTopics.some(t => topicNames.includes(t.name));
+  });
 }
 
 function itemMatchesAppType(item, appTypeNames, kind) {
-  if (kind === 'software') {
-    const apps = item.apps || [];
-    return apps.some(app => (app.appTypes || []).some(t => appTypeNames.includes(t.name)));
-  }
-  if (kind === 'repo') {
-    const apps = item.apps || [];
-    return apps.some(app => (app.appTypes || []).some(t => appTypeNames.includes(t.name)));
-  }
-  if (kind === 'bundle') {
-    // Bundles' cached member data doesn't include app type — bundle filter is
-    // a phase 2 concern, not enforced here.
-    return false;
-  }
-  return false;
+  const accessors = KIND_ACCESSORS[kind];
+  if (!accessors) return false;
+  return accessors.memberApps(item).some(app =>
+    (app.appTypes || []).some(t => appTypeNames.includes(t.name))
+  );
 }
 
 function itemMatchesTags(item, tagNames, kind) {
@@ -134,50 +134,29 @@ function itemMatchesTags(item, tagNames, kind) {
 }
 
 function collectAllTagNames(item, kind) {
-  const tags = new Set();
-  if (kind === 'software') {
-    for (const t of (item.tags || [])) tags.add(t.name);
-    for (const app of (item.apps || [])) {
-      for (const t of (app.tags || [])) tags.add(t.name);
-    }
+  const accessors = KIND_ACCESSORS[kind];
+  const names = new Set();
+  if (!accessors) return names;
+  for (const t of accessors.ownTags(item)) names.add(t.name);
+  for (const app of accessors.memberApps(item)) {
+    for (const t of (app.tags || [])) names.add(t.name);
   }
-  if (kind === 'repo') {
-    // Repos don't carry their own tags; collect from member apps.
-    for (const app of (item.apps || [])) {
-      for (const t of (app.tags || [])) tags.add(t.name);
-    }
-  }
-  // Bundles: cached fields don't include tags; tag-filter on Bundles in
-  // phase 1 returns empty.
-  return tags;
+  return names;
 }
 
 function itemMatchesOrganization(item, orgNames, kind, repoOrgByRepoId = {}) {
-  if (kind === 'repo') {
-    return !!item.organization && orgNames.includes(item.organization.name);
+  const accessors = KIND_ACCESSORS[kind];
+  if (!accessors) return false;
+  if (!accessors.orgThroughApps) {
+    const own = accessors.ownOrg(item);
+    return !!own && orgNames.includes(own.name);
   }
-  if (kind === 'bundle') {
-    return !!item.organization && orgNames.includes(item.organization.name);
-  }
-  if (kind === 'software') {
-    // A software matches if any of its apps' parent Repo has the
-    // selected org. Per spec §4, Repos are the authoritative
-    // org-bearer once they exist — so the join is repoId → the
-    // Repo's organization. App-level organization is a fallback
-    // for apps that don't yet have a Repo set (e.g., pre-backfill
-    // legacy data).
-    return (item.apps || []).some(app => {
-      // Primary: join through parent Repo.
-      if (app.repoId && repoOrgByRepoId[app.repoId]) {
-        if (orgNames.includes(repoOrgByRepoId[app.repoId])) {
-          return true;
-        }
-      }
-      // Fallback: app's own organization field (legacy or sync-set).
-      return app.organization && orgNames.includes(app.organization.name);
-    });
-  }
-  return false;
+  return accessors.memberApps(item).some(app => {
+    if (app.repoId && repoOrgByRepoId[app.repoId] && orgNames.includes(repoOrgByRepoId[app.repoId])) {
+      return true;
+    }
+    return app.organization && orgNames.includes(app.organization.name);
+  });
 }
 
 function stripHtml(html) {

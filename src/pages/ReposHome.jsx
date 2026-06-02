@@ -9,10 +9,11 @@ import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
 import FilterDrawer from '../components/home/FilterDrawer';
 import RepoGrid from '../components/home/RepoGrid';
+import { deriveAvailableOptions } from '../utils/deriveFilterOptions';
 import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
 export default function ReposHome() {
-  const { repos, filterOptions, loading, error, refetch } = useAppverseData();
+  const { repos, software, filterOptions, loading, error, refetch } = useAppverseData();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
@@ -105,7 +106,13 @@ export default function ReposHome() {
     setSearchParams(newParams);
   }, [filters, searchQuery, setSearchParams, track]);
 
-  const filteredRepos = useBrowseFilters(repos, {
+  // Monorepos display: only repos with more than one app. This STRUCTURAL
+  // filter runs BEFORE useBrowseFilters so single-app repos never enter
+  // matching or option derivation. (Single-app repos stay in the cache for
+  // RepoDetail/AppRow — this filter is display-only.)
+  const monorepos = (repos || []).filter((r) => (r.apps?.length ?? 0) > 1);
+
+  const displayedRepos = useBrowseFilters(monorepos, {
     kind: 'repo',
     searchQuery,
     filters: {
@@ -114,12 +121,19 @@ export default function ReposHome() {
       tags: filters.tags || [],
       organizations: filters.organizations || [],
     },
+    repos,
+    software,
   });
-  // Monorepos display: only repos with more than one app. Single-app repos stay in the cache for other consumers (RepoDetail, AppRow), so this filter is display-only here.
-  const monorepos = filteredRepos.filter((r) => (r.apps?.length ?? 0) > 1);
-  // Track the count actually shown (monorepos), not the pre-filter total, so
-  // the search analytics result_count matches the rendered grid.
-  resultCountRef.current = monorepos.length;
+  // Track the count actually shown.
+  resultCountRef.current = displayedRepos.length;
+
+  // Available filter options reflect the STRUCTURAL candidate set (monorepos),
+  // NOT the search/facet-filtered result, so facets stay stable as the user
+  // selects. Only options reachable from a displayed monorepo appear.
+  const availableOptions = useMemo(
+    () => deriveAvailableOptions(monorepos, 'repo', { software, repos }),
+    [monorepos, software, repos]
+  );
 
   if (error) return <ErrorMessage error={error} onRetry={refetch} />;
 
@@ -156,7 +170,7 @@ export default function ReposHome() {
         onClose={() => setShowFilters(false)}
         filters={filters}
         onFilterChange={handleFilterChange}
-        filterOptions={filterOptions}
+        filterOptions={availableOptions}
       />
 
       <div className="mx-6 mb-6">
@@ -166,12 +180,12 @@ export default function ReposHome() {
               <FilterSidebar
                 filters={filters}
                 onFilterChange={handleFilterChange}
-                filterOptions={filterOptions}
+                filterOptions={availableOptions}
               />
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <RepoGrid repos={monorepos} loading={loading} />
+            <RepoGrid repos={displayedRepos} loading={loading} />
           </div>
         </div>
       </div>

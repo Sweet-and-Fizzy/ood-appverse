@@ -7,6 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAppverseData } from '../hooks/useAppverseData';
 import { useBrowseFilters } from '../hooks/useBrowseFilters';
 import { useTracking } from '../hooks/useTracking';
+import { deriveAvailableOptions } from '../utils/deriveFilterOptions';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
@@ -156,7 +157,15 @@ export default function SoftwareHome() {
     // app.repoId → Repo's organization (per spec §4 —
     // Repos are the authoritative org-bearer).
     repos,
+    software,
   });
+
+  // Available options reflect the full software candidate set (not the
+  // search/facet-filtered result), so facets stay stable while filtering.
+  const availableOptions = useMemo(
+    () => deriveAvailableOptions(software, 'software', { software, repos }),
+    [software, repos]
+  );
 
   // Keep result count ref in sync for debounced search tracking
   resultCountRef.current = filteredSoftware.length;
@@ -237,7 +246,7 @@ export default function SoftwareHome() {
         onClose={() => setShowFilters(false)}
         filters={filters}
         onFilterChange={handleFilterChange}
-        filterOptions={filterOptions}
+        filterOptions={availableOptions}
       />
 
       {/* Main content: Sidebar + Grid */}
@@ -249,7 +258,7 @@ export default function SoftwareHome() {
               <FilterSidebar
                 filters={filters}
                 onFilterChange={handleFilterChange}
-                filterOptions={filterOptions}
+                filterOptions={availableOptions}
               />
             </div>
           )}

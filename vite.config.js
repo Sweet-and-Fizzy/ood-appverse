@@ -10,6 +10,12 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
 
+    test: {
+      // Pure-function + hook-logic unit tests; no DOM needed.
+      environment: 'node',
+      include: ['src/**/*.test.{js,jsx}'],
+    },
+
     // Dev server configuration
     // Dev proxy: forwards requests to the Drupal backend so the browser
     // doesn't hit CORS restrictions. The /flag, /user, and /session proxies
