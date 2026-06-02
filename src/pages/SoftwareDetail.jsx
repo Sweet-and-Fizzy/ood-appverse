@@ -270,6 +270,7 @@ export default function SoftwareDetail() {
           <div className="flex-1 min-w-0">
             <AppList
               apps={apps}
+              appsLoading={appsLoading}
               expandedAppId={expandedAppId}
               onToggleApp={handleToggleApp}
             />

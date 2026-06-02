@@ -47,8 +47,8 @@ export default function RepoDetail() {
     return (
       <div className="mx-6 mt-6">
         <p className="text-appverse-black font-sans">
-          No Repo found with slug “{slug}”.{' '}
-          <a href="#/repos" className="text-appverse-red hover:underline">Back to Repos</a>.
+          No Monorepo found with slug “{slug}”.{' '}
+          <a href="#/repos" className="text-appverse-red hover:underline">Back to Monorepos</a>.
         </p>
       </div>
     );
@@ -95,8 +95,8 @@ export default function RepoDetail() {
       <div className="mx-6 mt-6">
         <DetailHeader
           backTo="/repos"
-          backLabel="Back to Repos"
-          usingButtonLabel="Using Repos"
+          backLabel="Back to Monorepos"
+          usingButtonLabel="Using Monorepos"
           usingButtonUrl={usingDocsUrl}
           shareTitle={repo.title}
         />
