@@ -33,17 +33,24 @@ Good tagging makes your app easier to discover in the catalog.
 
 ### Implementation Tags (for Apps)
 
-Implementation tags describe how an app runs:
+Implementation tags describe how an app runs. Declare them in your app's
+`appverse.yml` under a `tags:` list (case-insensitive matching against the
+catalog's vocabulary). Unknown values are flagged in the form preview with
+a "Did you mean…?" suggestion when one is available.
 
-- Apptainer
-- Batch Connect
-- Classroom
-- Containerized
-- Docker
-- GPU-enabled
-- Modules
-- Passenger 
-- Source Install
+**Current valid implementation tags** (live from the catalog — updated
+automatically by the doc-sync process):
+
+{{ APPVERSE_IMPLEMENTATION_TAGS }}
+
+Example `appverse.yml`:
+
+```yaml
+software: Jupyter
+tags:
+  - Batch Connect
+  - Containerized
+```
 
 ### Topics (for Software)
 
@@ -82,11 +89,21 @@ Each app must live in a **public repository** (GitHub; GitLab support may be add
 
 ### Required Files
 
+To register a repo in the Appverse, it needs catalog metadata at its root. You
+can provide that with an `appverse.yml` (recommended) or a `manifest.yml`:
+
 | File | Purpose |
 |------|---------|
-| `manifest.yml` | App metadata for the catalog (name, category, description) |
+| `appverse.yml` | The recommended way to describe your app(s). You declare the software your app implements, its app type, tags, maintainer, links, and, if the repo ships more than one app, the full list of them. This is also how you create a Monorepo. See [The appverse.yml](#the-appverseyml) below. |
+| `manifest.yml` | The standard OOD app manifest that runs your app inside Open OnDemand. If a repo has no `appverse.yml`, Appverse infers a single catalog app from this file and the repo's GitHub metadata, though you give up control over app type, software, tags, and maintainer. |
 | `README.md` | Documentation for researchers and HPC administrators deploying the app |
 | `LICENSE` | Open source license (MIT recommended by OOD community) |
+
+Every registered repository shows up as a Repo in the catalog. If it contains a
+single app, that's all it is. If it declares several apps through the `apps:`
+list in `appverse.yml`, the catalog groups them together as a Monorepo. Most
+repos hold one app and don't need this; reach for a Monorepo only when one
+repository really does contain several distinct apps.
 
 ### Recommended Files for Batch Connect Apps
 
@@ -121,9 +138,83 @@ Your app name appears in the Appverse catalog and in the OOD dashboard. A good n
 
 **Repository naming:** Follow the OOD convention of prefixing with `bc_` for Batch Connect apps (e.g., `bc_jupyter`, `bc_rstudio_gpu`). This makes it immediately clear what type of app the repo contains.
 
+### The appverse.yml
+
+An `appverse.yml` at your repo root lets you say exactly how your app appears in
+the catalog, instead of leaving Appverse to guess from your `manifest.yml`. It's
+the recommended approach for any new repo.
+
+A single-app repo describes its one app with top-level fields:
+
+```yaml
+title: "RStudio Server"
+description: "RStudio Server on HPC via Open OnDemand."
+software: "RStudio"            # must match a Software in the catalog
+app_type: "Batch Connect"      # must match an App Type
+tags:
+  - "GPU-enabled"
+maintainer:
+  name: "OSC User Support"
+  support_url: "https://example.org/support"
+website: "https://example.org/rstudio"
+docs: "https://example.org/rstudio/docs"
+```
+
+A Monorepo holds several apps. Add an `apps:` list, with one entry per app,
+each living in its own subpath:
+
+```yaml
+title: "Example Monorepo"
+description: "Two example apps."
+apps:
+  - path: "jupyter"
+    name: "Jupyter (Example)"
+    description: "Example Jupyter."
+    software: "Jupyter"
+    app_type: "Batch Connect"
+    maintainer:
+      name: "Example Team"
+      support_url: "https://example.org/support"
+  - path: "rstudio"
+    name: "RStudio (Example)"
+    description: "Example RStudio."
+    software: "RStudio"
+    app_type: "Batch Connect"
+    maintainer:
+      name: "Example Team"
+      support_url: "https://example.org/support"
+```
+
+A few fields are required. The repo needs a `description`, and each app needs
+`name`, `description`, `app_type`, `maintainer.name`, and
+`maintainer.support_url`, along with a `software` value that matches a software
+entry in the catalog. If an app is missing any of these, it stays off the
+catalog until you fill them in and re-sync. It won't disappear; it just isn't
+listed yet. Appverse matches `software`, `app_type`, and `tags` against the
+catalog's vocabularies without worrying about capitalization, and suggests the
+closest match when something doesn't line up.
+
+You don't set `organization`, `stars`, last commit, `readme`, or any of the
+sync and validation fields. Appverse fills those in from GitHub.
+
+For the complete field list, including types, defaults, and how values are
+resolved when you declare them in more than one place, see
+[`docs/appverse.yml`](appverse.yml). It's a fully annotated example you can copy
+as a starting point.
+
+Once you've edited `appverse.yml`, re-sync from the maintenance hub to bring
+your changes into the catalog.
+
 ### The manifest.yml
 
-This file defines how your app appears in the catalog. It must include:
+The `manifest.yml` is the standard Open OnDemand app manifest, and it's what
+actually runs your app inside OOD. If your repo has no `appverse.yml`, Appverse
+also reads this file to infer a single catalog app, taking the name and
+description from here and the rest from the repo's GitHub metadata. Even when
+you do provide an `appverse.yml`, you still need a `manifest.yml` for the app to
+run in OOD.
+
+It must include:
 
 ```yaml
 name: My App Name
@@ -146,7 +237,9 @@ metadata:
   field_of_science: Chemistry     # Additional categorization of research domain
 ```
 
-> **Planned requirement:** A `contact` or `support_url` field will be added to `manifest.yml` as a required field. Apps without a contact or support URL will not be listed in the catalog. This ensures deployers always know where to get help or report issues. Details TBD — watch the [Appverse affinity group](https://openondemand.connectci.org/affinity-groups/ood-appverse) for updates.
+> Every app has to point deployers somewhere for help, so a maintainer support
+> URL is required. In `appverse.yml` that's `maintainer.support_url` (see
+> [The appverse.yml](#the-appverseyml)). An app without one won't be listed.
 
 See the [OOD manifest.yml reference](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/manifest.html) for full details.
 
@@ -277,19 +370,19 @@ Currently only **GitHub** repositories are supported, but GitLab support may be 
 
 ### What Gets Synced
 
-- Repository metadata (name, description, topics)
-- manifest.yml contents
-- README for display in the catalog
-- Release/tag information
+- Your `appverse.yml`, or the inferred metadata from `manifest.yml` if you don't have one
+- Repository metadata from GitHub, such as stars, last commit, and organization
+- README files shown in the catalog, both the repo's and each app's
+- Release and tag information
 
 ### Keeping Things Current
 
 After making changes to your app:
 
-1. Update the README if behavior changed
-2. Update the CHANGELOG
-3. Create a new release tag if it's a significant update
-4. The catalog will pick up changes on the next sync cycle
+1. Edit `appverse.yml` to change how it appears in the catalog, whether that's the name, app type, tags, maintainer, links, or the `apps:` list in a Monorepo
+2. Update the README if the app's behavior changed
+3. Update the CHANGELOG, and tag a new release for anything significant
+4. Re-sync from the maintenance hub to pull the changes in right away, or just wait for the next daily sync
 
 ## 8. Review, Maintenance & Community
 
