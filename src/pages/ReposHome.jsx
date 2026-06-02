@@ -117,7 +117,9 @@ export default function ReposHome() {
   });
   // Monorepos display: only repos with more than one app. Single-app repos stay in the cache for other consumers (RepoDetail, AppRow), so this filter is display-only here.
   const monorepos = filteredRepos.filter((r) => (r.apps?.length ?? 0) > 1);
-  resultCountRef.current = filteredRepos.length;
+  // Track the count actually shown (monorepos), not the pre-filter total, so
+  // the search analytics result_count matches the rendered grid.
+  resultCountRef.current = monorepos.length;
 
   if (error) return <ErrorMessage error={error} onRetry={refetch} />;
 
