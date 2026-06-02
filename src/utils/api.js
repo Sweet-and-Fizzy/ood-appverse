@@ -8,7 +8,7 @@ const STATIC_CACHE_PATH = '/sites/default/files/appverse-cache/appverse-data.jso
 
 // Sparse fieldsets for app detail view (still fetched via JSON:API for README, org, license)
 const APP_DETAIL_FIELDS = [
-  'fields[node--appverse_app]=title,body,field_appverse_github_url,field_appverse_readme,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,field_appverse_software_implemen,field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_appverse_maintainer_name,field_license',
+  'fields[node--appverse_app]=title,body,field_appverse_github_url,field_appverse_readme,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,field_appverse_software_implemen,field_appverse_repo,field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_appverse_maintainer_name,field_license',
   'fields[taxonomy_term--appverse_app_type]=name',
   'fields[taxonomy_term--tags]=name',
   'fields[taxonomy_term--appverse_organization]=name',
@@ -123,6 +123,7 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
         flagCount: app.attributes?.flag_count || 0,
         lastUpdated: app.attributes?.field_appverse_lastupdated || null,
         softwareId: app.relationships?.field_appverse_software_implemen?.data?.id || null,
+        repoId: app.relationships?.field_appverse_repo?.data?.id || null,
         appTypes,
         organization,
         maintainerName: app.attributes?.field_appverse_maintainer_name || null,
@@ -197,6 +198,7 @@ export async function fetchAppsByRepo(repoId, config = {}) {
         flagCount: app.attributes?.flag_count || 0,
         lastUpdated: app.attributes?.field_appverse_lastupdated || null,
         softwareId: app.relationships?.field_appverse_software_implemen?.data?.id || null,
+        repoId: app.relationships?.field_appverse_repo?.data?.id || null,
         appTypes,
         organization,
         maintainerName: app.attributes?.field_appverse_maintainer_name || null,
