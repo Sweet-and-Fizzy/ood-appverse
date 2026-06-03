@@ -50,8 +50,8 @@ Example `appverse.yml`:
 ```yaml
 software: Jupyter
 tags:
-  - Batch Connect
-  - Containerized
+  - batch connect
+  - containerized
 ```
 
 ### Topics (for Software)
@@ -191,14 +191,13 @@ apps:
       support_url: "https://example.org/support"
 ```
 
-A few fields are required. The repo needs a `description`, and each app needs
-`name`, `description`, `app_type`, `maintainer.name`, and
-`maintainer.support_url`, along with a `software` value that matches a software
-entry in the catalog. If an app is missing any of these, it stays off the
-catalog until you fill them in and re-sync. It won't disappear; it just isn't
-listed yet. Appverse matches `software`, `app_type`, and `tags` against the
-catalog's vocabularies without worrying about capitalization, and suggests the
-closest match when something doesn't line up.
+Each app needs `name`, `description`, `app_type`, `maintainer.name`,
+`maintainer.support_url`, and a `software` value that matches a software entry
+in the catalog. Miss any of these and the app stays off the catalog until you
+add it and re-sync — it won't disappear, it just isn't listed yet. Appverse
+matches `software`, `app_type`, and `tags` against the catalog's vocabularies
+without worrying about capitalization, and suggests the closest match when
+something doesn't line up.
 
 You don't set `organization`, `stars`, last commit, `readme`, or any of the
 sync and validation fields. Appverse fills those in from GitHub.
@@ -370,7 +369,7 @@ The `=` means "output this." The `-` means "run this silently." Getting these mi
 
 ## 7. How Apps Get Synced
 
-The catalog pulls information from your repository **daily**. The sync can also be triggered manually if needed.
+The catalog refreshes from your repository automatically every few hours. You don't have to wait for that, though — re-syncing from the maintenance hub pulls your changes in right away.
 
 Currently only **GitHub** repositories are supported, but GitLab support may be added in the future.
 
