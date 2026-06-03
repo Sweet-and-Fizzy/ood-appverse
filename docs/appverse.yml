@@ -16,10 +16,12 @@
 #                     create a Monorepo (a repo with multiple apps).
 #
 #   • manifest.yml  — Supported. If a repo has only a manifest.yml (no
-#                     appverse.yml), Appverse INFERS a single app from it and
-#                     the repo's GitHub metadata. You get less control — only
-#                     name and description come from the manifest; app type,
-#                     software, tags, and maintainer can't be set this way.
+#                     appverse.yml), Appverse infers a single app from it and
+#                     the repo's GitHub metadata. It reads the app's name and
+#                     description, and derives the app type from the manifest's
+#                     `role` (e.g. role: batch_connect). You can't set software,
+#                     tags, or the maintainer this way, and you can't make a
+#                     Monorepo. appverse.yml gives you all of that.
 #
 # Use appverse.yml so the catalog shows exactly what you intend.
 #
@@ -36,30 +38,13 @@
 # maintenance hub to pull the changes into the catalog.
 #
 # -----------------------------------------------------------------------------
-# A NOTE ON WHAT YOU DO *NOT* SET HERE
+# A NOTE ON WHAT YOU DON'T SET HERE
 # -----------------------------------------------------------------------------
-# These are populated automatically from GitHub / by Appverse. Do NOT put them
-# in appverse.yml — they're ignored, and listing them here is misleading:
-#
-#   • organization   — derived from the GitHub repo owner.
-#   • stars          — from GitHub.
-#   • last commit    — from GitHub's default branch.
-#   • readme         — the repo's README.md (and each subpath's README.md) is
-#                      fetched automatically.
-#   • validation state / errors, sync timestamp, repo URL, shape (declared vs
-#     inferred), moderation state — all managed by Appverse.
+# A few things you might expect to set come from GitHub automatically, so don't
+# put them in appverse.yml: the organization (your repo owner), star count, last
+# commit, and the README (fetched from your README.md files).
 #
 # =============================================================================
-
-
-# =============================================================================
-# OPTIONAL: schema version guard
-# =============================================================================
-# appverse:
-#   min_version: "1.0"   # Optional. If you declare a min_version GREATER than
-#                        # the version Appverse supports (currently 1.0), the
-#                        # repo is marked invalid and not synced. Omit it unless
-#                        # you have a reason to pin.
 
 
 # =============================================================================
@@ -71,8 +56,9 @@
 # --- Repo-level fields (also serve as the single app's metadata) -------------
 
 title: "RStudio Server"
-# Optional. The repo's display title. Defaults to the GitHub repo name if
-# omitted.
+# Set this. It's technically optional and falls back to the GitHub repo name,
+# but repo names (bc_rstudio, bc_osc_jupyter) make poor catalog titles. Give it
+# a clean, human title.
 
 description: "RStudio Server on HPC via Open OnDemand."
 # REQUIRED. Short description, shown in the catalog. Markdown is allowed.
@@ -92,8 +78,8 @@ app_type: "batch-connect-basic"
 # rejected with a suggestion.
 
 tags:
-  - "GPU-enabled"
-  - "Containerized"
+  - "gpu-enabled"
+  - "containerized"
 # Optional. A list of implementation tags, each matching an existing term in
 # the implementation-tags vocabulary (case-insensitive). Unmatched tags are
 # flagged with a suggestion; valid ones are applied. Omit the key for none.
@@ -133,7 +119,7 @@ docs: "https://example.org/rstudio/docs"
 # website: "https://example.org"      # Optional repo website URL.
 # docs: "https://example.org/docs"    # Optional repo docs URL.
 # tags:                               # Optional repo-level tags.
-#   - "Containerized"
+#   - "containerized"
 # maintainer:                         # Optional repo-level maintainer (a member
 #   name: "Example Team"              # app may override with its own maintainer).
 #   support_url: "https://example.org/support"
@@ -153,7 +139,7 @@ docs: "https://example.org/rstudio/docs"
 #     software: "Jupyter"              # Required-for-acceptance. Match catalog Software.
 #     app_type: "batch-connect-basic"  # REQUIRED. Match App Type (see top of file).
 #     tags:                            # Optional. Match implementation-tags vocab.
-#       - "Containerized"
+#       - "containerized"
 #     maintainer:
 #       name: "Example Team"           # REQUIRED for the app.
 #       support_url: "https://example.org/support"  # REQUIRED for the app.
