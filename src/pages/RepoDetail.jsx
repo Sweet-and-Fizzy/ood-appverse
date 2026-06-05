@@ -41,6 +41,23 @@ export default function RepoDetail() {
     }
   }, [repo, slug, track]);
 
+  // When arriving via a deep link (?app=<slug>), scroll the matching app row
+  // into view once the apps have loaded. The row carries id="app-<app.id>".
+  useEffect(() => {
+    if (appsLoading || !expandedAppSlug || !apps.length) return;
+    const match = apps.find(a =>
+      (a.slug && a.slug === expandedAppSlug) ||
+      a.id === expandedAppSlug ||
+      String(a.nid) === expandedAppSlug
+    );
+    if (!match) return;
+    // Defer to the next frame so the expanded row has rendered before scrolling.
+    const id = requestAnimationFrame(() => {
+      document.getElementById(`app-${match.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [appsLoading, expandedAppSlug, apps]);
+
   if (error) return <ErrorMessage error={error} onRetry={refetch} />;
   if (loading) return <LoadingSpinner />;
   if (!repo) {

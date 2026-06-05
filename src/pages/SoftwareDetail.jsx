@@ -89,6 +89,12 @@ export default function SoftwareDetail() {
 
       slugToId[slug] = app.id;
       idToSlug[app.id] = slug;
+
+      // Also accept the path-alias slug (what the maintenance hub deep-links
+      // emit), so ?app=<path-alias-slug> resolves here too.
+      if (app.slug) {
+        slugToId[app.slug] = app.id;
+      }
     }
 
     return { appSlugToId: slugToId, appIdToSlug: idToSlug };
@@ -112,6 +118,16 @@ export default function SoftwareDetail() {
     if (!expandedAppId || !apps.length) return null;
     return apps.find(a => a.id === expandedAppId) || null;
   }, [expandedAppId, apps]);
+
+  // Deep link (?app=...): scroll the matching app row into view once loaded.
+  // The row carries id="app-<app.id>".
+  useEffect(() => {
+    if (appsLoading || !expandedAppId) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(`app-${expandedAppId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [appsLoading, expandedAppId]);
 
   const documentMeta = useMemo(() => {
     if (!software) return null;

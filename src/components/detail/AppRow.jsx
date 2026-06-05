@@ -170,7 +170,7 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
   );
 
   return (
-    <div className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
+    <div id={`app-${app.id}`} className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
       {/* !p-5: Drupal theme has .p-5 with !important, so we need to override it */}
       <div className="!p-5">
         {/* Desktop layout - 3 column (hidden on mobile) */}

@@ -6,9 +6,19 @@ const DEFAULT_API_BASE_URL = '/api';
 const DEFAULT_SITE_BASE_URL = '';
 const STATIC_CACHE_PATH = '/sites/default/files/appverse-cache/appverse-data.json';
 
+// The catalog deep-link (?app=<slug>) uses the last segment of an app's path
+// alias, which is what the Drupal hub also emits. Derive it from the JSON:API
+// `path.alias` so RepoDetail/SoftwareDetail can match the deep-link param.
+function appSlugFromPath(app) {
+  const alias = app.attributes?.path?.alias;
+  if (!alias) return null;
+  const segments = alias.split('/').filter(Boolean);
+  return segments.length ? segments[segments.length - 1] : null;
+}
+
 // Sparse fieldsets for app detail view (still fetched via JSON:API for README, org, license)
 const APP_DETAIL_FIELDS = [
-  'fields[node--appverse_app]=title,body,field_appverse_github_url,field_appverse_readme,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,field_appverse_software_implemen,field_appverse_repo,field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_appverse_maintainer_name,field_license',
+  'fields[node--appverse_app]=title,body,field_appverse_github_url,field_appverse_readme,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,path,field_appverse_software_implemen,field_appverse_repo,field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_appverse_maintainer_name,field_license',
   'fields[taxonomy_term--appverse_app_type]=name',
   'fields[taxonomy_term--tags]=name',
   'fields[taxonomy_term--appverse_organization]=name',
@@ -70,7 +80,10 @@ export async function fetchStaticCache(config = {}) {
  */
 export async function fetchAppsBySoftware(softwareId, config = {}) {
   const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
-  const url = `${apiBaseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
+  // filter[status]=1: the catalog shows published apps only. Without this an
+  // authenticated viewer (e.g. an admin who just published) sees unpublished
+  // sibling apps with no indication of their state, unlike the anon catalog.
+  const url = `${apiBaseUrl}/node/appverse_app?filter[status]=1&filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
 
   try {
     const response = await fetch(url);
@@ -116,6 +129,7 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
         id: app.id,
         title: app.attributes?.title || '',
         nid: app.attributes?.drupal_internal__nid,
+        slug: appSlugFromPath(app),
         githubUrl: app.attributes?.field_appverse_github_url?.uri || null,
         readme: app.attributes?.field_appverse_readme?.value || null,
         body: app.attributes?.body?.processed || app.attributes?.body?.value || null,
@@ -145,7 +159,10 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
  */
 export async function fetchAppsByRepo(repoId, config = {}) {
   const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
-  const url = `${apiBaseUrl}/node/appverse_app?filter[field_appverse_repo.id]=${repoId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
+  // filter[status]=1: the catalog shows published apps only. Without this an
+  // authenticated viewer (e.g. an admin who just published) sees unpublished
+  // sibling apps with no indication of their state, unlike the anon catalog.
+  const url = `${apiBaseUrl}/node/appverse_app?filter[status]=1&filter[field_appverse_repo.id]=${repoId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
 
   try {
     const response = await fetch(url);
@@ -191,6 +208,7 @@ export async function fetchAppsByRepo(repoId, config = {}) {
         id: app.id,
         title: app.attributes?.title || '',
         nid: app.attributes?.drupal_internal__nid,
+        slug: appSlugFromPath(app),
         githubUrl: app.attributes?.field_appverse_github_url?.uri || null,
         readme: app.attributes?.field_appverse_readme?.value || null,
         body: app.attributes?.body?.processed || app.attributes?.body?.value || null,
