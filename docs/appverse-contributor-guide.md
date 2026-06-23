@@ -36,9 +36,9 @@ Good tagging makes your app easier to discover in the catalog.
 ### Implementation Tags (for Apps)
 
 Implementation tags describe how an app runs. Declare them in your app's
-`appverse.yml` under a `tags:` list (case-insensitive matching against the
-catalog's vocabulary). Unknown values are flagged in the form preview with
-a "Did you mean…?" suggestion when one is available.
+`appverse.yml` under an `implementation_tags:` list (case-insensitive matching
+against the catalog's vocabulary). Unknown values are flagged in the form
+preview with a "Did you mean…?" suggestion when one is available.
 
 **Current valid implementation tags** (live from the catalog — updated
 automatically by the doc-sync process):
@@ -49,10 +49,21 @@ Example `appverse.yml`:
 
 ```yaml
 software: Jupyter
-tags:
+implementation_tags:
   - batch connect
   - containerized
 ```
+
+In a Monorepo, you can declare implementation tags once at the repo root under
+`shared_implementation_tags:`; every member app inherits them (added to each
+app's own `implementation_tags`), so you don't repeat tags the whole repo
+shares.
+
+> **Don't confuse these with a Monorepo's repo-level `tags:`.** A Monorepo's
+> top-level `tags:` are *discovery* tags for finding the repo in the catalog — a
+> different vocabulary that does not flow to the member apps.
+> `implementation_tags` (per app) and `shared_implementation_tags` (inherited)
+> are the ones that describe how an app runs.
 
 ### Topics (for Software)
 
@@ -157,7 +168,7 @@ title: "RStudio Server"
 description: "RStudio Server on HPC via Open OnDemand."
 software: "RStudio"               # must match a Software in the catalog
 app_type: "batch-connect-basic"   # must match an App Type (see §2)
-tags:
+implementation_tags:
   - "gpu-enabled"                 # must match an implementation tag (see §3)
 maintainer:
   name: "OSC User Support"
@@ -167,37 +178,45 @@ docs: "https://example.org/rstudio/docs"
 ```
 
 A Monorepo holds several apps. Add an `apps:` list, with one entry per app,
-each living in its own subpath:
+each living in its own subpath. Repo-level `maintainer` and
+`shared_implementation_tags` are inherited by every app, so you only declare
+them once:
 
 ```yaml
 title: "Example Monorepo"
 description: "Two example apps."
+tags:                             # repo DISCOVERY tags (find the repo in the
+  - "hpc"                         # catalog) — a different vocabulary, not
+                                  # inherited by the apps
+shared_implementation_tags:       # implementation tags every app inherits
+  - "containerized"
+maintainer:                       # inherited by any app without its own
+  name: "Example Team"
+  support_url: "https://example.org/support"
 apps:
   - path: "jupyter"
     name: "Jupyter (Example)"
     description: "Example Jupyter."
     software: "Jupyter"
     app_type: "batch-connect-basic"
-    maintainer:
-      name: "Example Team"
-      support_url: "https://example.org/support"
+    implementation_tags:
+      - "jupyter"                 # ends up with: jupyter, containerized
   - path: "rstudio"
     name: "RStudio (Example)"
     description: "Example RStudio."
     software: "RStudio"
     app_type: "batch-connect-basic"
-    maintainer:
-      name: "Example Team"
-      support_url: "https://example.org/support"
+    # no maintainer here — inherits the repo's; gets "containerized" too
 ```
 
 Each app needs `name`, `description`, `app_type`, `maintainer.name`,
 `maintainer.support_url`, and a `software` value that matches a software entry
-in the catalog. Miss any of these and the app stays off the catalog until you
+in the catalog. The maintainer may be inherited from the repo level rather than
+declared per app. Miss any of these and the app stays off the catalog until you
 add it and re-sync — it won't disappear, it just isn't listed yet. Appverse
-matches `software`, `app_type`, and `tags` against the catalog's vocabularies
-without worrying about capitalization, and suggests the closest match when
-something doesn't line up.
+matches `software`, `app_type`, and `implementation_tags` against the catalog's
+vocabularies without worrying about capitalization, and suggests the closest
+match when something doesn't line up.
 
 You don't set `organization`, `stars`, last commit, `readme`, or any of the
 sync and validation fields. Appverse fills those in from GitHub.
