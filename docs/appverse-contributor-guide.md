@@ -20,18 +20,20 @@ This guide is for developers, HPC admins, and anyone who wants to contribute or 
 
 Apps for software are always encouraged.
 
-If the software already has app implementations, consider:
+If the software already has app implementations, use this to decide:
 
-1. **Modified an existing app?** Contribute changes back to the original repository rather than publishing a new version. Forks that diverge silently create maintenance burden for everyone (see [Avoid Fork Rot](#avoid-fork-rot)).
-2. **Only changed site-specific configuration?** That likely doesn't warrant a new app — it's working as intended. Document your configuration instead.
-3. **Added significant new functionality?** (e.g., GPU support, containerization, a different execution model) That's a good candidate for a new app.
+| Your situation | What to do |
+|----------------|------------|
+| Modified an existing app | Contribute changes back to the original repository rather than publishing a new version. Forks that diverge silently create maintenance burden for everyone (see [Avoid Fork Rot](#avoid-fork-rot)). |
+| Only changed site-specific configuration | That likely doesn't warrant a new app — it's working as intended. Document your configuration instead. |
+| Added significant new functionality (e.g., GPU support, containerization, a different execution model) | That's a good candidate for a new app. |
 
 ### High-Level Workflow
 
-1. Prepare your repository with the required files and metadata
-2. Register it in the Appverse through the add-a-repo form, where you paste your repository URL
-3. Review and validation (see [Review Process](#review-process))
-4. Ongoing maintenance
+1. **Prepare your repository** with the required files and metadata — at minimum an `appverse.yml`, `manifest.yml`, `README.md`, and `LICENSE`. See [Repository Essentials](#repository-essentials).
+2. **Register it** through the add-a-repo form on the Appverse site, where you paste your repository URL. The catalog picks it up and runs an initial validation.
+3. **Review and validation** — a reviewer checks your app against the [Reviewer Checklist](#review-process). This usually takes a few days. You may be asked to make changes before the app is listed.
+4. **Ongoing maintenance** — once listed, you're responsible for keeping the app current as OOD and the upstream software evolve.
 
 ### Support: Where to Go for Help
 
@@ -46,7 +48,7 @@ When you need help with an app:
 - **Open a GitHub Issue** if you find a bug or need help with configuration.
 - **Submit a Pull Request** if you've found a fix — contributing it back is the best way to help the community.
 
-Core OOD developers provide the platform; the community provides the apps. If your app has a problem, contact the app contributor, not the OOD team.
+The app maintainer is your best resource for app-specific issues — they know the code, the deployment context, and the edge cases. The OOD team maintains the platform; the contributor community maintains the apps.
 
 ## Repository Essentials
 
@@ -200,16 +202,19 @@ See the [OOD manifest.yml reference](https://osc.github.io/ood-documentation/lat
 
 Write for **HPC administrators** who need to deploy your app on their system.
 
-Use the [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template) as your starting point. A good README covers:
+Use the [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template) as your starting point.
 
+**Must have:**
 1. **Overview** — what the app launches and who it's for
-2. **Features** — key capabilities of this OOD app
-3. **Requirements** — compute node software, OOD version, scheduler
-4. **Installation** — step-by-step deployment instructions
-5. **Configuration** — what to customize and where
-6. **Troubleshooting** — common issues and solutions
-7. **Testing** — where it's been deployed and how to verify
-8. **Known limitations** — what doesn't work, what's untested
+2. **Requirements** — compute node software, OOD version, scheduler
+3. **Installation** — step-by-step deployment instructions
+4. **Configuration** — what to customize and where (a table of site-specific values works well here)
+5. **Known limitations** — what doesn't work, what's untested
+
+**Should have:**
+- **Features** — key capabilities specific to this OOD app
+- **Troubleshooting** — common issues and solutions
+- **Testing** — where it's been deployed and how to verify
 
 **Exemplar:** [EpiGenomicsCode/ProteinStructure-OOD](https://github.com/EpiGenomicsCode/ProteinStructure-OOD) — covers features, prerequisites, dual-engine usage, monitoring, and troubleshooting.
 
@@ -249,9 +254,13 @@ Most repos hold one app and don't need this. Reach for a Monorepo only when one 
 
 ## Collections
 
-Collections are curated sets of apps grouped around a theme, research domain, or use case. Unlike Monorepos — which are a single repository containing multiple apps — a Collection can draw from apps across many different repositories.
+A Collection is a curated, multi-app bundle assembled around a shared purpose — a research domain, a workflow, or an institutional deployment package. Examples include a Bioinformatics Suite (AlphaFold, BLAST, RStudio for genomics), or an institutional starter pack that bundles the apps a new HPC site is most likely to need.
 
-<!-- TODO: Add content on how to create and manage collections -->
+Unlike a Monorepo — where multiple apps share a single repository — a Collection draws from apps across many different repositories. The apps already exist in the catalog; a Collection is the curation layer on top.
+
+Collections have dedicated support in the Appverse through a schema, catalog UI, and maintainer tooling. A collection maintainer is responsible for deciding which apps belong, keeping the membership current, and describing the Collection's purpose clearly so deployers understand what they're getting as a set.
+
+To propose or create a Collection, reach out through the [Appverse Affinity Group](https://openondemand.connectci.org/affinity-groups/ood-appverse) or [OOD Discourse](https://discourse.openondemand.org/).
 
 ## Best Practices
 
