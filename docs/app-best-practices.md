@@ -70,6 +70,15 @@ The OOD community recommends MIT. Without a license, others legally cannot use y
 
 OSC apps use dual licensing: MIT for code, CC-BY-4.0 for documentation. Either approach works.
 
+### Tag Your App for Discovery
+
+Tags make your app findable in the catalog. There are two distinct kinds, and they live at different levels — don't confuse them:
+
+- **`implementation_tags`** (per app) — how the app runs (e.g. `batch connect`, `gpu-enabled`, `containerized`). Declared on each app, in its `apps[]` entry or its subpath `appverse.yml`. In a monorepo you can declare `shared_implementation_tags` once at the repo root and every member app inherits them (added to its own).
+- **`tags`** (repo level only) — the repo's *discovery* tags, drawn from the shared site-wide tag vocabulary, for catalog browsing. They describe the repo, not its apps.
+
+Both match case-insensitively against existing vocabulary terms. A tag that doesn't match is **dropped and flagged** for a reviewer (it isn't applied, and it doesn't fail your submission) — so check the submit preview and fix any "did you mean…?" warnings. Reviewers can add genuinely-new *implementation* tags; the shared `tags` vocabulary is not grown from app submissions, so pick an existing one. See the [contributor guide](https://openondemand.connectci.org/appverse-contributor-documentation) for the current valid values and full details.
+
 ## Configuration & Portability
 
 ### Centralize Site-Specific Configuration
