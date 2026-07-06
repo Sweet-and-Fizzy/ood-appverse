@@ -114,8 +114,8 @@ Set one of these as your app's `app_type` in `appverse.yml`. The value must matc
 | `batch-connect-basic` | Interactive jobs that run an HTTP server on a compute node (Jupyter, RStudio, etc.) — set `template: "basic"` in `submit.yml.erb` |
 | `batch-connect-VNC` | Interactive jobs that run a VNC desktop on a compute node (MATLAB, Abaqus, remote desktops) — set `template: "vnc"` in `submit.yml.erb` |
 | `companion_app` | A Passenger-style web app served via Open OnDemand (Ruby Rack, Python WSGI, or Node.js) |
-| `widgets` | Small UI components embedded in dashboards |
-| `dashboards` | Structured user interfaces (e.g., classroom portals, monitoring panels) |
+| `widget` | Small UI components embedded in a dashboard |
+| `dashboard` | Structured user interfaces (e.g., classroom portals, monitoring panels) |
 
 #### Tags & Discoverability
 
