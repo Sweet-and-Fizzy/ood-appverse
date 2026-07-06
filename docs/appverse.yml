@@ -81,7 +81,7 @@ software: "RStudio"
 app_type: "batch-connect-basic"
 # REQUIRED. Must match an App Type exactly (case-insensitive, but keep the
 # hyphens). One value only. Current values: batch-connect-basic,
-# batch-connect-VNC, companion_app, widgets, dashboards. Unknown values are
+# batch-connect-VNC, companion_app, widget, dashboard. Unknown values are
 # rejected with a suggestion.
 
 implementation_tags:
