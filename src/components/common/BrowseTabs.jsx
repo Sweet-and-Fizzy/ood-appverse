@@ -3,9 +3,12 @@ import { useTracking } from '../../hooks/useTracking';
 
 const TABS = [
   { key: 'software', label: 'Software', to: '/' },
-  { key: 'bundles', label: 'Bundles', to: '/bundles' },
   { key: 'repos', label: 'Monorepos', to: '/repos' },
-  { key: 'classrooms', label: 'For Classrooms', to: '/for-classrooms' },
+  // Bundles (likely to become "Collections") and For Classrooms are still in
+  // planning. Their routes/placeholder pages remain, but the tabs are hidden
+  // until those features ship. Re-add here to surface them again.
+  // { key: 'bundles', label: 'Bundles', to: '/bundles' },
+  // { key: 'classrooms', label: 'For Classrooms', to: '/for-classrooms' },
 ];
 
 function activeKey(pathname) {

@@ -144,6 +144,24 @@ export default function ReposHome() {
         <p className="text-base font-sans text-appverse-black max-w-2xl">
           Browse Appverse apps grouped into Monorepos — source repositories that ship more than one app from one place.
         </p>
+        <div
+          role="note"
+          className="mt-4 max-w-2xl bg-appverse-pink border-l-4 border-appverse-red rounded-appverse px-4 py-3"
+        >
+          <p className="text-sm font-sans text-appverse-black">
+            <span className="font-semibold">The Monorepo feature is new.</span>{' '}
+            We'd love your feedback — please{' '}
+            <a
+              href="https://openondemand.connectci.org/affinity-groups/ood-appverse"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-appverse-red underline hover:no-underline"
+            >
+              let us know
+            </a>{' '}
+            if you have any thoughts or run into issues.
+          </p>
+        </div>
       </div>
 
       <div className="mx-6 my-6 bg-appverse-black px-4 py-3 rounded-appverse">

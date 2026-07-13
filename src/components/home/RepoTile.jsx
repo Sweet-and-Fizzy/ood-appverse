@@ -12,11 +12,12 @@
 import { Link } from 'react-router-dom';
 import { useTracking } from '../../hooks/useTracking';
 import RepoIcon from '../common/RepoIcon';
+import { repoSlug } from '../../utils/slugify';
 
 export default function RepoTile({ repo }) {
   const track = useTracking();
   const appCount = (repo.apps || []).length;
-  const slug = repo.slug;
+  const slug = repoSlug(repo);
   return (
     <Link
       to={`/repo/${slug}`}

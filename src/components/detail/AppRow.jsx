@@ -10,7 +10,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import OrgLink from '../common/OrgLink';
-import { slugify } from '../../utils/slugify';
+import { slugify, repoSlug } from '../../utils/slugify';
 import { repoLabel } from '../../utils/repoLabel';
 import { ChevronRight, People, StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
@@ -193,7 +193,7 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
             {!hideRepoLevel && isMonorepo && (
               <p className="text-sm font-sans text-appverse-black">
                 Part of{' '}
-                <Link to={`/repo/${parentRepo.slug}`} className="text-appverse-red hover:underline">
+                <Link to={`/repo/${repoSlug(parentRepo)}`} className="text-appverse-red hover:underline">
                   {parentRepo.title} Monorepo
                 </Link>
               </p>
@@ -257,7 +257,7 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
               {!hideRepoLevel && isMonorepo && (
                 <p className="text-sm font-sans text-appverse-black mb-2">
                   Part of{' '}
-                  <Link to={`/repo/${parentRepo.slug}`} className="text-appverse-red hover:underline">
+                  <Link to={`/repo/${repoSlug(parentRepo)}`} className="text-appverse-red hover:underline">
                     {parentRepo.title} Monorepo
                   </Link>
                 </p>
@@ -310,7 +310,7 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
           <p className="text-sm font-sans text-appverse-black mt-2">
             Part of{' '}
             <Link
-              to={`/repo/${parentRepo.slug}`}
+              to={`/repo/${repoSlug(parentRepo)}`}
               className="text-appverse-red hover:underline"
             >
               {parentRepo.title} {repoLabel(parentRepo)}

@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Globe, Book } from 'react-bootstrap-icons';
 import { useAppverseData } from '../hooks/useAppverseData';
 import { useTracking } from '../hooks/useTracking';
 import { useConfig } from '../contexts/ConfigContext';
 import { fetchAppsByRepo } from '../utils/api';
+import { resolveRepoApps } from '../utils/resolveRepoApps';
 import ErrorMessage from '../components/common/ErrorMessage';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import DetailHeader from '../components/common/DetailHeader';
@@ -25,15 +26,24 @@ export default function RepoDetail() {
   // lack `readme`, so SHOW README is broken without this). Mirrors SoftwareDetail.
   const [apps, setApps] = useState([]);
   const [appsLoading, setAppsLoading] = useState(true);
+  const [appsError, setAppsError] = useState(null);
+
+  const loadApps = useCallback((repoId) => {
+    if (!repoId) return;
+    setAppsLoading(true);
+    setAppsError(null);
+    fetchAppsByRepo(repoId, config)
+      .then(data => setApps(data))
+      .catch(err => {
+        console.error('Failed to fetch apps for repo:', err);
+        setAppsError(err);
+      })
+      .finally(() => setAppsLoading(false));
+  }, [config]);
 
   useEffect(() => {
-    if (!repo?.id) return;
-    setAppsLoading(true);
-    fetchAppsByRepo(repo.id, config)
-      .then(data => setApps(data))
-      .catch(err => console.error('Failed to fetch apps for repo:', err))
-      .finally(() => setAppsLoading(false));
-  }, [repo?.id, config]);
+    loadApps(repo?.id);
+  }, [repo?.id, loadApps]);
 
   useEffect(() => {
     if (repo) {
@@ -71,10 +81,17 @@ export default function RepoDetail() {
     );
   }
 
-  // Prefer the freshly-fetched apps (with READMEs); fall back to cache during
-  // the brief window before the JSON:API request resolves to avoid layout
-  // flicker.
-  const effectiveApps = apps.length ? apps : (repo.apps || []);
+  // Prefer the freshly-fetched (published-only, README-bearing) apps. Cache
+  // apps are used only as an anti-flicker placeholder during the initial
+  // load — never after the fetch fails (which would leak unpublished apps
+  // with broken READMEs). See resolveRepoApps.
+  const { apps: effectiveApps, showError: showAppsError, error: appsFetchError } =
+    resolveRepoApps({ apps, appsLoading, appsError, cacheApps: repo.apps });
+
+  if (showAppsError) {
+    return <ErrorMessage error={appsFetchError} onRetry={() => loadApps(repo.id)} />;
+  }
+
   const repoWithFullApps = { ...repo, apps: effectiveApps };
 
   // AppRow uses `isExpanded` keyed on app.id (not slug). RepoDetail
