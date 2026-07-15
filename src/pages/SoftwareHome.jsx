@@ -5,18 +5,20 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppverseData } from '../hooks/useAppverseData';
-import { useSoftwareSearch } from '../hooks/useSoftwareSearch';
+import { useBrowseFilters } from '../hooks/useBrowseFilters';
 import { useTracking } from '../hooks/useTracking';
+import { deriveAvailableOptions } from '../utils/deriveFilterOptions';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
 import FilterDrawer from '../components/home/FilterDrawer';
 import SoftwareGrid from '../components/home/SoftwareGrid';
+import BrowseTabs from '../components/common/BrowseTabs';
 import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
 export default function SoftwareHome() {
   // Get data from context
-  const { software, appsBySoftwareId, filterOptions, loading, error, refetch } = useAppverseData();
+  const { software, repos, filterOptions, loading, error, refetch } = useAppverseData();
 
   // Debug: Log render timing
   // console.log('[SoftwareHome] Render - loading:', loading, '| software count:', software?.length ?? 0);
@@ -86,7 +88,8 @@ export default function SoftwareHome() {
       searchTimerRef.current = setTimeout(() => {
         track('search', {
           search_query: query,
-          result_count: resultCountRef.current
+          result_count: resultCountRef.current,
+          scope: 'software'
         });
       }, 500);
     }
@@ -139,61 +142,30 @@ export default function SoftwareHome() {
     setSearchParams(newParams);
   }, [filters, searchQuery, setSearchParams, track]);
 
-  // Apply search across software and apps
-  // NOTE: To switch to server-side search, replace useSoftwareSearch with a different hook
-  // that makes API calls with search parameters instead of filtering client-side
-  const searchedSoftware = useSoftwareSearch(software, appsBySoftwareId, searchQuery);
+  // Apply search and filters via the unified hook.
+  // The hook reads software[].apps[] which the static cache now nests inline.
+  const filteredSoftware = useBrowseFilters(software, {
+    kind: 'software',
+    searchQuery,
+    filters: {
+      topics: filters.topics || [],
+      appType: filters.appType || [],
+      tags: filters.tags || [],
+      organizations: filters.organizations || [],
+    },
+    // Pass the Repo list so the org filter can join through
+    // app.repoId → Repo's organization (per spec §4 —
+    // Repos are the authoritative org-bearer).
+    repos,
+    software,
+  });
 
-  // Apply taxonomy filters to searched results
-  const filteredSoftware = useMemo(() => {
-    if (!searchedSoftware) return [];
-
-    let filtered = [...searchedSoftware];
-
-    // Apply Topics filter (directly on Software - only Software has topics)
-    // Filter values are term names, not UUIDs
-    if (filters.topics && filters.topics.length > 0) {
-      filtered = filtered.filter(softwareItem => {
-        const softwareTopicNames = softwareItem.topics?.map(t => t.name) || [];
-        return filters.topics.some(topicName => softwareTopicNames.includes(topicName));
-      });
-    }
-
-    // Apply Type filter (only Apps have type)
-    // Need to look up app type names from the included data
-    if (filters.appType && filters.appType.length > 0) {
-      filtered = filtered.filter(softwareItem => {
-        const softwareApps = appsBySoftwareId[softwareItem.id] || [];
-        return softwareApps.some(app => {
-          // App types is now an array (supports multiple types per app)
-          const appTypeNames = (app.appTypes || []).map(t => t.name);
-          return appTypeNames.some(name => filters.appType.includes(name));
-        });
-      });
-    }
-
-    // Apply Tags filter with AND logic:
-    // Every selected tag must appear somewhere in the Software's tags
-    // (field_tags) or any of its apps' tags (field_add_implementation_tags).
-    if (filters.tags && filters.tags.length > 0) {
-      filtered = filtered.filter(softwareItem => {
-        const softwareTagNames = softwareItem.tags?.map(t => t.name) || [];
-        const softwareApps = appsBySoftwareId[softwareItem.id] || [];
-        const appTagNames = softwareApps.flatMap(app => app.tags?.map(t => t.name) || []);
-        const allTagNames = new Set([...softwareTagNames, ...appTagNames]);
-        return filters.tags.every(tagName => allTagNames.has(tagName));
-      });
-    }
-
-    // Sort alphabetically by title
-    filtered.sort((a, b) => {
-      const nameA = (a.title || '').toLowerCase();
-      const nameB = (b.title || '').toLowerCase();
-      return nameA.localeCompare(nameB);
-    });
-
-    return filtered;
-  }, [searchedSoftware, filters, appsBySoftwareId]);
+  // Available options reflect the full software candidate set (not the
+  // search/facet-filtered result), so facets stay stable while filtering.
+  const availableOptions = useMemo(
+    () => deriveAvailableOptions(software, 'software', { software, repos }),
+    [software, repos]
+  );
 
   // Keep result count ref in sync for debounced search tracking
   resultCountRef.current = filteredSoftware.length;
@@ -226,7 +198,7 @@ export default function SoftwareHome() {
               App Support
             </a>
             <a
-              href="/node/add/appverse_app"
+              href="/appverse/add-repo"
               className="w-full sm:w-auto text-center lg:flex-shrink-0 py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
             >
               Add an app
@@ -237,7 +209,7 @@ export default function SoftwareHome() {
 
       {/* Search and filter toggle section */}
       <div className="mx-6 my-6 bg-appverse-black px-4 py-3 rounded-appverse">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           {/* Toggle filters button */}
           <button
             onClick={() => {
@@ -253,6 +225,9 @@ export default function SoftwareHome() {
             )}
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
+
+          {/* Browse tabs */}
+          <BrowseTabs />
 
           {/* Search bar */}
           <div className="w-80">
@@ -271,7 +246,7 @@ export default function SoftwareHome() {
         onClose={() => setShowFilters(false)}
         filters={filters}
         onFilterChange={handleFilterChange}
-        filterOptions={filterOptions}
+        filterOptions={availableOptions}
       />
 
       {/* Main content: Sidebar + Grid */}
@@ -283,7 +258,7 @@ export default function SoftwareHome() {
               <FilterSidebar
                 filters={filters}
                 onFilterChange={handleFilterChange}
-                filterOptions={filterOptions}
+                filterOptions={availableOptions}
               />
             </div>
           )}

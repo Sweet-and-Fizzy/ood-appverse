@@ -6,9 +6,19 @@ const DEFAULT_API_BASE_URL = '/api';
 const DEFAULT_SITE_BASE_URL = '';
 const STATIC_CACHE_PATH = '/sites/default/files/appverse-cache/appverse-data.json';
 
+// The catalog deep-link (?app=<slug>) uses the last segment of an app's path
+// alias, which is what the Drupal hub also emits. Derive it from the JSON:API
+// `path.alias` so RepoDetail/SoftwareDetail can match the deep-link param.
+function appSlugFromPath(app) {
+  const alias = app.attributes?.path?.alias;
+  if (!alias) return null;
+  const segments = alias.split('/').filter(Boolean);
+  return segments.length ? segments[segments.length - 1] : null;
+}
+
 // Sparse fieldsets for app detail view (still fetched via JSON:API for README, org, license)
 const APP_DETAIL_FIELDS = [
-  'fields[node--appverse_app]=title,body,field_appverse_github_url,field_appverse_readme,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,field_appverse_software_implemen,field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license',
+  'fields[node--appverse_app]=title,body,field_appverse_github_url,field_appverse_readme,field_appverse_lastupdated,field_appverse_stars,flag_count,drupal_internal__nid,path,field_appverse_software_implemen,field_appverse_repo,field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_appverse_maintainer_name,field_license',
   'fields[taxonomy_term--appverse_app_type]=name',
   'fields[taxonomy_term--tags]=name',
   'fields[taxonomy_term--appverse_organization]=name',
@@ -17,7 +27,7 @@ const APP_DETAIL_FIELDS = [
 
 /**
  * Fetch all appverse data from the static JSON cache.
- * Returns software (with nested apps) and filter options in flat shape.
+ * Returns software (with nested apps), repos, and filter options.
  */
 export async function fetchStaticCache(config = {}) {
   const siteBaseUrl = config.siteBaseUrl ?? DEFAULT_SITE_BASE_URL;
@@ -30,26 +40,36 @@ export async function fetchStaticCache(config = {}) {
 
   const cache = await response.json();
 
-  // Prepend siteBaseUrl to logo URLs
-  const software = cache.software.map(sw => ({
+  // Prepend siteBaseUrl to logo URLs on software items.
+  const software = (cache.software || []).map(sw => ({
     ...sw,
     logoUrl: sw.logoUrl ? `${siteBaseUrl}${sw.logoUrl}` : null,
   }));
 
-  // Flatten apps from nested software and build grouping map
+  // Flatten apps from nested software into appsBySoftwareId.
   const appsBySoftwareId = {};
   for (const sw of software) {
     appsBySoftwareId[sw.id] = sw.apps || [];
   }
 
+  // Repos come pre-resolved from the cache. Member apps are already
+  // nested inside each repo. No URL transformation needed at this
+  // level — Task 17/19 will resolve display logo paths if/when added.
+  const repos = (cache.repos || []).map(c => ({
+    ...c,
+    apps: (c.apps || []).map(app => ({ ...app })),
+  }));
+
   return {
     software,
     appsBySoftwareId,
+    repos,
     filterOptions: {
-      topics: cache.filterOptions.topics || [],
-      license: cache.filterOptions.licenses || [],
-      tags: cache.filterOptions.tags || [],
-      appType: cache.filterOptions.appTypes || [],
+      topics: cache.filterOptions?.topics || [],
+      license: cache.filterOptions?.licenses || cache.filterOptions?.license || [],
+      tags: cache.filterOptions?.tags || [],
+      appType: cache.filterOptions?.appTypes || [],
+      organizations: cache.filterOptions?.organizations || [],
     },
   };
 }
@@ -60,7 +80,10 @@ export async function fetchStaticCache(config = {}) {
  */
 export async function fetchAppsBySoftware(softwareId, config = {}) {
   const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
-  const url = `${apiBaseUrl}/node/appverse_app?filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
+  // filter[status]=1: the catalog shows published apps only. Without this an
+  // authenticated viewer (e.g. an admin who just published) sees unpublished
+  // sibling apps with no indication of their state, unlike the anon catalog.
+  const url = `${apiBaseUrl}/node/appverse_app?filter[status]=1&filter[field_appverse_software_implemen.id]=${softwareId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
 
   try {
     const response = await fetch(url);
@@ -106,6 +129,7 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
         id: app.id,
         title: app.attributes?.title || '',
         nid: app.attributes?.drupal_internal__nid,
+        slug: appSlugFromPath(app),
         githubUrl: app.attributes?.field_appverse_github_url?.uri || null,
         readme: app.attributes?.field_appverse_readme?.value || null,
         body: app.attributes?.body?.processed || app.attributes?.body?.value || null,
@@ -113,8 +137,10 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
         flagCount: app.attributes?.flag_count || 0,
         lastUpdated: app.attributes?.field_appverse_lastupdated || null,
         softwareId: app.relationships?.field_appverse_software_implemen?.data?.id || null,
+        repoId: app.relationships?.field_appverse_repo?.data?.id || null,
         appTypes,
         organization,
+        maintainerName: app.attributes?.field_appverse_maintainer_name || null,
         license,
         tags,
       };
@@ -122,6 +148,85 @@ export async function fetchAppsBySoftware(softwareId, config = {}) {
 
   } catch (error) {
     console.error('Error fetching apps by software:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch apps for a specific repo with taxonomy terms resolved.
+ * Mirrors fetchAppsBySoftware — used by RepoDetail to get full per-app
+ * data (README, organization, license) that isn't in the static cache.
+ */
+export async function fetchAppsByRepo(repoId, config = {}) {
+  const apiBaseUrl = config.apiBaseUrl ?? DEFAULT_API_BASE_URL;
+  // filter[status]=1: the catalog shows published apps only. Without this an
+  // authenticated viewer (e.g. an admin who just published) sees unpublished
+  // sibling apps with no indication of their state, unlike the anon catalog.
+  const url = `${apiBaseUrl}/node/appverse_app?filter[status]=1&filter[field_appverse_repo.id]=${repoId}&include=field_appverse_app_type,field_add_implementation_tags,field_appverse_organization,field_license&${APP_DETAIL_FIELDS}`;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch apps: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const apps = data.data || [];
+    const included = data.included || [];
+
+    const includedMap = {};
+    for (const item of included) {
+      includedMap[item.id] = item;
+    }
+
+    return apps.map(app => {
+      const appTypeData = app.relationships?.field_appverse_app_type?.data;
+      const appTypeRefs = Array.isArray(appTypeData) ? appTypeData : (appTypeData ? [appTypeData] : []);
+      const appTypes = appTypeRefs
+        .map(ref => includedMap[ref.id])
+        .filter(Boolean)
+        .map(term => ({ id: term.id, name: term.attributes.name }));
+
+      const orgRef = app.relationships?.field_appverse_organization?.data;
+      const organization = orgRef && includedMap[orgRef.id]
+        ? { id: orgRef.id, name: includedMap[orgRef.id].attributes.name }
+        : null;
+
+      const licenseRef = app.relationships?.field_license?.data;
+      const license = licenseRef && includedMap[licenseRef.id]
+        ? { id: licenseRef.id, name: includedMap[licenseRef.id].attributes.name }
+        : null;
+
+      const tagsData = app.relationships?.field_add_implementation_tags?.data || [];
+      const tags = tagsData
+        .map(ref => includedMap[ref.id])
+        .filter(Boolean)
+        .map(term => ({ id: term.id, name: term.attributes.name }));
+
+      return {
+        id: app.id,
+        title: app.attributes?.title || '',
+        nid: app.attributes?.drupal_internal__nid,
+        slug: appSlugFromPath(app),
+        githubUrl: app.attributes?.field_appverse_github_url?.uri || null,
+        readme: app.attributes?.field_appverse_readme?.value || null,
+        body: app.attributes?.body?.processed || app.attributes?.body?.value || null,
+        stars: app.attributes?.field_appverse_stars ?? 0,
+        flagCount: app.attributes?.flag_count || 0,
+        lastUpdated: app.attributes?.field_appverse_lastupdated || null,
+        softwareId: app.relationships?.field_appverse_software_implemen?.data?.id || null,
+        repoId: app.relationships?.field_appverse_repo?.data?.id || null,
+        appTypes,
+        organization,
+        maintainerName: app.attributes?.field_appverse_maintainer_name || null,
+        license,
+        tags,
+      };
+    });
+
+  } catch (error) {
+    console.error('Error fetching apps by repo:', error);
     throw error;
   }
 }

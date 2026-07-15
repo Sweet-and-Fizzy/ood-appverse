@@ -89,6 +89,12 @@ export default function SoftwareDetail() {
 
       slugToId[slug] = app.id;
       idToSlug[app.id] = slug;
+
+      // Also accept the path-alias slug (what the maintenance hub deep-links
+      // emit), so ?app=<path-alias-slug> resolves here too.
+      if (app.slug) {
+        slugToId[app.slug] = app.id;
+      }
     }
 
     return { appSlugToId: slugToId, appIdToSlug: idToSlug };
@@ -112,6 +118,16 @@ export default function SoftwareDetail() {
     if (!expandedAppId || !apps.length) return null;
     return apps.find(a => a.id === expandedAppId) || null;
   }, [expandedAppId, apps]);
+
+  // Deep link (?app=...): scroll the matching app row into view once loaded.
+  // The row carries id="app-<app.id>".
+  useEffect(() => {
+    if (appsLoading || !expandedAppId) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(`app-${expandedAppId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [appsLoading, expandedAppId]);
 
   const documentMeta = useMemo(() => {
     if (!software) return null;
@@ -251,7 +267,7 @@ export default function SoftwareDetail() {
               )}
             </button>
             <a
-              href="/node/add/appverse_app"
+              href="/appverse/add-repo"
               className="py-3 px-6 bg-appverse-red text-white font-sans font-semibold rounded-appverse hover:bg-red-700 transition-colors"
             >
               Add an app
@@ -270,6 +286,7 @@ export default function SoftwareDetail() {
           <div className="flex-1 min-w-0">
             <AppList
               apps={apps}
+              appsLoading={appsLoading}
               expandedAppId={expandedAppId}
               onToggleApp={handleToggleApp}
             />

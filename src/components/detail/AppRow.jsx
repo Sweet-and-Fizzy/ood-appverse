@@ -8,15 +8,38 @@
  * @param {Function} onToggle - Callback when toggle is clicked
  */
 import { useRef, useEffect, useState } from 'react';
-import { ChevronRight, StarFill } from 'react-bootstrap-icons';
+import { Link } from 'react-router-dom';
+import OrgLink from '../common/OrgLink';
+import { slugify, repoSlug } from '../../utils/slugify';
+import { repoLabel } from '../../utils/repoLabel';
+import { ChevronRight, People, StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import FlagButton from '../common/FlagButton';
 import { useFlag } from '../../contexts/FlagContext';
 import { useTracking } from '../../hooks/useTracking';
+import { useAppverseData } from '../../hooks/useAppverseData';
 
-export default function AppRow({ app, isExpanded, onToggle }) {
+export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = false }) {
   const { getFlagCountAdjustment } = useFlag();
+  const { repos, software } = useAppverseData();
   const track = useTracking();
+
+  // Resolve the parent Repo for the "Part of X Repo" link
+  // (cache stores repoId/repoTitle; slug requires runtime lookup)
+  const parentRepo = app.repoId
+    ? repos.find((c) => c.id === app.repoId)
+    : null;
+
+  // Show a Monorepo affiliation under the title in the software listing.
+  // Only for multi-app repos (repoLabel returns 'Monorepo'); single-app
+  // repos get no line. Suppressed on the Repo detail page (hideRepoLevel),
+  // where the parent is already the page context.
+  const isMonorepo = parentRepo && repoLabel(parentRepo) === 'Monorepo';
+
+  // Resolve the software this app implements, for the logo + Software detail link.
+  const implementedSoftware = app.softwareId
+    ? (software || []).find((s) => s.id === app.softwareId)
+    : null;
 
   const title = app.title || 'Untitled App';
   const githubUrl = app.githubUrl;
@@ -30,6 +53,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
   // Resolved taxonomy terms from API
   const organization = app.organization;
+  const maintainerName = app.maintainerName;
   const tags = app.tags || [];
 
   // App identifiers for flagging
@@ -111,6 +135,27 @@ export default function AppRow({ app, isExpanded, onToggle }) {
     </button>
   );
 
+  const SoftwareLink = () => implementedSoftware && (
+    <Link
+      to={`/${slugify(implementedSoftware.title)}`}
+      onClick={() => track('software_click_from_app', {
+        app_title: title,
+        software_title: implementedSoftware.title,
+      })}
+      className="inline-flex items-center gap-1.5 text-sm font-sans text-appverse-black hover:text-gray-600 transition-colors"
+    >
+      {implementedSoftware.logoUrl && (
+        <img
+          src={implementedSoftware.logoUrl}
+          alt=""
+          className="h-4 w-4 object-contain"
+          loading="lazy"
+        />
+      )}
+      <span>{implementedSoftware.title}</span>
+    </Link>
+  );
+
   const TagList = () => tags.length > 0 && (
     <div className="flex flex-wrap gap-2">
       {tags.map((tag) => (
@@ -125,19 +170,38 @@ export default function AppRow({ app, isExpanded, onToggle }) {
   );
 
   return (
-    <div className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
+    <div id={`app-${app.id}`} className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
       {/* !p-5: Drupal theme has .p-5 with !important, so we need to override it */}
       <div className="!p-5">
         {/* Desktop layout - 3 column (hidden on mobile) */}
         <div className="hidden md:flex md:gap-6">
-          {/* Left column: title, org, show readme */}
+          {/* Left column: title, software, org, show readme */}
           <div className="flex-1 min-w-0 flex flex-col">
             <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
               {title}
             </h3>
-            {organization && (
+            {hideRepoLevel && implementedSoftware && (
+              <div className="mb-1">
+                <SoftwareLink />
+              </div>
+            )}
+            {!hideRepoLevel && organization && (
               <p className="text-sm font-sans text-appverse-black">
-                {organization.name}
+                <OrgLink name={organization.name} />
+              </p>
+            )}
+            {!hideRepoLevel && isMonorepo && (
+              <p className="text-sm font-sans text-appverse-black">
+                Part of{' '}
+                <Link to={`/repo/${repoSlug(parentRepo)}`} className="text-appverse-red hover:underline">
+                  {parentRepo.title} Monorepo
+                </Link>
+              </p>
+            )}
+            {hideRepoLevel && maintainerName && (
+              <p className="flex items-center gap-1 text-sm font-sans text-appverse-black">
+                <People className="w-3.5 h-3.5" />
+                <span>{maintainerName}</span>
               </p>
             )}
             <div className="mt-auto pt-3">
@@ -152,17 +216,19 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
           {/* Right column: view repo, report issue + stats box */}
           <div className="flex flex-col gap-2 flex-shrink-0 items-start">
-            <ViewRepoButton />
+            {!hideRepoLevel && <ViewRepoButton />}
             <ReportIssueButton />
             <div className="bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black min-w-[160px]">
-              <p className="flex items-center gap-1">
-                <span className="font-bold">{githubStars}</span> <StarFill className="w-3 h-3" /> on GitHub
-              </p>
+              {!hideRepoLevel && (
+                <p className="flex items-center gap-1">
+                  <span className="font-bold">{githubStars}</span> <StarFill className="w-3 h-3" /> on GitHub
+                </p>
+              )}
               <p className="flex items-center justify-between">
                 <span><span className="font-bold">{flagCount}</span> reported usages</span>
                 {nid && <FlagButton appId={appId} nid={nid} compact />}
               </p>
-              {formattedDate && (
+              {!hideRepoLevel && formattedDate && (
                 <p><span className="font-bold">{formattedDate}</span> last commit</p>
               )}
             </div>
@@ -178,9 +244,28 @@ export default function AppRow({ app, isExpanded, onToggle }) {
               <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
                 {title}
               </h3>
-              {organization && (
+              {hideRepoLevel && implementedSoftware && (
+                <div className="mb-2">
+                  <SoftwareLink />
+                </div>
+              )}
+              {!hideRepoLevel && organization && (
                 <p className="text-sm font-sans text-appverse-black mb-2">
-                  {organization.name}
+                  <OrgLink name={organization.name} />
+                </p>
+              )}
+              {!hideRepoLevel && isMonorepo && (
+                <p className="text-sm font-sans text-appverse-black mb-2">
+                  Part of{' '}
+                  <Link to={`/repo/${repoSlug(parentRepo)}`} className="text-appverse-red hover:underline">
+                    {parentRepo.title} Monorepo
+                  </Link>
+                </p>
+              )}
+              {hideRepoLevel && maintainerName && (
+                <p className="flex items-center gap-1 text-sm font-sans text-appverse-black mb-2">
+                  <People className="w-3.5 h-3.5" />
+                  <span>{maintainerName}</span>
                 </p>
               )}
               {/* Tags */}
@@ -191,7 +276,7 @@ export default function AppRow({ app, isExpanded, onToggle }) {
               )}
               {/* Action buttons */}
               <div className="flex flex-row flex-wrap gap-4">
-                <ViewRepoButton />
+                {!hideRepoLevel && <ViewRepoButton />}
                 <ReportIssueButton />
                 <ShowReadmeButton />
               </div>
@@ -199,20 +284,40 @@ export default function AppRow({ app, isExpanded, onToggle }) {
 
             {/* Stats box - full width on small screens, sidebar on sm+ */}
             <div className="bg-appverse-gray/30 rounded px-3 py-2 text-sm font-sans text-appverse-black sm:min-w-[160px] sm:w-fit sm:flex-shrink-0">
-              <p className="flex items-center gap-1">
-                <span className="font-bold">{githubStars}</span> <StarFill className="w-3 h-3" /> on GitHub
-              </p>
+              {!hideRepoLevel && (
+                <p className="flex items-center gap-1">
+                  <span className="font-bold">{githubStars}</span> <StarFill className="w-3 h-3" /> on GitHub
+                </p>
+              )}
               <p className="flex items-center justify-between">
                 <span><span className="font-bold">{flagCount}</span> reported usages</span>
                 {nid && <FlagButton appId={appId} nid={nid} compact />}
               </p>
-              {formattedDate && (
+              {!hideRepoLevel && formattedDate && (
                 <p><span className="font-bold">{formattedDate}</span> last commit</p>
               )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Expansion metadata - "Part of X Repo" link.
+          Only shown on Software detail (hideRepoLevel=false); on the Repo
+          detail page the user is already viewing the parent, so the line
+          is redundant. */}
+      {isExpanded && parentRepo && !hideRepoLevel && (
+        <div className="border-t border-appverse-gray !px-5 !py-3 bg-white">
+          <p className="text-sm font-sans text-appverse-black mt-2">
+            Part of{' '}
+            <Link
+              to={`/repo/${repoSlug(parentRepo)}`}
+              className="text-appverse-red hover:underline"
+            >
+              {parentRepo.title} {repoLabel(parentRepo)}
+            </Link>
+          </p>
+        </div>
+      )}
 
       {/* README panel - GitHub-style markdown rendering, dark mode */}
       {/* Animated height transition for smooth expand/collapse */}

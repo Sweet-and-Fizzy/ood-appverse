@@ -18,7 +18,8 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
   const [expandedSections, setExpandedSections] = useState({
     topics: true,
     appType: true,
-    tags: true
+    tags: true,
+    organizations: true
   });
 
   // Number of items before we make the list scrollable
@@ -123,6 +124,14 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
         value: item.name,  // Use name for URL params
         label: item.name
       }))
+    },
+    filterOptions.organizations?.length > 0 && {
+      key: 'organizations',
+      title: 'Organization',
+      options: filterOptions.organizations.map(item => ({
+        value: item.name,  // Use name for URL params
+        label: item.name
+      }))
     }
   ].filter(Boolean);  // Remove falsy entries
 
@@ -160,15 +169,15 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
         const isExpanded = expandedSections[section.key];
 
         return (
-          <div key={section.key} className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+          <div key={section.key} className="border-t border-gray-200 first:border-t-0 overflow-hidden">
             <button
               onClick={() => setExpandedSections({
                 ...expandedSections,
                 [section.key]: !isExpanded
               })}
-              className="w-full flex items-center justify-between bg-gray-100 px-4 py-2 hover:bg-gray-200 transition-colors"
+              className="w-full flex items-center justify-between bg-gray-100 px-4 py-1.5 hover:bg-gray-200 transition-colors"
             >
-              <h3 className="text-base font-serif font-bold text-gray-900">
+              <h3 className="text-sm font-serif font-bold text-gray-900">
                 {section.title} ({section.options.length})
               </h3>
               <ChevronDown
@@ -229,10 +238,18 @@ export default function FilterSidebar({ filters, onFilterChange, filterOptions =
     return filterContent;
   }
 
-  // Desktop: render with sticky sidebar wrapper
+  // Desktop: render with sticky sidebar wrapper.
+  //
+  // A sticky element taller than the viewport is a trap: it pins at top-4 and
+  // its overflowing bottom (the last section) sits below the fold with no way
+  // to scroll it into view — page scroll only moves the results, not the
+  // pinned sidebar. So the wrapper caps at the viewport height and scrolls its
+  // own content past that point. max-h (not a fixed h) means it still sizes to
+  // its content when the filters are short, so there's no reserved empty space.
+  // overscroll-contain keeps the inner scroll from chaining to the page.
   return (
     <aside className="w-64 flex-shrink-0">
-      <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pr-2">
+      <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto overscroll-contain rounded-lg border border-gray-200 bg-white">
         {filterContent}
       </div>
     </aside>

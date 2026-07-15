@@ -4,14 +4,23 @@
  *
  * Props:
  * @param {Array} apps - Array of app objects
+ * @param {boolean} appsLoading - Whether the per-software app fetch is in flight
  * @param {string} expandedAppId - ID of currently expanded app
  * @param {Function} onToggleApp - Callback when app is toggled
  */
 import AppRow from './AppRow';
+import LoadingSpinner from '../common/LoadingSpinner';
 import { FileText } from 'react-bootstrap-icons';
 
-export default function AppList({ apps, expandedAppId, onToggleApp }) {
-  // Handle empty state
+export default function AppList({ apps, appsLoading, expandedAppId, onToggleApp }) {
+  // Apps are fetched lazily per-software after the page mounts. Until that
+  // fetch resolves, show a spinner — not the empty state — so a slow network
+  // doesn't flash "No Apps Found" before the real apps arrive.
+  if (appsLoading) {
+    return <LoadingSpinner message="Loading apps…" />;
+  }
+
+  // Handle empty state (only after loading completes)
   if (!apps || apps.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
