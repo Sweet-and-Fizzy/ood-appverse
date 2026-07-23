@@ -39,8 +39,10 @@
 # Both shapes are shown below. Copy the one that fits, delete the other, and
 # fill in your values.
 #
-# After editing appverse.yml in your repo, re-sync from the Appverse
-# maintenance hub to pull the changes into the catalog.
+# After editing appverse.yml in your repo — or adding one to a repo already in
+# the catalog — re-sync from the Appverse maintenance hub to pull the changes
+# in. Your existing entry is updated in place; nothing needs to be deleted or
+# re-submitted. See the contributor guide linked above for the full walkthrough.
 #
 # -----------------------------------------------------------------------------
 # A NOTE ON WHAT YOU DON'T SET HERE

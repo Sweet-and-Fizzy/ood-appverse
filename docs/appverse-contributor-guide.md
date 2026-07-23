@@ -99,7 +99,23 @@ For Batch Connect apps, also include:
 
 ### The appverse.yml
 
-An `appverse.yml` at your repo root lets you control exactly how your app appears in the catalog. It's the recommended approach for any new repo.
+An `appverse.yml` at your repo root lets you control exactly how your app appears in the catalog. It's the recommended approach for any repo, new or already listed.
+
+If your repo has no `appverse.yml`, the catalog infers a single app from your `manifest.yml` and your GitHub metadata. That works, but it can't set the software your app implements, its tags, or its maintainer, and it can't describe a repo that ships more than one app. Adding an `appverse.yml` lets you control all of it.
+
+#### Adding an appverse.yml to an App Already in the Catalog
+
+If your app is already listed and you want to switch it to an `appverse.yml`, you don't need to remove anything or submit it again. The catalog updates your existing entry in place.
+
+1. Add an `appverse.yml` to your repo root and push it to your default branch.
+2. Go to your maintenance hub at **My Appverse** and click **Re-sync from GitHub** on the repo.
+3. Your app keeps its existing catalog entry, its URL, and its review status. Only the metadata changes.
+
+If your `appverse.yml` declares several apps with an `apps:` list, the re-sync creates one catalog entry per app and removes the original single entry, since that app is now described by one of the `apps:` entries. See [Monorepos](#monorepos).
+
+Re-syncing is also how you pull in any later edit to your `appverse.yml`. The catalog re-reads your repo on its own every few hours, so a change will land eventually, but a re-sync applies it right away. If the catalog notices your repo's structure changed before you re-sync, it flags the repo and asks you to re-sync rather than restructuring your entries on its own.
+
+> **Don't re-submit through the add-a-repo form.** The form rejects a repository that's already registered and points you back to your hub. Re-sync is the supported path.
 
 #### Registering New Software
 
@@ -144,7 +160,7 @@ Research area(s) of the associated software (e.g., AI/ML, genomics, chemistry, m
 
 **Tags (for Software)**
 
-Tags from the Connect.CI tag taxonomy of the associated software.
+Tags from the Connect.CI tag taxonomy of the associated software. These come from a shared taxonomy used across the whole portal, so a tag has to match one that already exists — the Appverse doesn't add new ones. If a tag you declare doesn't match, the submit preview suggests the closest existing tag, and the unmatched value is dropped rather than applied. Pick from the suggestions or drop the tag.
 
 > **Tip:** Apps with good tagging are significantly easier to find. Aim for at least 3–5 relevant tags.
 
