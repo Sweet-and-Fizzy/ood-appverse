@@ -32,7 +32,42 @@ If the software already has apps in the catalog:
 - **Same app, forked with minor changes** → Reject unless the fork adds significant new capability. Encourage contributing back upstream.
 - **Same software, meaningfully different approach** → Accept. Examples: containerized vs. module-based, GPU vs. CPU, different execution model (e.g., AlphaFold 2 vs. AlphaFold 3 support).
 
-Document the rationale either way.
+Document the rationale either way — the review report has a duplicate-check
+rationale field under "Not checked" for this; fill it in before pasting the
+feedback into the issue or email.
+
+### Software Entry Check
+
+The app's `software` value must match a Software entry in the catalog or the app
+won't be listed. Software is its own catalog node type, created separately from
+the app — the app form only references an existing Software entry, it cannot
+create one. If there is no matching entry, it is the reviewer's decision, not an
+automatic failure:
+
+- **Software should exist in the catalog** → create the Software entry first
+  using the [Add Appverse Software form](https://openondemand.connectci.org/node/add/appverse_software)
+  (reviewer login required), then the app can reference it and list.
+- **Typo, or maps to an existing entry under a different name** → ask the
+  contributor to correct the `software` value.
+- **Not appropriate for the catalog** → Request changes, with the reason.
+
+## Declared vs. Inferred Repos and Monorepos
+
+A repo with a root `appverse.yml` is **declared**: the contributor states how their
+app(s) appear in the catalog. A repo with only a root `manifest.yml` is **inferred**:
+the catalog derives a single app from that file plus GitHub metadata.
+
+A declared repo whose `appverse.yml` has an `apps:` list is a **Monorepo**. Review
+every entry in `apps[]` as its own app — each gets its own structure, security, and
+quality assessment, and its own decision. Per-app fields resolve with this precedence:
+
+1. Inline in the root `appverse.yml` `apps[]` entry (highest)
+2. `<subpath>/appverse.yml`
+3. `<subpath>/manifest.yml` (name/description fallback only)
+
+Directories listed in `shared_paths` are shared code: review them once at repo level
+and include them in the security review. Decisions can differ per app — e.g., accept
+three apps and request changes on a fourth.
 
 ## Required Criteria
 
@@ -40,17 +75,35 @@ All of these must be met for inclusion. These are pass/fail.
 
 ### 1. Repository Structure
 
+Every repo, regardless of shape:
+
 | Check | What to Look For |
 |-------|------------------|
-| `manifest.yml` exists | Has `name`, `category`, `role`, `description` at minimum. **Planned:** `contact` or `support_url` will become required — apps without one won't be listed. |
 | `README.md` exists | Is substantive (not just a title) — see Documentation section |
 | `LICENSE` exists | Open source license present (MIT recommended) |
+| Repo shape is identifiable | Root `appverse.yml` (declared) or root `manifest.yml` (inferred) — see "Declared vs. Inferred Repos and Monorepos" above |
+
+**Inferred repos** (root `manifest.yml`, no `appverse.yml`):
+
+| Check | What to Look For |
+|-------|------------------|
+| `manifest.yml` required fields | `name`, `category`, `role`, `description` at minimum |
+
+**Declared repos** (root `appverse.yml`), checked per app after field-precedence resolution:
+
+| Check | What to Look For |
+|-------|------------------|
+| `description` | Present |
+| `software` | Present (checked here). It must also match a catalog Software entry to be listed — see Software Entry Check for what to do when it doesn't |
+| `app_type` | A known value (see the [appverse.yml reference](https://github.com/Sweet-and-Fizzy/ood-appverse/blob/main/docs/appverse.yml)) |
+| `maintainer.name` + `maintainer.support_url` | Both required and present. An app without a support URL gives deployers no one to contact — a missing one is a required-criteria failure |
+| `manifest.yml` at the app's subpath | Required for the app to actually run inside OOD |
 
 For Batch Connect Apps: standard OOD structure with expected files (`form.yml`, `submit.yml.erb`, `template/`)
 
 ### 2. Documentation Minimum
 
-The README should follow the [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template) structure (see also the [filled-in example](https://github.com/tamu-edu/appverse_readme_template)). At minimum, it must answer these questions for an HPC admin who has never seen the app:
+The README should follow the [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template) structure. At minimum, it must answer these questions for an HPC admin who has never seen the app:
 
 | Question | Where to Find It |
 |----------|-----------------|
@@ -67,11 +120,12 @@ The README should follow the [Appverse README Template](https://github.com/tamu-
 
 ### 3. Security Concerns
 
-| Check | What to Look For |
-|-------|------------------|
-| Credentials in code | Committed API keys, passwords, or tokens |
-| Disabled security without justification | If encryption or auth is disabled, there should be a comment explaining why |
-| Arbitrary code execution from user input | Form values passed to shell commands should be validated |
+Security review follows the dedicated security rubric in
+the Appverse Security Rubric: build a capability profile for the
+app's type, run the pattern checks, and classify findings under the OODT taxonomy.
+The three legacy spot-checks (committed credentials, disabled security without
+justification, user input reaching shell commands) are all covered by the rubric's
+pattern checks.
 
 ### 4. Basic Functionality
 
@@ -79,7 +133,7 @@ The README should follow the [Appverse README Template](https://github.com/tamu-
 |-------|------------------|
 | `form.yml` is valid YAML | Parses without errors |
 | `manifest.yml` is valid YAML | Parses without errors |
-| Template scripts are syntactically correct | ERB templates render, shell scripts pass basic lint |
+| Template scripts are syntactically correct | ERB templates render, shell scripts pass shellcheck (for `.sh.erb`, strip ERB tags first — see [security-tools.md](security-tools.md)) |
 | No obviously broken references | Module names, paths, and variables referenced in templates exist in form.yml |
 
 ## Quality Criteria
@@ -120,7 +174,9 @@ These are evaluated on a scale. An app doesn't need to be perfect, but the more 
 
 **Target for inclusion:** At least error handling and input validation. Other items are improvement suggestions.
 
-### Maintenance Signals
+## Maintenance Signals
+
+Repo-level signals about the project's health.
 
 | Signal | Good Sign | Concern |
 |--------|-----------|---------|
@@ -129,9 +185,11 @@ These are evaluated on a scale. An app doesn't need to be perfect, but the more 
 | Issues | Responded to | Open issues with no response |
 | Contributors | Multiple | Single contributor with no activity |
 | CHANGELOG | Present and current | Missing |
-| CI/CD | Automated checks | None |
+| CI/CD | A workflow that lints shell/ERB or validates the YAML (`.github/workflows/` or equivalent) | None |
 
-**Target for inclusion:** Active within 12 months and at least one release. For brand-new apps, waive the history requirement but flag for follow-up review in 6 months.
+**Target for inclusion:** Active within 12 months. For brand-new apps, waive the history requirement but flag for follow-up review in 6 months.
+
+The other signals — tagged releases, issue responsiveness, contributors, CHANGELOG, CI — are good-practice indicators, not requirements. There is no requirement to cut releases or use versioning; a release is a positive signal that the team follows good practices, and its absence is worth a suggestion, never a failure. CI is the weakest of these for an app repo: most Appverse apps are config-and-template repos with little to test beyond YAML validity and shell/ERB lint, which Appverse Review already checks — so weight a missing CI workflow low.
 
 ## Review Process
 
@@ -139,38 +197,45 @@ These are evaluated on a scale. An app doesn't need to be perfect, but the more 
 
 Apps awaiting review appear in the Manage Appverse Apps view in Drupal: [openondemand.connectci.org/appverse/manage-apps](https://openondemand.connectci.org/appverse/manage-apps). The view shows the submitter's name and email so you can follow up with questions, the moderation state, and a link to edit the app node.
 
-### Step 1: Quick Scan (5 minutes)
+Most of the checks below are performed by **Appverse Review**, which produces an
+evidence-backed report covering structure, security, quality, and maintenance,
+with file:line findings and a recommended decision. The reviewer receives this
+report, verifies its findings, and makes the call — the review recommends, a
+human decides.
 
-1. Open the repository
-2. Check: Does it have `manifest.yml`, `README.md`, `LICENSE`?
-3. Read the README: Can you understand what this app does and how to deploy it?
-4. Check: Is this a duplicate of something already in the catalog?
+### Step 1: Start from the review report
 
-If it fails the quick scan, provide feedback to the contributor with specific items to address.
+Begin with the Appverse Review report for the submitted repo. Note the commit it
+was run against — the report pins a commit SHA, and its file:line findings are
+only valid for that commit. If the repo has moved on since, get a fresh report
+before continuing.
 
-### Step 2: Structure Review (10 minutes)
+### Step 2: Verify the findings
 
-1. Verify `manifest.yml` has required fields
-2. Verify `form.yml` is valid and has reasonable defaults
-3. Check `submit.yml.erb` for hardcoded paths or cluster-specific values
-4. Scan template scripts for error handling and security issues
-5. Check for an open source license
+Read the report against the repo and confirm its findings hold, rather than
+taking them on trust. Spot-check that:
 
-### Step 3: Quality Assessment (10 minutes)
+1. Required files and metadata are as the report states — `appverse.yml` or
+   `manifest.yml`, `README.md`, `LICENSE`, standard OOD structure.
+2. Security findings are real and correctly rated — open a few and check the
+   cited `file:line` actually shows the flagged pattern.
+3. Quality ratings and any correctness-&-polish findings match what you see —
+   documentation level, portability, and any copy-paste artifacts or typos.
+4. Maintenance signals are current — last commit, releases, CI, CHANGELOG.
+5. The duplicate check is settled — the review cannot see the catalog, so this is
+   the reviewer's to confirm (see Duplicate Check above).
 
-1. Rate documentation quality (Minimal / Adequate / Strong / Exemplary)
-2. Rate configuration portability
-3. Check code quality items
-4. Review maintenance signals
+Trust the report's structure but verify its substance; if a finding does not
+hold, correct it before it reaches the contributor.
 
-### Step 4: Decision
+### Step 3: Decision
 
 | Outcome | Criteria |
 |---------|----------|
-| **Accept** | Passes all required criteria, adequate+ documentation, partially portable+ config |
-| **Accept with suggestions** | Passes required criteria but has clear improvement areas — include specific feedback |
-| **Request changes** | Missing required criteria but fixable — provide specific list of what to address |
-| **Reject** | Duplicate app, no license, abandoned/unmaintained, security concerns, or not an OOD app |
+| **Accept** | Passes all required criteria, adequate+ documentation, partially portable+ config. Always conditional on the duplicate/catalog checks the review cannot perform — word any Accept as pending those. |
+| **Accept with suggestions** | Passes required criteria but has clear improvement areas — include specific feedback. Below-target docs or portability belongs here, not Request changes, when required criteria are otherwise met. |
+| **Request changes** | Missing required criteria but fixable — provide specific list of what to address. A fixable security misconfiguration, even High severity (e.g. CORS open to all origins), is Request changes, not Reject. |
+| **Reject** | Duplicate app, no license, abandoned/unmaintained, not an OOD app, or a security finding tagged potentially malicious or unfixable without redesigning the app. |
 
 ### Providing Feedback
 
@@ -208,24 +273,36 @@ Copy this template when reviewing a new app submission:
 ## App Review: [App Name]
 
 **Repository:** [URL]
+**Reviewed commit:** [SHA] ([date])
 **Reviewer:** [Name]
 **Date:** [Date]
 
 ### Required Criteria
-- [ ] manifest.yml with required fields (planned: `contact` or `support_url` will be required)
+- [ ] Required metadata fields for the repo shape (see Repository Structure)
 - [ ] README.md (substantive)
 - [ ] LICENSE (open source)
 - [ ] Standard OOD app structure
-- [ ] No security concerns
-- [ ] Not a duplicate
+
+For Monorepos: repeat the per-app criteria and decision for each entry in `apps[]`.
+
+### Security
+- Findings classified under the OODT taxonomy, with severity and file:line evidence
 
 ### Quality Assessment
 - Documentation: [Minimal / Adequate / Strong / Exemplary]
-- Portability: [Not portable / Partially / Portable / Highly portable]
-- Maintenance signals: [Active / Moderate / Inactive]
+- Portability: [Not portable / Partially portable / Portable]
+- Code quality and correctness-&-polish findings, with file:line evidence
+
+### Maintenance Signals
+- [Active / Moderate / Inactive] — last commit, releases, CI, CHANGELOG
+
+### Not Checked (requires catalog access)
+- [ ] Duplicate check against the existing catalog
+- [ ] `software` value matches a catalog Software entry (see Software Entry Check — create the entry if the software should exist)
 
 ### Decision: [Accept / Accept with suggestions / Request changes / Reject]
+- Accept is conditional on the Not Checked items above
 
 ### Feedback
-[Specific items to address or improve]
+[Specific items to address or improve — every item must already appear above]
 ```
