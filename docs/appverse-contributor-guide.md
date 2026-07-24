@@ -35,7 +35,7 @@ If the software already has app implementations, use this to decide:
 3. **Review and validation** — a reviewer checks your app against the [Reviewer Checklist](#review-process). This usually takes a few days. You may be asked to make changes before the app is listed.
 4. **Ongoing maintenance** — once listed, you're responsible for keeping the app current as OOD and the upstream software evolve.
 
-### Support: Where to Go for Help
+### Support
 
 The Appverse follows a shared responsibility model. There's a clear boundary between platform support and app support.
 
