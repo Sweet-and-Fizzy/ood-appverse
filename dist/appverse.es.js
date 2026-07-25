@@ -14241,7 +14241,7 @@ function aO() {
         /* @__PURE__ */ _.jsx(
           "a",
           {
-            href: "https://openondemand.connectci.org/appverse-contributor-documentation#9-support",
+            href: "https://openondemand.connectci.org/appverse-contributor-documentation#support",
             target: "_blank",
             rel: "noopener noreferrer",
             className: "w-full sm:w-auto text-center lg:flex-shrink-0 py-3 px-6 border-2 border-appverse-red text-appverse-red font-sans font-semibold rounded-appverse hover:bg-appverse-red hover:text-white transition-colors",
@@ -52339,7 +52339,7 @@ function WB({ repo: e }) {
   return H.useEffect(() => {
     a && o.current ? c(Math.min(o.current.scrollHeight, 350)) : c(0);
   }, [a, p]), /* @__PURE__ */ _.jsxs("div", { className: "border border-appverse-gray rounded-appverse overflow-hidden bg-white", children: [
-    /* @__PURE__ */ _.jsx("div", { className: "!p-5", children: /* @__PURE__ */ _.jsxs("div", { className: "flex items-start justify-between gap-4", children: [
+    /* @__PURE__ */ _.jsx("div", { className: "!p-5", children: /* @__PURE__ */ _.jsxs("div", { className: "flex flex-col md:flex-row md:items-start md:justify-between gap-4", children: [
       /* @__PURE__ */ _.jsxs("div", { className: "flex-1 min-w-0", children: [
         /* @__PURE__ */ _.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: "Main Repo" }),
         E && /* @__PURE__ */ _.jsx("p", { className: "text-sm font-sans text-appverse-black mb-1", children: /* @__PURE__ */ _.jsx(Jp, { name: E }) }),
@@ -52377,7 +52377,7 @@ function WB({ repo: e }) {
           }
         )
       ] }),
-      y.length > 0 && /* @__PURE__ */ _.jsx("div", { className: "w-[180px] flex-shrink-0 flex flex-wrap gap-2 items-start", children: y.map((v) => /* @__PURE__ */ _.jsx(
+      y.length > 0 && /* @__PURE__ */ _.jsx("div", { className: "w-full md:w-[180px] flex-shrink-0 flex flex-wrap gap-2 items-start", children: y.map((v) => /* @__PURE__ */ _.jsx(
         "span",
         {
           className: "px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded",
