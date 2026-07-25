@@ -40,7 +40,7 @@ export default function RepoMainCard({ repo }) {
     <div className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
       {/* !p-5: Drupal theme has .p-5 with !important, so we need to override it */}
       <div className="!p-5">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           {/* Left: heading, org, maintainer, SHOW README */}
           <div className="flex-1 min-w-0">
             <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
@@ -86,7 +86,7 @@ export default function RepoMainCard({ repo }) {
 
           {/* Middle: Repo-level tag chips */}
           {tags.length > 0 && (
-            <div className="w-[180px] flex-shrink-0 flex flex-wrap gap-2 items-start">
+            <div className="w-full md:w-[180px] flex-shrink-0 flex flex-wrap gap-2 items-start">
               {tags.map((tag) => (
                 <span
                   key={tag.id}
