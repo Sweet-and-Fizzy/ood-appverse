@@ -44,7 +44,7 @@ export default function RepoMainCard({ repo }) {
             column, so it must respond to its OWN width, not the viewport —
             otherwise it stacks even on wide screens. */}
         <div className="flex flex-col @md:flex-row @md:items-start @md:justify-between gap-4">
-          {/* Left: heading, org, maintainer, SHOW README */}
+          {/* Left: heading, org, maintainer, tags, SHOW README */}
           <div className="flex-1 min-w-0">
             <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
               Main Repo
@@ -59,6 +59,18 @@ export default function RepoMainCard({ repo }) {
                 <People className="w-3.5 h-3.5" />
                 <span>{maintainerName}</span>
               </p>
+            )}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 items-start mb-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded"
+                  >
+                    {tag.name}
+                  </span>
+                ))}
+              </div>
             )}
             {readme && (
               <button
@@ -86,20 +98,6 @@ export default function RepoMainCard({ repo }) {
               </button>
             )}
           </div>
-
-          {/* Middle: Repo-level tag chips */}
-          {tags.length > 0 && (
-            <div className="w-full @md:w-[180px] flex-shrink-0 flex flex-wrap gap-2 items-start">
-              {tags.map((tag) => (
-                <span
-                  key={tag.id}
-                  className="px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded"
-                >
-                  {tag.name}
-                </span>
-              ))}
-            </div>
-          )}
 
           {/* Right: VIEW REPO (top), stats box (below) */}
           <div className="flex flex-col gap-2 flex-shrink-0 items-start">
