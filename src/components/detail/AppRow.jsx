@@ -170,12 +170,14 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
   );
 
   return (
-    <div id={`app-${app.id}`} className="border border-appverse-gray rounded-appverse overflow-hidden bg-white">
+    <div id={`app-${app.id}`} className="@container border border-appverse-gray rounded-appverse overflow-hidden bg-white">
       {/* !p-5: Drupal theme has .p-5 with !important, so we need to override it */}
       <div className="!p-5">
-        {/* Desktop layout - 3 column (hidden on mobile) */}
-        <div className="hidden md:flex md:gap-6">
-          {/* Left column: title, software, org, show readme */}
+        {/* Wide layout — 2 columns. Container query (@md, not md): the card
+            lives in a constrained column, so it must respond to its OWN width,
+            not the viewport, or it shows the wide layout even when cramped. */}
+        <div className="hidden @md:flex @md:gap-6">
+          {/* Left column: title, software, org, tags, show readme */}
           <div className="flex-1 min-w-0 flex flex-col">
             <h3 className="text-xl font-sans font-bold text-appverse-black mb-1">
               {title}
@@ -204,14 +206,14 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
                 <span>{maintainerName}</span>
               </p>
             )}
+            {tags.length > 0 && (
+              <div className="mt-2">
+                <TagList />
+              </div>
+            )}
             <div className="mt-auto pt-3">
               <ShowReadmeButton />
             </div>
-          </div>
-
-          {/* Middle column: tags */}
-          <div className="w-[180px] flex-shrink-0">
-            <TagList />
           </div>
 
           {/* Right column: view repo, report issue + stats box */}
@@ -235,8 +237,8 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
           </div>
         </div>
 
-        {/* Mobile layout - stacked (hidden on desktop) */}
-        <div className="md:hidden">
+        {/* Narrow layout - stacked (hidden when the card's container is wide) */}
+        <div className="@md:hidden">
           {/* Stacked on small screens, side-by-side on sm+ */}
           <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
             {/* Left: Title, org, tags, buttons */}
