@@ -51831,9 +51831,9 @@ function xv({ app: e, isExpanded: t, onToggle: a, hideRepoLevel: i = !1 }) {
     },
     G.id
   )) });
-  return /* @__PURE__ */ _.jsxs("div", { id: `app-${e.id}`, className: "border border-appverse-gray rounded-appverse overflow-hidden bg-white", children: [
+  return /* @__PURE__ */ _.jsxs("div", { id: `app-${e.id}`, className: "@container border border-appverse-gray rounded-appverse overflow-hidden bg-white", children: [
     /* @__PURE__ */ _.jsxs("div", { className: "!p-5", children: [
-      /* @__PURE__ */ _.jsxs("div", { className: "hidden md:flex md:gap-6", children: [
+      /* @__PURE__ */ _.jsxs("div", { className: "hidden @md:flex @md:gap-6", children: [
         /* @__PURE__ */ _.jsxs("div", { className: "flex-1 min-w-0 flex flex-col", children: [
           /* @__PURE__ */ _.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: E }),
           i && h && /* @__PURE__ */ _.jsx("div", { className: "mb-1", children: /* @__PURE__ */ _.jsx(de, {}) }),
@@ -51850,9 +51850,9 @@ function xv({ app: e, isExpanded: t, onToggle: a, hideRepoLevel: i = !1 }) {
             /* @__PURE__ */ _.jsx(iu, { className: "w-3.5 h-3.5" }),
             /* @__PURE__ */ _.jsx("span", { children: L })
           ] }),
+          Y.length > 0 && /* @__PURE__ */ _.jsx("div", { className: "mt-2", children: /* @__PURE__ */ _.jsx(ce, {}) }),
           /* @__PURE__ */ _.jsx("div", { className: "mt-auto pt-3", children: /* @__PURE__ */ _.jsx(ie, {}) })
         ] }),
-        /* @__PURE__ */ _.jsx("div", { className: "w-[180px] flex-shrink-0", children: /* @__PURE__ */ _.jsx(ce, {}) }),
         /* @__PURE__ */ _.jsxs("div", { className: "flex flex-col gap-2 flex-shrink-0 items-start", children: [
           !i && /* @__PURE__ */ _.jsx(q, {}),
           /* @__PURE__ */ _.jsx(Q, {}),
@@ -51877,7 +51877,7 @@ function xv({ app: e, isExpanded: t, onToggle: a, hideRepoLevel: i = !1 }) {
           ] })
         ] })
       ] }),
-      /* @__PURE__ */ _.jsx("div", { className: "md:hidden", children: /* @__PURE__ */ _.jsxs("div", { className: "flex flex-col sm:flex-row gap-4 sm:items-start", children: [
+      /* @__PURE__ */ _.jsx("div", { className: "@md:hidden", children: /* @__PURE__ */ _.jsxs("div", { className: "flex flex-col sm:flex-row gap-4 sm:items-start", children: [
         /* @__PURE__ */ _.jsxs("div", { className: "flex-1 min-w-0", children: [
           /* @__PURE__ */ _.jsx("h3", { className: "text-xl font-sans font-bold text-appverse-black mb-1", children: E }),
           i && h && /* @__PURE__ */ _.jsx("div", { className: "mb-2", children: /* @__PURE__ */ _.jsx(de, {}) }),
