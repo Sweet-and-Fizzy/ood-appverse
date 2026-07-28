@@ -52347,6 +52347,14 @@ function WB({ repo: e }) {
           /* @__PURE__ */ _.jsx(iu, { className: "w-3.5 h-3.5" }),
           /* @__PURE__ */ _.jsx("span", { children: T })
         ] }),
+        y.length > 0 && /* @__PURE__ */ _.jsx("div", { className: "flex flex-wrap gap-2 items-start mb-2", children: y.map((v) => /* @__PURE__ */ _.jsx(
+          "span",
+          {
+            className: "px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded",
+            children: v.name
+          },
+          v.id
+        )) }),
         p && /* @__PURE__ */ _.jsxs(
           "button",
           {
@@ -52377,14 +52385,6 @@ function WB({ repo: e }) {
           }
         )
       ] }),
-      y.length > 0 && /* @__PURE__ */ _.jsx("div", { className: "w-full @md:w-[180px] flex-shrink-0 flex flex-wrap gap-2 items-start", children: y.map((v) => /* @__PURE__ */ _.jsx(
-        "span",
-        {
-          className: "px-2.5 py-1 text-xs font-sans text-appverse-black bg-appverse-gray rounded",
-          children: v.name
-        },
-        v.id
-      )) }),
       /* @__PURE__ */ _.jsxs("div", { className: "flex flex-col gap-2 flex-shrink-0 items-start", children: [
         d && /* @__PURE__ */ _.jsxs(
           "a",
