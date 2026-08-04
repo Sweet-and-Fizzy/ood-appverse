@@ -244,7 +244,7 @@ A Monorepo holds several apps in one repository. Add an `apps:` list to your `ap
 title: "Example Monorepo"
 description: "Two example apps."
 shared_implementation_tags:
-  - "containerized"
+  - "batch connect"
 maintainer:
   name: "Example Team"
   support_url: "https://example.org/support"
@@ -255,13 +255,13 @@ apps:
     software: "Jupyter"
     app_type: "batch-connect-basic"
     implementation_tags:
-      - "jupyter"           # ends up with: jupyter, containerized
+      - "containerized"           # ends up with: batch connect, containerized
   - path: "rstudio"
     name: "RStudio (Example)"
     description: "Example RStudio."
     software: "RStudio"
     app_type: "batch-connect-basic"
-    # inherits maintainer and "containerized"
+    # inherits maintainer and "batch connect"
 ```
 
 Most repos hold one app and don't need this. Reach for a Monorepo only when one repository really does contain several distinct apps that ship together.
