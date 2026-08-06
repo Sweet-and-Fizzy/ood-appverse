@@ -33,7 +33,7 @@ If the software already has app implementations, use this to decide:
 1. **Prepare your repository** with the required files and metadata — at minimum an `appverse.yml`, `manifest.yml`, `README.md`, and `LICENSE`. See [Repository Essentials](#repository-essentials).
 2. **Register it** through the add-a-repo form on the Appverse site, where you paste your repository URL. The catalog picks it up and runs an initial validation.
 3. **Review and validation** — a reviewer checks your app against the [Reviewer Checklist](#review-process). This usually takes a few days. You may be asked to make changes before the app is listed.
-4. **Ongoing maintenance** — once listed, you're responsible for keeping the app current as OOD and the upstream software evolve.
+4. **Ongoing maintenance** — once listed, you're responsible for keeping the app current as OOD and the upstream software evolve. If you decide to stop maintaining your app, please archive the GitHub repository.
 
 ### Support
 
@@ -119,7 +119,7 @@ Re-syncing is also how you pull in any later edit to your `appverse.yml`. The ca
 
 #### Registering New Software
 
-The `software:` field in your `appverse.yml` must reference an existing Software entry in the catalog. Before filling it in, check whether your software is already listed. If it isn't, you'll need to request that it be added — this is a manual process. Contact the Appverse team through the [Appverse Affinity Group](https://openondemand.connectci.org/affinity-groups/ood-appverse) or post on [OOD Discourse](https://discourse.openondemand.org/).
+The `software:` field in your `appverse.yml` must reference an existing Software entry in the catalog. Before filling it in, check whether your software is already listed [in the catalog](https://openondemand.connectci.org/appverse). If it isn't, you'll need to request that it be added — by [contacting the Appverse team](mailto:openondemand@sweetandfizzy.com?subject=Open%20OnDemand%20Appverse%20Software%20Request).
 
 #### App Types
 
