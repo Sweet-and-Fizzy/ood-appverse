@@ -89,15 +89,16 @@ app_type: "batch-connect-basic"
 implementation_tags:
   - "gpu-enabled"
   - "containerized"
-# Optional. This app's IMPLEMENTATION tags — they describe how the app runs
-# (gpu-enabled, containerized, etc.). Each must match an existing term in the
-# implementation-tags vocabulary (case-insensitive); unmatched tags are flagged
-# with a "did you mean …?" suggestion and reject the app, valid ones are
-# applied. Omit the key for none.
+# Optional. This app's IMPLEMENTATION tags — they describe how the app RUNS
+# (gpu-enabled, containerized, etc.). Matched against the implementation-tags
+# vocabulary (case-insensitive). A matched tag is applied; an unmatched one is
+# flagged with a "did you mean …?" suggestion and kept as an UNRESOLVED tag shown
+# to reviewers — it does NOT reject the app. Omit the key for none.
 #
 # Note the key is `implementation_tags`, not `tags`. At the repo level (Monorepo
 # SHAPE 2 below) a separate `tags:` key means the repo's DISCOVERY tags, a
-# different vocabulary — don't confuse the two.
+# different vocabulary — don't confuse the two. Implementation tags = HOW the app
+# runs; discovery tags = HPC infrastructure/tools/skills it relates to.
 
 maintainer:
   name: "OSC User Support"

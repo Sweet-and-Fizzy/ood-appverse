@@ -137,9 +137,21 @@ Set one of these as your app's `app_type` in `appverse.yml`. The value must matc
 
 Good tagging makes your app easier to discover in the catalog.
 
+**Which field for which kind of tag?**
+
+There are three separate places tags live, and they're easy to mix up because they overlap. Here's what goes where:
+
+| Field | Where you set it | What it describes | Examples |
+|---|---|---|---|
+| `implementation_tags` | Your app's `appverse.yml` | **How your app runs** — the delivery technology | `apptainer`, `containerized`, `gpu-enabled`, `passenger`, `mcp` |
+| `tags` (discovery) | Your `appverse.yml` (repo-level for monorepos) | **HPC infrastructure, tools, and skills** your app relates to | `slurm`, `globus`, `python`, `tensorflow`, `singularity` |
+| Field of science / research domain | The **Software entry** (not your app) | **The research area** the software serves | `artificial intelligence`, `genomics`, `chemistry` |
+
+The overlaps are the confusing part. `containerized` is an *implementation* tag (how it runs), while `containers`, `docker`, and `singularity` are *discovery* tags (infrastructure it uses). A subject like AI/ML can legitimately appear in **both** the discovery `tags` and the Software entry's research domain — putting it in both is fine, not a mistake. You don't set the research domain directly; it comes from the Software entry your app points at via `software:`.
+
 **Implementation Tags (for Apps)**
 
-Implementation tags describe how an app runs. Declare them in your app's `appverse.yml` under an `implementation_tags:` list (case-insensitive matching against the catalog's vocabulary). Unknown values are flagged in the form preview with a "Did you mean…?" suggestion when one is available.
+Implementation tags describe how an app runs. Declare them in your app's `appverse.yml` under an `implementation_tags:` list (case-insensitive matching against the catalog's vocabulary). A value that matches is applied; one that doesn't is flagged in the form preview with a "Did you mean…?" suggestion and kept as an *unresolved tag* shown to reviewers — it does **not** reject your app.
 
 **Current valid implementation tags** (live from the catalog — updated automatically by the doc-sync process):
 
@@ -154,13 +166,13 @@ implementation_tags:
   - containerized
 ```
 
-**Topics (for Software)**
+**Research domain (from the Software entry)**
 
-Research area(s) of the associated software (e.g., AI/ML, genomics, chemistry, materials science).
+The research area(s) the software serves (e.g., AI/ML, genomics, chemistry, materials science). You don't set this on your app directly — it comes from the Software entry your `software:` value points at.
 
-**Tags (for Software)**
+**Discovery Tags**
 
-Tags from the Connect.CI tag taxonomy of the associated software. These come from a shared taxonomy used across the whole portal, so a tag has to match one that already exists — the Appverse doesn't add new ones. If a tag you declare doesn't match, the submit preview suggests the closest existing tag, and the unmatched value is dropped rather than applied. Pick from the suggestions or drop the tag.
+Discovery tags come from the shared Connect.CI tag taxonomy — HPC infrastructure, tools, and skills (see the table above). Declare the ones you think apply; don't trim your list to only what already exists. A tag that matches is applied. A tag that doesn't match is **not dropped and doesn't block your app** — it's kept as an *unresolved tag* and shown to reviewers, who can recommend it be added to the taxonomy (an administrator makes the actual addition). The submit preview suggests a close existing term when there is one, so prefer that for a near-miss — but a genuinely relevant new tag is worth declaring, because that's how the catalog learns what's missing.
 
 > **Tip:** Apps with good tagging are significantly easier to find. Aim for at least 3–5 relevant tags.
 
