@@ -172,7 +172,7 @@ The research area(s) the software serves (e.g., AI/ML, genomics, chemistry, mate
 
 **Discovery Tags**
 
-Discovery tags come from the shared Connect.CI tag taxonomy — HPC infrastructure, tools, and skills (see the table above). Declare the ones you think apply; don't trim your list to only what already exists. A tag that matches is applied. A tag that doesn't match is **not dropped and doesn't block your app** — it's kept as an *unresolved tag* and shown to reviewers, who can recommend it be added to the taxonomy (an administrator makes the actual addition). The submit preview suggests a close existing term when there is one, so prefer that for a near-miss — but a genuinely relevant new tag is worth declaring, because that's how the catalog learns what's missing.
+Discovery tags come from the shared Connect.CI tag taxonomy — HPC infrastructure, tools, and skills (see the table above). Browse the current taxonomy at [openondemand.connectci.org/tags](https://openondemand.connectci.org/tags) to pick the tags that fit your app. Declare the ones you think apply; don't trim your list to only what already exists. A tag that matches is applied. A tag that doesn't match is **not dropped and doesn't block your app** — it's kept as an *unresolved tag* and shown to reviewers, who can recommend it be added to the taxonomy (an administrator makes the actual addition). The submit preview suggests a close existing term when there is one, so prefer that for a near-miss — but a genuinely relevant new tag is worth declaring, because that's how the catalog learns what's missing.
 
 > **Tip:** Apps with good tagging are significantly easier to find. Aim for at least 3–5 relevant tags.
 
