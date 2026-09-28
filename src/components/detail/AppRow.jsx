@@ -15,6 +15,7 @@ import { repoLabel } from '../../utils/repoLabel';
 import { ChevronRight, People, StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import FlagButton from '../common/FlagButton';
+import ReviewStrip from './ReviewStrip';
 import { useFlag } from '../../contexts/FlagContext';
 import { useTracking } from '../../hooks/useTracking';
 import { useAppverseData } from '../../hooks/useAppverseData';
@@ -320,6 +321,9 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
           </p>
         </div>
       )}
+
+      {/* Published review: four axes in fixed positions; nothing when unreviewed */}
+      <ReviewStrip review={app.review ?? null} />
 
       {/* README panel - GitHub-style markdown rendering, dark mode */}
       {/* Animated height transition for smooth expand/collapse */}

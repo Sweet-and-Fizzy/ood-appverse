@@ -13,6 +13,8 @@ export default {
         'appverse-pink': '#F2E2E5',
         'appverse-blue': '#0076AF',
         'appverse-green': '#00857A',
+        // Review signal middle tone; green and red are the existing site colours.
+        'appverse-amber': '#C98A2B',
       },
       fontFamily: {
         'serif': ['"Serifa Std"', 'serif'],

@@ -51744,6 +51744,76 @@ function BA({ appId: e, nid: t, compact: a = !1, className: i = "" }) {
     }
   );
 }
+const PB = {
+  solid: "Low",
+  some_notes: "Medium",
+  needs_attention: "High"
+}, HB = {
+  solid: "good",
+  some_notes: "note",
+  needs_attention: "attention"
+}, zB = [
+  { key: "security", axis: "Security" },
+  { key: "portability", axis: "Portability" },
+  { key: "documentation", axis: "Docs" },
+  { key: "upkeep", axis: "Upkeep" }
+];
+function jB(e) {
+  return PB[e] ?? null;
+}
+function GB(e) {
+  return HB[e] ?? "none";
+}
+function $B(e) {
+  return !e || typeof e != "object" ? [] : zB.map(({ key: t, axis: a }) => {
+    const i = e[t] ?? {};
+    return {
+      key: t,
+      axis: a,
+      level: i.level ?? null,
+      label: jB(i.level),
+      tone: GB(i.level),
+      summary: i.summary ?? "",
+      anchor: i.anchor ?? ""
+    };
+  });
+}
+function qB(e) {
+  return !e || !e.outOfDate ? null : e.sha7 ? `Reviewed at ${e.sha7}; the repo has changed since` : "The repo has changed since this review";
+}
+const YB = {
+  good: "bg-appverse-green",
+  note: "bg-appverse-amber",
+  attention: "bg-appverse-red",
+  none: "bg-appverse-gray"
+};
+function VB({ review: e }) {
+  const t = $B(e);
+  if (t.length === 0)
+    return null;
+  const a = qB(e);
+  return /* @__PURE__ */ _.jsxs(
+    "div",
+    {
+      className: "border-t border-appverse-gray px-5 py-3 flex flex-wrap items-center gap-x-7 gap-y-2 text-sm font-sans text-appverse-black",
+      "data-testid": "review-strip",
+      children: [
+        t.map((i) => {
+          const o = i.anchor ? "a" : "span", l = i.anchor ? { href: i.anchor, target: "_blank", rel: "noopener", className: "flex items-center gap-2 no-underline hover:underline" } : { className: "flex items-center gap-2" };
+          return /* @__PURE__ */ _.jsxs(o, { ...l, title: i.label ? `${i.axis}: ${i.label}` : `${i.axis}: not rated`, children: [
+            /* @__PURE__ */ _.jsx("span", { className: `inline-block w-2.5 h-2.5 rounded-full flex-none ${YB[i.tone]}`, "aria-hidden": "true" }),
+            /* @__PURE__ */ _.jsx("span", { className: "text-appverse-black", children: i.axis }),
+            i.label && /* @__PURE__ */ _.jsx("span", { className: "sr-only", children: i.label }),
+            i.summary && /* @__PURE__ */ _.jsx("span", { className: "text-gray-500 text-xs", children: i.summary })
+          ] }, i.key);
+        }),
+        /* @__PURE__ */ _.jsx("span", { className: "flex-1" }),
+        a && /* @__PURE__ */ _.jsx("span", { className: "text-xs text-appverse-amber", title: a, children: a }),
+        e.url && /* @__PURE__ */ _.jsx("a", { href: e.url, className: "text-sm font-semibold text-appverse-red no-underline hover:underline", children: "Full review ›" })
+      ]
+    }
+  );
+}
 function xv({ app: e, isExpanded: t, onToggle: a, hideRepoLevel: i = !1 }) {
   const { getFlagCountAdjustment: o } = s1(), { repos: l, software: c } = lo(), d = Cn(), p = e.repoId ? l.find((G) => G.id === e.repoId) : null, f = p && y_(p) === "Monorepo", h = e.softwareId ? (c || []).find((G) => G.id === e.softwareId) : null, E = e.title || "Untitled App", T = e.githubUrl, y = e.readme, A = e.lastUpdated, k = (e.flagCount || 0) + o(e.id), v = e.stars ?? 0, P = e.organization, L = e.maintainerName, Y = e.tags || [], j = e.id, D = e.nid, W = H.useRef(null), [ne, re] = H.useState(0);
   H.useEffect(() => {
@@ -51938,6 +52008,7 @@ function xv({ app: e, isExpanded: t, onToggle: a, hideRepoLevel: i = !1 }) {
         }
       )
     ] }) }),
+    /* @__PURE__ */ _.jsx(VB, { review: e.review ?? null }),
     y && /* @__PURE__ */ _.jsx(
       "div",
       {
@@ -51955,7 +52026,7 @@ function xv({ app: e, isExpanded: t, onToggle: a, hideRepoLevel: i = !1 }) {
     )
   ] });
 }
-function PB({ apps: e, appsLoading: t, expandedAppId: a, onToggleApp: i }) {
+function WB({ apps: e, appsLoading: t, expandedAppId: a, onToggleApp: i }) {
   return t ? /* @__PURE__ */ _.jsx(Mf, { message: "Loading apps…" }) : !e || e.length === 0 ? /* @__PURE__ */ _.jsxs("div", { className: "flex flex-col items-center justify-center py-16", children: [
     /* @__PURE__ */ _.jsx("div", { className: "w-20 h-20 rounded-full bg-appverse-gray flex items-center justify-center mb-4", children: /* @__PURE__ */ _.jsx(m1, { className: "w-10 h-10 text-gray-400" }) }),
     /* @__PURE__ */ _.jsx("h3", { className: "text-xl font-serif font-bold text-appverse-black mb-2", children: "No Apps Found" }),
@@ -51970,11 +52041,11 @@ function PB({ apps: e, appsLoading: t, expandedAppId: a, onToggleApp: i }) {
     o.id
   )) });
 }
-const HB = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-function zB(e) {
-  return HB.test(e);
+const XB = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function KB(e) {
+  return XB.test(e);
 }
-function jB() {
+function ZB() {
   const { slug: e } = Rf(), [t, a] = gu(), i = oo(), { getSoftwareBySlug: o, loading: l } = lo(), c = Cn(), d = l ? null : o(e), [p, f] = H.useState([]), [h, E] = H.useState(!0), [T, y] = H.useState(null), [A, w] = H.useState(!1), k = t.get("app");
   H.useEffect(() => {
     d && (E(!0), y(null), m_(d.id, i).then((q) => f(q)).catch((q) => {
@@ -51997,7 +52068,7 @@ function jB() {
       q[se] = de.id, Q[de.id] = se, de.slug && (q[de.slug] = de.id);
     }
     return { appSlugToId: q, appIdToSlug: Q };
-  }, [p]), Y = H.useMemo(() => k ? zB(k) ? k : P[k] || null : null, [k, P]), j = H.useMemo(() => !Y || !p.length ? null : p.find((q) => q.id === Y) || null, [Y, p]);
+  }, [p]), Y = H.useMemo(() => k ? KB(k) ? k : P[k] || null : null, [k, P]), j = H.useMemo(() => !Y || !p.length ? null : p.find((q) => q.id === Y) || null, [Y, p]);
   H.useEffect(() => {
     if (h || !Y) return;
     const q = requestAnimationFrame(() => {
@@ -52099,7 +52170,7 @@ function jB() {
     /* @__PURE__ */ _.jsxs("div", { className: "flex flex-col lg:flex-row gap-8 lg:gap-12", children: [
       /* @__PURE__ */ _.jsx("div", { className: "w-full lg:w-[280px] lg:flex-shrink-0", children: /* @__PURE__ */ _.jsx(sO, { software: d }) }),
       /* @__PURE__ */ _.jsx("div", { className: "flex-1 min-w-0", children: /* @__PURE__ */ _.jsx(
-        PB,
+        WB,
         {
           apps: p,
           appsLoading: h,
@@ -52133,7 +52204,7 @@ function wv({ size: e = 60, className: t = "" }) {
     }
   );
 }
-function GB({ repo: e }) {
+function QB({ repo: e }) {
   const t = Cn(), a = (e.apps || []).length, i = Ql(e);
   return /* @__PURE__ */ _.jsx(
     fn,
@@ -52156,10 +52227,10 @@ function GB({ repo: e }) {
     }
   );
 }
-function $B({ repos: e, loading: t }) {
-  return t ? /* @__PURE__ */ _.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: Array.from({ length: 10 }).map((a, i) => /* @__PURE__ */ _.jsx(_1, {}, i)) }) : !e || e.length === 0 ? /* @__PURE__ */ _.jsx("div", { className: "text-center py-12 text-appverse-black font-sans", children: "No monorepos match your filters." }) : /* @__PURE__ */ _.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: e.map((a) => /* @__PURE__ */ _.jsx(GB, { repo: a }, a.id)) });
+function JB({ repos: e, loading: t }) {
+  return t ? /* @__PURE__ */ _.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: Array.from({ length: 10 }).map((a, i) => /* @__PURE__ */ _.jsx(_1, {}, i)) }) : !e || e.length === 0 ? /* @__PURE__ */ _.jsx("div", { className: "text-center py-12 text-appverse-black font-sans", children: "No monorepos match your filters." }) : /* @__PURE__ */ _.jsx("div", { className: "grid gap-6", style: { gridTemplateColumns: "repeat(auto-fill, minmax(199px, 1fr))" }, children: e.map((a) => /* @__PURE__ */ _.jsx(QB, { repo: a }, a.id)) });
 }
-function qB() {
+function eF() {
   const { repos: e, software: t, filterOptions: a, loading: i, error: o, refetch: l } = lo(), [c, d] = gu(), [p, f] = H.useState(c.get("search") || ""), h = H.useMemo(() => {
     const D = {};
     for (const [W, ne] of c.entries())
@@ -52285,14 +52356,14 @@ function qB() {
           filterOptions: j
         }
       ) }),
-      /* @__PURE__ */ _.jsx("div", { className: "flex-1 min-w-0", children: /* @__PURE__ */ _.jsx($B, { repos: Y, loading: i }) })
+      /* @__PURE__ */ _.jsx("div", { className: "flex-1 min-w-0", children: /* @__PURE__ */ _.jsx(JB, { repos: Y, loading: i }) })
     ] }) })
   ] });
 }
-function YB({ apps: e, appsLoading: t, appsError: a, cacheApps: i }) {
+function tF({ apps: e, appsLoading: t, appsError: a, cacheApps: i }) {
   return a ? { apps: [], showError: !0, error: a } : t ? { apps: i || [], showError: !1, error: null } : { apps: e || [], showError: !1, error: null };
 }
-function VB({ backTo: e, backLabel: t, usingButtonLabel: a, usingButtonUrl: i, shareTitle: o }) {
+function nF({ backTo: e, backLabel: t, usingButtonLabel: a, usingButtonUrl: i, shareTitle: o }) {
   const l = () => {
     const c = window.location.href;
     navigator.share ? navigator.share({ title: o || document.title, url: c }).catch(() => {
@@ -52329,7 +52400,7 @@ function VB({ backTo: e, backLabel: t, usingButtonLabel: a, usingButtonUrl: i, s
     ] })
   ] });
 }
-function WB({ repo: e }) {
+function aF({ repo: e }) {
   var w, k;
   const t = Cn(), [a, i] = H.useState(!1), o = H.useRef(null), [l, c] = H.useState(0), d = e.repoUrl, p = e.readme, f = typeof e.stars == "number" ? e.stars : null, h = e.lastUpdated, E = (w = e.organization) == null ? void 0 : w.name, T = (k = e.maintainer) == null ? void 0 : k.name, y = e.tags || [], A = h ? new Date(h * 1e3).toLocaleDateString("en-US", {
     year: "2-digit",
@@ -52441,10 +52512,10 @@ function WB({ repo: e }) {
     )
   ] });
 }
-function XB({ repo: e, expandedAppId: t, onToggleApp: a }) {
+function rF({ repo: e, expandedAppId: t, onToggleApp: a }) {
   const i = e.apps || [];
   return /* @__PURE__ */ _.jsxs("div", { className: "relative", children: [
-    /* @__PURE__ */ _.jsx(WB, { repo: e }),
+    /* @__PURE__ */ _.jsx(aF, { repo: e }),
     i.length > 0 && /* @__PURE__ */ _.jsxs("div", { className: "ml-6 mt-0", children: [
       /* @__PURE__ */ _.jsx("div", { className: "w-0.5 bg-appverse-black h-4 ml-0" }),
       /* @__PURE__ */ _.jsx("ul", { className: "m-0 p-0 list-none", children: i.map((o, l) => /* @__PURE__ */ _.jsxs("li", { className: "relative pl-6", children: [
@@ -52469,7 +52540,7 @@ function XB({ repo: e, expandedAppId: t, onToggleApp: a }) {
     ] })
   ] });
 }
-function KB() {
+function iF() {
   const { slug: e } = Rf(), { repos: t, loading: a, error: i, refetch: o, getRepoBySlug: l } = lo(), [c, d] = gu(), p = c.get("app"), f = Cn(), h = oo(), E = a ? null : l(e), [T, y] = H.useState([]), [A, w] = H.useState(!0), [k, v] = H.useState(null), P = H.useCallback((q) => {
     q && (w(!0), v(null), xC(q, h).then((Q) => y(Q)).catch((Q) => {
       console.error("Failed to fetch apps for repo:", Q), v(Q);
@@ -52501,7 +52572,7 @@ function KB() {
       /* @__PURE__ */ _.jsx("a", { href: "#/repos", className: "text-appverse-red hover:underline", children: "Back to Monorepos" }),
       "."
     ] }) });
-  const { apps: L, showError: Y, error: j } = YB({ apps: T, appsLoading: A, appsError: k, cacheApps: E.apps });
+  const { apps: L, showError: Y, error: j } = tF({ apps: T, appsLoading: A, appsError: k, cacheApps: E.apps });
   if (Y)
     return /* @__PURE__ */ _.jsx(Qs, { error: j, onRetry: () => P(E.id) });
   const D = { ...E, apps: L }, W = p ? L.find((q) => q.slug ? q.slug === p : q.id === p || String(q.nid) === p) : null, ne = W ? W.id : null, re = (q) => {
@@ -52516,7 +52587,7 @@ function KB() {
   };
   return /* @__PURE__ */ _.jsx("div", { className: "mb-4 bg-white", children: /* @__PURE__ */ _.jsxs("div", { className: "mx-6 mt-6", children: [
     /* @__PURE__ */ _.jsx(
-      VB,
+      nF,
       {
         backTo: "/repos",
         backLabel: "Back to Monorepos",
@@ -52572,7 +52643,7 @@ function KB() {
         ] })
       ] }),
       /* @__PURE__ */ _.jsx("main", { children: /* @__PURE__ */ _.jsx(
-        XB,
+        rF,
         {
           repo: D,
           expandedAppId: ne,
@@ -52582,7 +52653,7 @@ function KB() {
     ] })
   ] }) });
 }
-function ZB() {
+function sF() {
   return /* @__PURE__ */ _.jsxs("div", { className: "mb-4 bg-white", children: [
     /* @__PURE__ */ _.jsx("div", { className: "mx-6 mt-6 mb-4", children: /* @__PURE__ */ _.jsx("h2", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "Bundles" }) }),
     /* @__PURE__ */ _.jsx("div", { className: "mx-6 my-6 bg-appverse-black px-4 py-3 rounded-appverse", children: /* @__PURE__ */ _.jsx("div", { className: "flex items-center justify-end", children: /* @__PURE__ */ _.jsx(bu, {}) }) }),
@@ -52598,7 +52669,7 @@ function ZB() {
     ] })
   ] });
 }
-function QB() {
+function oF() {
   return /* @__PURE__ */ _.jsxs("div", { className: "mb-4 bg-white", children: [
     /* @__PURE__ */ _.jsx("div", { className: "mx-6 mt-6 mb-4", children: /* @__PURE__ */ _.jsx("h2", { className: "text-3xl font-serif font-bold text-appverse-black mb-2", children: "For Classrooms" }) }),
     /* @__PURE__ */ _.jsx("div", { className: "mx-6 my-6 bg-appverse-black px-4 py-3 rounded-appverse", children: /* @__PURE__ */ _.jsx("div", { className: "flex items-center justify-end", children: /* @__PURE__ */ _.jsx(bu, {}) }) }),
@@ -52614,29 +52685,29 @@ function QB() {
     ] })
   ] });
 }
-function JB() {
+function lF() {
   const { "*": e } = Rf(), t = gn(), a = `/${e || ""}${t.search}`;
   return /* @__PURE__ */ _.jsx(VA, { to: a, replace: !0 });
 }
-function eF() {
+function uF() {
   return FC(), /* @__PURE__ */ _.jsx(CC, { children: /* @__PURE__ */ _.jsx(MC, { children: /* @__PURE__ */ _.jsx("div", { className: "appverse-container", children: /* @__PURE__ */ _.jsxs($w, { children: [
     /* @__PURE__ */ _.jsx(fa, { path: "/", element: /* @__PURE__ */ _.jsx(aO, {}) }),
-    /* @__PURE__ */ _.jsx(fa, { path: "/repos", element: /* @__PURE__ */ _.jsx(qB, {}) }),
-    /* @__PURE__ */ _.jsx(fa, { path: "/bundles", element: /* @__PURE__ */ _.jsx(ZB, {}) }),
-    /* @__PURE__ */ _.jsx(fa, { path: "/for-classrooms", element: /* @__PURE__ */ _.jsx(QB, {}) }),
-    /* @__PURE__ */ _.jsx(fa, { path: "/repo/:slug", element: /* @__PURE__ */ _.jsx(KB, {}) }),
-    /* @__PURE__ */ _.jsx(fa, { path: "/:slug", element: /* @__PURE__ */ _.jsx(jB, {}) }),
-    /* @__PURE__ */ _.jsx(fa, { path: "/appverse/*", element: /* @__PURE__ */ _.jsx(JB, {}) }),
+    /* @__PURE__ */ _.jsx(fa, { path: "/repos", element: /* @__PURE__ */ _.jsx(eF, {}) }),
+    /* @__PURE__ */ _.jsx(fa, { path: "/bundles", element: /* @__PURE__ */ _.jsx(sF, {}) }),
+    /* @__PURE__ */ _.jsx(fa, { path: "/for-classrooms", element: /* @__PURE__ */ _.jsx(oF, {}) }),
+    /* @__PURE__ */ _.jsx(fa, { path: "/repo/:slug", element: /* @__PURE__ */ _.jsx(iF, {}) }),
+    /* @__PURE__ */ _.jsx(fa, { path: "/:slug", element: /* @__PURE__ */ _.jsx(ZB, {}) }),
+    /* @__PURE__ */ _.jsx(fa, { path: "/appverse/*", element: /* @__PURE__ */ _.jsx(lF, {}) }),
     /* @__PURE__ */ _.jsx(fa, { path: "*", element: /* @__PURE__ */ _.jsx(VA, { to: "/", replace: !0 }) })
   ] }) }) }) });
 }
-function tF(e, t = {}) {
+function cF(e, t = {}) {
   const a = typeof e == "string" ? document.getElementById(e) : e;
   if (!a)
     return console.error(`AppVerse: Element with id "${e}" not found`), null;
   const i = Qx.createRoot(a);
   return i.render(
-    /* @__PURE__ */ _.jsx(mC, { children: /* @__PURE__ */ _.jsx(wC, { config: t, children: /* @__PURE__ */ _.jsx(eF, {}) }) })
+    /* @__PURE__ */ _.jsx(mC, { children: /* @__PURE__ */ _.jsx(wC, { config: t, children: /* @__PURE__ */ _.jsx(uF, {}) }) })
   ), {
     unmount: () => {
       i.unmount();
@@ -52644,8 +52715,8 @@ function tF(e, t = {}) {
   };
 }
 export {
-  eF as AppVerseBrowser,
-  tF as default,
-  tF as mount
+  uF as AppVerseBrowser,
+  cF as default,
+  cF as mount
 };
 //# sourceMappingURL=appverse.es.js.map
