@@ -15,13 +15,14 @@ import { repoLabel } from '../../utils/repoLabel';
 import { ChevronRight, People, StarFill } from 'react-bootstrap-icons';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import FlagButton from '../common/FlagButton';
+import ReviewChips from './ReviewChips';
 import { useFlag } from '../../contexts/FlagContext';
 import { useTracking } from '../../hooks/useTracking';
 import { useAppverseData } from '../../hooks/useAppverseData';
 
 export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = false }) {
   const { getFlagCountAdjustment } = useFlag();
-  const { repos, software } = useAppverseData();
+  const { repos, software, reviewsByAppId } = useAppverseData();
   const track = useTracking();
 
   // Resolve the parent Repo for the "Part of X Repo" link
@@ -50,6 +51,8 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
   // Adjust flag count based on user's flag actions (updated after server confirms)
   const flagCount = baseFlagCount + getFlagCountAdjustment(app.id);
   const githubStars = app.stars ?? 0;
+  // Cache apps carry their review; JSON:API apps look it up by UUID.
+  const review = app.review ?? reviewsByAppId?.get(app.id) ?? null;
 
   // Resolved taxonomy terms from API
   const organization = app.organization;
@@ -234,6 +237,11 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
                 <p><span className="font-bold">{formattedDate}</span> last commit</p>
               )}
             </div>
+            {review && (
+              <div className="mt-auto self-end">
+                <ReviewChips review={review} />
+              </div>
+            )}
           </div>
         </div>
 
@@ -300,6 +308,11 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
               )}
             </div>
           </div>
+          {review && (
+            <div className="flex justify-end mt-3">
+              <ReviewChips review={review} />
+            </div>
+          )}
         </div>
       </div>
 

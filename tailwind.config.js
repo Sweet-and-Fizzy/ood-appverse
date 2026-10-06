@@ -13,6 +13,7 @@ export default {
         'appverse-pink': '#F2E2E5',
         'appverse-blue': '#0076AF',
         'appverse-green': '#00857A',
+        'appverse-amber': '#A86E00',
       },
       fontFamily: {
         'serif': ['"Serifa Std"', 'serif'],
