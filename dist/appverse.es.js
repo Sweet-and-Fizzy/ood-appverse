@@ -12444,7 +12444,7 @@ function lp(e, t) {
 function MC(e) {
   const t = e == null ? void 0 : e.count;
   if (!Number.isInteger(t) || t < 0) return null;
-  let a = "No findings";
+  let a = "No findings to review";
   return t === 1 ? a = "1 finding to review" : t > 1 && (a = `${t} findings to review`), { axis: "security", name: "Security", label: a, href: e.anchor || "" };
 }
 function UC(e, t) {

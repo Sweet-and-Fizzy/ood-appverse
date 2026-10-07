@@ -51,10 +51,13 @@ export function axisChip(axis, signal) {
  * The security chip: a count of findings to review, never a level.
  */
 export function securityChip(signal) {
-  // A count that isn't a whole number must not read as "No findings".
+  // A count that isn't a whole number must not read as a clean result.
   const count = signal?.count;
   if (!Number.isInteger(count) || count < 0) return null;
-  let label = 'No findings';
+  // Counts the reviewer's findings as well as the tool's, so the zero label
+  // matches the others ("N findings to review") rather than crediting the
+  // tool alone; it describes the review, never claims the app is safe.
+  let label = 'No findings to review';
   if (count === 1) label = '1 finding to review';
   else if (count > 1) label = `${count} findings to review`;
   return { axis: 'security', name: 'Security', label, href: signal.anchor || '' };
