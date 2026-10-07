@@ -10,6 +10,7 @@
  */
 import { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { fetchStaticCache } from '../utils/api';
+import { reviewsByAppId as buildReviewIndex } from '../utils/reviewSignals';
 import { slugify } from '../utils/slugify';
 import { useConfig } from './ConfigContext';
 
@@ -79,6 +80,13 @@ export function AppverseDataProvider({ children }) {
     return map;
   }, [data.repos]);
 
+  // Detail pages render apps from JSON:API, which has no review; they look
+  // the app's review up in the cache by UUID.
+  const reviewsByAppId = useMemo(
+    () => buildReviewIndex(data.appsBySoftwareId, data.repos),
+    [data.appsBySoftwareId, data.repos],
+  );
+
   const getSoftwareBySlug = useCallback((slug) => softwareSlugMap[slug] || null, [softwareSlugMap]);
   const getRepoBySlug = useCallback((slug) => repoSlugMap[slug] || null, [repoSlugMap]);
 
@@ -92,6 +100,7 @@ export function AppverseDataProvider({ children }) {
     repoSlugMap,
     getSoftwareBySlug,
     getRepoBySlug,
+    reviewsByAppId,
     refetch: fetchData,
   };
 
