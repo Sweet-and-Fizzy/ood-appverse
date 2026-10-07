@@ -32,14 +32,14 @@ describe('securityChip', () => {
       axis: 'security', name: 'Security', label: '2 findings to review', href: '/r/1#app-a',
     });
     expect(securityChip({ count: 1 }).label).toBe('1 finding to review');
-    expect(securityChip({ count: 0 }).label).toBe('No findings');
+    expect(securityChip({ count: 0 }).label).toBe('No findings to review');
   });
 
   it('returns null without a security block', () => {
     expect(securityChip(undefined)).toBeNull();
   });
 
-  it('shows no chip for a count that is missing or not a whole number, rather than "No findings"', () => {
+  it('shows no chip for a count that is missing or not a whole number, rather than "No findings to review"', () => {
     expect(securityChip({})).toBeNull();
     expect(securityChip({ count: null })).toBeNull();
     expect(securityChip({ count: '2' })).toBeNull();
