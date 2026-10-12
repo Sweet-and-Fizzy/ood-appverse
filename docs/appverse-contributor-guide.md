@@ -58,7 +58,7 @@ Then open Claude Code in your app's repository and run:
 ```
 
 The review checks the repository's structure, security, documentation,
-portability and upkeep against the
+portability, code quality and upkeep against the
 [Review Rubric](https://openondemand.connectci.org/appverse-review-rubric). It
 ends with a list of what to fix before you submit, most important first. Run
 it again after your changes. The review is automated and can be wrong, so
