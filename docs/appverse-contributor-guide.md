@@ -5,28 +5,32 @@
 
 ## What Is the Appverse?
 
-The Appverse is a shared catalog of Open OnDemand app configurations for HPC environments. The goal is to improve reuse and share deployment patterns instead of rebuilding them from scratch.
+The Appverse is a shared catalog of Open OnDemand apps. Instead of each HPC
+site building its own app for Jupyter or RStudio, sites can find an app that
+already works, install it, and improve it together.
 
-In simple terms:
+Two words come up throughout this guide:
 
-- **Software** = the tool (e.g., Jupyter, RStudio, a visualization app)
-- **App** = the Open OnDemand configuration that launches that software on an HPC system
+- **Software** is the tool itself, such as Jupyter, RStudio or MATLAB.
+- **App** is the Open OnDemand configuration that launches that software on
+  an HPC system. One piece of software can have several apps.
 
-This guide is for developers, HPC admins, and anyone who wants to contribute or improve apps in the catalog.
+This guide is for anyone who builds or maintains an Open OnDemand app and
+wants to share it. It covers what to put in your repository, how to write an
+app other sites can install, and how the review works.
 
 ## Contributing an App
 
 ### When to Contribute
 
-Apps for software are always encouraged.
-
-If the software already has app implementations, use this to decide:
+An app for software the catalog doesn't have yet is always welcome. If the
+software already has an app, use this table to decide:
 
 | Your situation | What to do |
 |----------------|------------|
-| Modified an existing app | Contribute changes back to the original repository rather than publishing a new version. Forks that diverge silently create maintenance burden for everyone (see [Avoid Fork Rot](#avoid-fork-rot)). |
-| Only changed site-specific configuration | That likely doesn't warrant a new app — it's working as intended. Document your configuration instead. |
-| Added significant new functionality (e.g., GPU support, containerization, a different execution model) | That's a good candidate for a new app. |
+| You improved an existing app | Send your changes to the original repository instead of listing a copy. Copies that drift apart leave everyone maintaining the same fixes twice (see [Avoid Fork Rot](#avoid-fork-rot)). |
+| You only changed settings for your site | That isn't a new app. Changing settings is what sites are meant to do. Document your settings instead. |
+| You added something substantial, such as GPU support, a container, or a different way of running the software | That's a good candidate for a new app. |
 | The original app is no longer maintained | A maintained fork is welcome. Say in your README which app it continues. |
 
 ### High-Level Workflow
@@ -69,123 +73,155 @@ More detail, including how to review one aspect at a time, is in the
 
 ### Support
 
-The Appverse follows a shared responsibility model. There's a clear boundary between platform support and app support.
+The Open OnDemand team supports Open OnDemand itself. Each app's maintainer
+supports their app.
 
-- **Platform Support (Discourse):** Use the [Open OnDemand Discourse](https://discourse.openondemand.org/) for issues related to the OOD platform itself — installation, authentication, web server errors, or core Batch Connect functionality.
-- **App Support (GitHub):** For issues specific to an app in the Appverse, support happens at the source. Open an issue in that app's GitHub repository — this alerts the actual author of the code.
+- **Problems with Open OnDemand** (installing it, logging in, web server
+  errors, Batch Connect itself) go to the
+  [Open OnDemand Discourse](https://discourse.openondemand.org/).
+- **Problems with an app** go to that app's GitHub repository. Check its
+  README first, since most installation questions are answered there. If
+  not, open an issue, which reaches the people who wrote the app. If you've
+  found a fix, a pull request is the most useful thing you can send.
 
-When you need help with an app:
-
-- **Check the README first.** Most deployment issues are covered in the app's documentation.
-- **Open a GitHub Issue** if you find a bug or need help with configuration.
-- **Submit a Pull Request** if you've found a fix — contributing it back is the best way to help the community.
-
-The app maintainer is your best resource for app-specific issues — they know the code, the deployment context, and the edge cases. The OOD team maintains the platform; the contributor community maintains the apps.
+As a contributor, this means people will open issues on your repository. See
+[Maintenance](#maintenance).
 
 ## Repository Essentials
 
-Each app must live in a **public repository** (GitHub; GitLab support may be added in the future).
+Each app must be in a public GitHub repository.
 
 ### Naming Your App and Repository
 
-Your app name appears in the Appverse catalog and in the OOD dashboard. A good name helps deployers find your app and understand what it does at a glance.
+Your app's name appears in the catalog and in the Open OnDemand dashboard.
+A good name tells someone what the app runs and how it differs from other
+apps for the same software.
 
-**Conventions:**
-- Start with the **software name** (e.g., "Jupyter", "RStudio", "MATLAB")
-- Add a **differentiator** if there are multiple apps for the same software — describe what makes yours different (e.g., containerized, GPU-enabled, classroom mode)
-- Keep it concise — aim for 2–4 words
+- Start with the software's name, such as Jupyter, RStudio or MATLAB.
+- If other apps exist for the same software, add what makes yours different,
+  such as a container, GPUs or classroom use.
+- Keep it to two to four words.
 
 **Good names:**
-- `Jupyter Notebook` — clear, simple, no ambiguity
-- `Jupyter (Apptainer)` — differentiates from a module-based version
-- `RStudio Server (GPU)` — tells deployers this variant needs GPU nodes
-- `MATLAB (Classroom)` — signals a specific use case
+- `Jupyter Notebook`
+- `Jupyter (Apptainer)`, which runs in a container rather than from a module
+- `RStudio Server (GPU)`, which needs GPU nodes
+- `MATLAB (Classroom)`, for teaching
 
 **Avoid:**
 - Generic names that don't mention the software: `My HPC App`, `Interactive Job`
-- Institution-specific names: `OSC Jupyter`, `TACC RStudio` — the catalog is for the whole community
+- Your institution's name: `OSC Jupyter`, `TACC RStudio`. The app is meant for every site.
 - Redundant prefixes: `OOD Jupyter`, `Batch Connect Jupyter`
 
-**Repository naming:** Follow the OOD convention of prefixing with `bc_` for Batch Connect apps (e.g., `bc_jupyter`, `bc_rstudio_gpu`).
+**Repository name:** Batch Connect app repositories usually start with
+`bc_`, such as `bc_jupyter` or `bc_rstudio_gpu`.
 
 ### Required Files
 
-To register a repo in the Appverse, it needs catalog metadata at its root:
+Every repository needs these files:
 
 | File | Purpose |
 |------|---------|
-| `appverse.yml` | The recommended way to describe your app(s). See [The appverse.yml](#the-appverseyml) below. |
-| `manifest.yml` | The standard OOD app manifest that runs your app inside Open OnDemand. Required even when you have an `appverse.yml`. |
-| `README.md` | Documentation for researchers and HPC administrators deploying the app |
-| `LICENSE` | Open source license (MIT recommended by OOD community) |
+| `manifest.yml` | The Open OnDemand manifest that runs your app. Always required: at the root, or in each app's folder in a [monorepo](#monorepos). |
+| `README.md` | How a site installs and configures the app. At the root. |
+| `LICENSE` | An open source license. The Open OnDemand community recommends MIT. At the root. |
+| `appverse.yml` | Recommended. Tells the catalog how to list your app. At the root. See [The appverse.yml](#the-appverseyml). |
 
-For Batch Connect apps, also include:
+A Batch Connect app also needs:
 
 | File | Purpose |
 |------|---------|
-| `CHANGELOG.md` | Version history with semantic versioning |
-| `icon.png` or `icon.svg` | App icon for the OOD Dashboard |
-| `form.yml` / `form.yml.erb` | User-facing launch form |
-| `submit.yml.erb` | Job submission configuration |
-| `template/` | Job template scripts |
+| `form.yml` or `form.yml.erb` | The form users fill in to launch the app |
+| `submit.yml.erb` | How the job is submitted to the scheduler |
+| `template/` | The scripts the job runs |
+
+and should have:
+
+| File | Purpose |
+|------|---------|
+| `CHANGELOG.md` | What changed in each version |
+| `icon.png` or `icon.svg` | The app's icon in the dashboard |
 
 ### The appverse.yml
 
-An `appverse.yml` at your repo root lets you control exactly how your app appears in the catalog. It's the recommended approach for any repo, new or already listed.
+An `appverse.yml` at your repository's root controls how your app appears in
+the catalog. We recommend one for every repository, new or already listed.
 
-If your repo has no `appverse.yml`, the catalog infers a single app from your `manifest.yml` and your GitHub metadata. That works, but it can't set the software your app implements, its tags, or its maintainer, and it can't describe a repo that ships more than one app. Adding an `appverse.yml` lets you control all of it.
+Without one, the catalog builds a single app entry from your `manifest.yml`
+and your GitHub details. That works, but it can't say which software your app
+runs, its tags or its maintainer, and it can't list more than one app.
 
 #### Adding an appverse.yml to an App Already in the Catalog
 
-If your app is already listed and you want to switch it to an `appverse.yml`, you don't need to remove anything or submit it again. The catalog updates your existing entry in place.
+If your app is already listed, you can add an `appverse.yml` without
+removing anything or submitting again. The catalog updates your entry in
+place.
 
 1. Add an `appverse.yml` to your repo root and push it to your default branch.
 2. Go to your maintenance hub at **My Appverse** and click **Re-sync from GitHub** on the repo.
 3. Your app keeps its existing catalog entry, its URL, and its review status. Only the metadata changes.
 
-If your `appverse.yml` declares several apps with an `apps:` list, the re-sync creates one catalog entry per app and removes the original single entry, since that app is now described by one of the `apps:` entries. See [Monorepos](#monorepos).
+If your `appverse.yml` lists several apps under `apps:`, the re-sync creates
+one catalog entry for each and removes the old single entry. See
+[Monorepos](#monorepos).
 
-Re-syncing is also how you pull in any later edit to your `appverse.yml`. The catalog re-reads your repo on its own every few hours, so a change will land eventually, but a re-sync applies it right away. If the catalog notices your repo's structure changed before you re-sync, it flags the repo and asks you to re-sync rather than restructuring your entries on its own.
+Re-syncing also picks up any later change to your `appverse.yml`. The catalog
+reads your repository on its own every few hours, so changes arrive anyway,
+but a re-sync applies them right away. If your repository's layout changes,
+for example from one app to several, the catalog waits for you to re-sync
+rather than reorganizing your entries on its own.
 
-> **Don't re-submit through the add-a-repo form.** The form rejects a repository that's already registered and points you back to your hub. Re-sync is the supported path.
+> **Don't add the repository again.** The Add an Appverse repo page turns
+> away a repository that's already registered. Re-sync instead.
 
 #### Registering New Software
 
-The `software:` field in your `appverse.yml` must reference an existing Software entry in the catalog. Before filling it in, check whether your software is already listed [in the catalog](https://openondemand.connectci.org/appverse). If it isn't, you'll need to request that it be added — by [contacting the Appverse team](mailto:openondemand@sweetandfizzy.com?subject=Open%20OnDemand%20Appverse%20Software%20Request).
+The `software:` field in your `appverse.yml` must name software already in
+the [catalog](https://openondemand.connectci.org/appverse). If yours isn't
+there, [ask the Appverse team](mailto:openondemand@sweetandfizzy.com?subject=Open%20OnDemand%20Appverse%20Software%20Request)
+to add it.
 
 #### App Types
 
-Set one of these as your app's `app_type` in `appverse.yml`. The value must match exactly (case-insensitive, but keep the hyphens):
+Set your app's `app_type` in `appverse.yml` to one of these values. Spell it
+exactly as shown. Capitals don't matter, but the hyphens and underscore do.
 
 | `app_type` value | Description |
 |------------------|-------------|
-| `batch-connect-basic` | Interactive jobs that run an HTTP server on a compute node (Jupyter, RStudio, etc.) — set `template: "basic"` in `submit.yml.erb` |
-| `batch-connect-VNC` | Interactive jobs that run a VNC desktop on a compute node (MATLAB, Abaqus, remote desktops) — set `template: "vnc"` in `submit.yml.erb` |
-| `companion_app` | A Passenger-style web app served via Open OnDemand (Ruby Rack, Python WSGI, or Node.js) |
-| `widget` | Small UI components embedded in a dashboard |
-| `dashboard` | Structured user interfaces (e.g., classroom portals, monitoring panels) |
+| `batch-connect-basic` | A job that runs a web server on a compute node, such as Jupyter or RStudio. Set `template: "basic"` in `submit.yml.erb`. |
+| `batch-connect-VNC` | A job that runs a remote desktop on a compute node, such as MATLAB or Abaqus. Set `template: "vnc"` in `submit.yml.erb`. |
+| `companion_app` | A web app that Open OnDemand serves directly (Passenger: Ruby Rack, Python WSGI or Node.js). |
+| `widget` | A small component shown on a dashboard. |
+| `dashboard` | A larger interface, such as a classroom portal or a monitoring panel. |
 
 #### Tags & Discoverability
 
 Good tagging makes your app easier to discover in the catalog.
 
-**Which field for which kind of tag?**
-
-There are three separate places tags live, and they're easy to mix up because they overlap. Here's what goes where:
+Tags help people find your app. There are three kinds, set in different
+places, and they overlap enough to be confusing:
 
 | Field | Where you set it | What it describes | Examples |
 |---|---|---|---|
-| `implementation_tags` | Your app's `appverse.yml` | **How your app runs** — the delivery technology | `apptainer`, `containerized`, `gpu-enabled`, `passenger`, `mcp` |
-| `tags` (discovery) | Your `appverse.yml` (repo-level for monorepos) | **HPC infrastructure, tools, and skills** your app relates to | `slurm`, `globus`, `python`, `tensorflow`, `singularity` |
-| Field of science / research domain | The **Software entry** (not your app) | **The research area** the software serves | `artificial intelligence`, `genomics`, `chemistry` |
+| `implementation_tags` | Your app's `appverse.yml` | How your app runs | `apptainer`, `containerized`, `gpu-enabled`, `passenger`, `mcp` |
+| `tags` (discovery) | Your `appverse.yml` (once per repository in a monorepo) | The HPC tools, systems and skills your app relates to | `slurm`, `globus`, `python`, `tensorflow`, `singularity` |
+| Research domain | The Software entry, not your app | The research area the software serves | `artificial intelligence`, `genomics`, `chemistry` |
 
-The overlaps are the confusing part. `containerized` is an *implementation* tag (how it runs), while `containers`, `docker`, and `singularity` are *discovery* tags (infrastructure it uses). A subject like AI/ML can legitimately appear in **both** the discovery `tags` and the Software entry's research domain — putting it in both is fine, not a mistake. You don't set the research domain directly; it comes from the Software entry your app points at via `software:`.
+For example, `containerized` is an implementation tag because it says how
+the app runs, while `docker` and `singularity` are discovery tags because
+they name tools the app uses. A subject such as AI can be both a discovery
+tag and the software's research domain, and that's fine. You don't set the
+research domain yourself. It comes from the Software entry your `software:`
+field names.
 
 **Implementation Tags (for Apps)**
 
-Implementation tags describe how an app runs. Declare them in your app's `appverse.yml` under an `implementation_tags:` list (case-insensitive matching against the catalog's vocabulary). A value that matches is applied; one that doesn't is flagged in the form preview with a "Did you mean…?" suggestion and kept as an *unresolved tag* shown to reviewers — it does **not** reject your app.
+List them under `implementation_tags:` in your app's `appverse.yml`.
+Capitals don't matter. A tag that's on the list below is applied. One that
+isn't gets a "Did you mean…?" suggestion in the preview and is shown to the
+reviewer. It doesn't stop your app being listed.
 
-**Current valid implementation tags** (live from the catalog — updated automatically by the doc-sync process):
+The current implementation tags, kept up to date from the catalog:
 
 {{ APPVERSE_IMPLEMENTATION_TAGS }}
 
@@ -200,17 +236,25 @@ implementation_tags:
 
 **Research domain (from the Software entry)**
 
-The research area(s) the software serves (e.g., AI/ML, genomics, chemistry, materials science). You don't set this on your app directly — it comes from the Software entry your `software:` value points at.
+The research areas the software serves, such as AI, genomics or chemistry.
+This comes from the Software entry, so you don't set it on your app.
 
 **Discovery Tags**
 
-Discovery tags come from the shared Connect.CI tag taxonomy — HPC infrastructure, tools, and skills (see the table above). Browse the current taxonomy at [openondemand.connectci.org/tags](https://openondemand.connectci.org/tags) to pick the tags that fit your app. Declare the ones you think apply; don't trim your list to only what already exists. A tag that matches is applied. A tag that doesn't match is **not dropped and doesn't block your app** — it's kept as an *unresolved tag* and shown to reviewers, who can recommend it be added to the taxonomy (an administrator makes the actual addition). The submit preview suggests a close existing term when there is one, so prefer that for a near-miss — but a genuinely relevant new tag is worth declaring, because that's how the catalog learns what's missing.
+Discovery tags come from the shared Connect.CI tag list, which you can
+browse at [openondemand.connectci.org/tags](https://openondemand.connectci.org/tags).
+Add every tag that fits your app, not only ones already on the list. A tag
+that's on the list is applied. One that isn't is kept and shown to the
+reviewer, who can suggest adding it to the list. If the preview suggests a
+close existing tag, use that. If your tag is genuinely new, keep it, because
+that's how the list grows.
 
-> **Tip:** Apps with good tagging are significantly easier to find. Aim for at least 3–5 relevant tags.
+> **Tip:** Aim for at least three to five tags. Well-tagged apps are much
+> easier to find.
 
 #### Single-App Configuration
 
-A single-app repo describes its one app with top-level fields:
+A repository with one app describes it with top-level fields:
 
 ```yaml
 title: "RStudio Server"
@@ -226,15 +270,19 @@ website: "https://example.org/rstudio"
 docs: "https://example.org/rstudio/docs"
 ```
 
-Each app needs `name`, `description`, `app_type`, `maintainer.name`, `maintainer.support_url`, and a `software` value that matches a software entry in the catalog. Miss any of these and the app stays off the catalog until you add it and re-sync.
+The app needs `description`, `app_type`, `maintainer.name`,
+`maintainer.support_url`, and a `software` value that names software in the
+catalog. If any is missing, the app stays out of the catalog until you add it
+and re-sync. `title` is optional, but set it: without it the catalog uses the
+repository's name, and `bc_rstudio` makes a poor title.
 
-For the complete field list, see the [annotated `appverse.yml` reference](https://github.com/Sweet-and-Fizzy/ood-appverse/blob/main/docs/appverse.yml).
+Every field is explained in the
+[annotated `appverse.yml` reference](https://github.com/Sweet-and-Fizzy/ood-appverse/blob/main/docs/appverse.yml).
 
 ### The manifest.yml
 
-The `manifest.yml` is the standard Open OnDemand app manifest — it's what actually runs your app inside OOD. Even when you have an `appverse.yml`, you still need a `manifest.yml`.
-
-It must include:
+The `manifest.yml` is what Open OnDemand reads to run your app, so you need
+one even when you have an `appverse.yml`. It must include:
 
 ```yaml
 name: My App Name
@@ -246,7 +294,7 @@ description: |
   and what it launches.
 ```
 
-Optional but helpful:
+These are optional but useful:
 
 ```yaml
 icon: icon.png
@@ -256,33 +304,36 @@ metadata:
   field_of_science: Chemistry
 ```
 
-See the [OOD manifest.yml reference](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/manifest.html) for full details.
+The [Open OnDemand manifest reference](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/manifest.html) has the full list.
 
 ### The README
 
-Write for **HPC administrators** who need to deploy your app on their system.
+Write the README for the HPC administrator at another site who has to
+install your app. Start from the
+[Appverse README Template](https://github.com/tamu-edu/appverse_readme_template).
 
-Use the [Appverse README Template](https://github.com/tamu-edu/appverse_readme_template) as your starting point.
+It should cover:
 
-**Must have:**
-1. **Overview** — what the app launches and who it's for
-2. **Requirements** — compute node software, OOD version, scheduler
-3. **Installation** — step-by-step deployment instructions
-4. **Configuration** — what to customize and where (a table of site-specific values works well here)
-5. **Known limitations** — what doesn't work, what's untested
+1. **Overview.** What the app launches and who it's for.
+2. **Requirements.** What has to be on the compute nodes, which Open
+   OnDemand version, and which scheduler.
+3. **Installation.** Step by step.
+4. **Configuration.** What a site changes and where. A table of the
+   site-specific values works well.
+5. **Known limitations.** What doesn't work or hasn't been tested.
 
-**Should have:**
-- **Features** — key capabilities specific to this OOD app
-- **Troubleshooting** — common issues and solutions
-- **Testing** — where it's been deployed and how to verify
+It helps to add the app's main features, common problems and how to fix
+them, and where it has been tested.
 
-**Exemplar:** [EpiGenomicsCode/ProteinStructure-OOD](https://github.com/EpiGenomicsCode/ProteinStructure-OOD) — covers features, prerequisites, dual-engine usage, monitoring, and troubleshooting.
-
-**Anti-pattern:** A README that only contains the project name and a contact email, or one still showing unfilled template placeholders.
+[EpiGenomicsCode/ProteinStructure-OOD](https://github.com/EpiGenomicsCode/ProteinStructure-OOD)
+is a good example. A README with only the project name and a contact email,
+or with the template's placeholder text still in it, will be sent back.
 
 ## Monorepos
 
-A Monorepo holds several apps in one repository. Add an `apps:` list to your `appverse.yml`, with one entry per app, each living in its own subpath. Repo-level `maintainer` and `shared_implementation_tags` are inherited by every app:
+A monorepo holds several apps in one repository. List them under `apps:` in
+your `appverse.yml`, one entry per app, each in its own folder. Every app
+inherits the repository's `maintainer` and `shared_implementation_tags`:
 
 ```yaml
 title: "Example Monorepo"
@@ -308,25 +359,33 @@ apps:
     # inherits maintainer and "batch connect"
 ```
 
-Most repos hold one app and don't need this. Reach for a Monorepo only when one repository really does contain several distinct apps that ship together.
+Most repositories hold one app and don't need this. Use a monorepo only when
+one repository really does contain several separate apps that are released
+together.
 
-> **Note:** A Monorepo's top-level `tags:` are discovery tags for finding the repo in the catalog — a different vocabulary that does not flow to member apps. `implementation_tags` (per app) and `shared_implementation_tags` (inherited) are the ones that describe how an app runs.
+> **Note:** A monorepo's top-level `tags:` are discovery tags for the
+> repository and aren't passed to its apps. `implementation_tags` (each app's
+> own) and `shared_implementation_tags` (inherited by every app) say how the
+> apps run.
 
 ## Collections
 
-A Collection is a curated, multi-app bundle assembled around a shared purpose — a research domain, a workflow, or an institutional deployment package. Examples include a Bioinformatics Suite (AlphaFold, BLAST, RStudio for genomics), or an institutional starter pack that bundles the apps a new HPC site is most likely to need.
+A collection is a hand-picked set of apps with a shared purpose, such as a
+bioinformatics suite (AlphaFold, BLAST, RStudio) or a starter set for a new
+HPC site. A monorepo is several apps in one repository. A collection gathers
+apps from many repositories that are already in the catalog.
 
-Unlike a Monorepo — where multiple apps share a single repository — a Collection draws from apps across many different repositories. The apps already exist in the catalog; a Collection is the curation layer on top.
+Each collection has a maintainer, who decides which apps belong, keeps the
+list current, and explains what the set is for.
 
-Collections have dedicated support in the Appverse through a schema, catalog UI, and maintainer tooling. A collection maintainer is responsible for deciding which apps belong, keeping the membership current, and describing the Collection's purpose clearly so deployers understand what they're getting as a set.
-
-To propose or create a Collection, reach out through the [Appverse Affinity Group](https://openondemand.connectci.org/affinity-groups/ood-appverse) or [OOD Discourse](https://discourse.openondemand.org/).
+To propose a collection, get in touch through the [Appverse Affinity Group](https://openondemand.connectci.org/affinity-groups/ood-appverse) or [Open OnDemand Discourse](https://discourse.openondemand.org/).
 
 ## Best Practices
 
 ### Repository & Metadata
 
-**Use semantic versioning and releases.** Tag releases so deployers can pin to stable versions rather than tracking a moving branch.
+**Make releases.** Tag versions using semantic versioning, so a site can
+install a known version instead of whatever is on `main` today.
 
 ```
 v1.0.0  — Initial release
@@ -334,9 +393,13 @@ v1.1.0  — Added GPU support
 v1.1.1  — Fixed module path for RHEL 9
 ```
 
-Many apps have zero releases, forcing deployers to clone `main` with no way to know if things will break. **Exemplar:** [OSC/bc_osc_ansys_workbench](https://github.com/OSC/bc_osc_ansys_workbench) — 43 releases with consistent semantic versioning.
+Many apps have no releases, so a site can't tell whether pulling the latest
+code will break something. [OSC/bc_osc_ansys_workbench](https://github.com/OSC/bc_osc_ansys_workbench)
+is a good example. Each new release is also how a listed app gets reviewed
+again (see [Review Process](#review-process)).
 
-**Maintain a CHANGELOG.** A CHANGELOG helps deployers decide whether to update and what to watch for.
+**Keep a CHANGELOG.** It tells a site whether to update and what to watch
+for.
 
 ```markdown
 ## [1.1.0] - 2025-06-15
@@ -348,22 +411,32 @@ Many apps have zero releases, forcing deployers to clone `main` with no way to k
 - Module load failure on clusters without Lmod
 ```
 
-**Include a license.** The OOD community recommends MIT. Without a license, others legally cannot use your code. OSC apps use dual licensing: MIT for code, CC-BY-4.0 for documentation. Either approach works.
+**Include a license.** Without one, nobody else can legally use your code.
+The Open OnDemand community recommends MIT. OSC's apps use MIT for code and
+CC-BY-4.0 for documentation, and that works too.
 
 ### Configuration & Portability
 
-**Centralize site-specific configuration.** There should be one clear place for a deployer to customize your app for their cluster. Don't scatter module names, paths, and queue names across multiple files.
+A site-specific value is anything that has to change for your app to run
+at another site: the cluster, partition, account, module, absolute paths and
+container image. The goal is for a site to install your app without editing
+your code.
+
+**Put site-specific values in form attributes.** Then a site can set them in
+its own Open OnDemand configuration instead of editing your repository.
+Don't scatter module names, paths and partitions across your scripts.
 
 ```yaml
-# form.yml — all site-specific values in one attributes block
+# form.yml: site-specific values as attributes, with your site's defaults
 attributes:
   modules:
-    value: "abaqus/2022"          # ← Change this for your site
+    value: "abaqus/2022"
   partition:
-    value: "batch"                # ← Change this for your site
+    value: "batch"
 ```
 
-**Avoid hardcoded paths.** Absolute paths to cluster-specific locations make your app impossible to deploy elsewhere without editing core scripts.
+**Don't hardcode paths.** A path to your cluster's scratch or project space
+means every other site has to edit your scripts.
 
 ```erb
 # Do this:
@@ -373,15 +446,18 @@ export SCRATCH_DIR="<%= scratch_dir %>"
 export SCRATCH_DIR="/fs/scratch/$USER"    # Only works at one site
 ```
 
-**Use `module load`, not absolute paths.** This is the most portable approach across HPC sites.
+**Load software with `module load`, not an absolute path.** Most HPC sites
+use modules, so this works almost everywhere.
 
 ```erb
 module load <%= modules %>
 ```
 
-**Use OOD's built-in form features.** OOD 4.0+ provides automatic form fields that adapt to the cluster. Use them instead of hardcoding options.
+**Use Open OnDemand's automatic form fields.** Since version 4.0, Open
+OnDemand can fill some form fields from the cluster itself. Use them instead
+of hardcoded lists.
 
-| Feature | Use Instead Of |
+| Field | Use it instead of |
 |---------|---------------|
 | `auto_queues` | Hardcoded partition dropdown |
 | `auto_accounts` | Hardcoded account list |
@@ -389,7 +465,7 @@ module load <%= modules %>
 | `auto_groups` | Hardcoded Unix group list |
 
 ```yaml
-# form.yml — automatic queue detection (Slurm)
+# form.yml: fill partitions and accounts from the cluster (Slurm)
 form:
   - auto_queues
   - auto_accounts
@@ -398,23 +474,25 @@ form:
 
 ### Batch Connect Apps
 
-If you're building or modifying a Batch Connect app, it helps to understand how the pieces fit together at runtime. OOD uses ERB (Embedded Ruby) templates to wire form values into job scripts and session views.
+This section explains how a Batch Connect app's files work together. Open
+OnDemand uses ERB (Embedded Ruby) templates to put the user's form values
+into the job's scripts.
 
-**The execution flow**
+**What happens when a user clicks Launch**
 
-When a user fills out the form and clicks Launch:
-
-1. `form.yml` (or `form.yml.erb`) renders the form and collects user input
-2. `submit.yml.erb` translates form values into scheduler directives
-3. `template/before.sh.erb` runs setup before the main script (ports, passwords, environment)
-4. `template/script.sh.erb` launches the application
-5. `template/after.sh.erb` runs cleanup when the session ends
+1. `form.yml` (or `form.yml.erb`) shows the form and collects the user's
+   choices.
+2. `submit.yml.erb` turns those choices into the scheduler request.
+3. `template/before.sh.erb` does the setup, such as picking a port, making
+   a password and setting the environment.
+4. `template/script.sh.erb` starts the application.
+5. `template/after.sh.erb` cleans up when the session ends.
 
 **The `context` and `session` objects**
 
-Inside any `.erb` file, two objects are available:
+Two objects are available in any `.erb` file.
 
-**`context`** — every form field becomes a method on `context`:
+**`context`** holds the user's form values. Each form field becomes a method:
 
 ```bash
 # In script.sh.erb
@@ -425,18 +503,18 @@ module load rstudio/<%= context.version %>
 <%- end -%>
 ```
 
-**`session`** — runtime information about the batch connect session:
+**`session`** holds details of the running session:
 
 | Attribute | What it gives you |
 |-----------|-------------------|
 | `session.id` | Unique session identifier |
 | `session.job_id` | The scheduler job ID |
-| `session.cluster` | Cluster name (matches your `clusters.d/` config) |
+| `session.cluster` | Cluster name, as in your `clusters.d/` configuration |
 | `session.staged_root` | Path to the session's staging directory |
 
 **Built-in helper methods**
 
-OOD provides helpers you should use instead of rolling your own:
+Use Open OnDemand's helpers instead of writing your own:
 
 ```bash
 # Find an available port on the compute node:
@@ -450,29 +528,35 @@ export RSTUDIO_PASSWORD="${password}"
 **ERB syntax**
 
 ```erb
-<%= expression %>     ← Renders the result as a string in the file
-<%- statement -%>     ← Executes Ruby code but renders nothing
+<%= expression %>     ← writes the result into the file
+<%- statement -%>     ← runs Ruby code and writes nothing
 ```
 
-The `=` means "output this." The `-` means "run this silently." Getting these mixed up is a common source of bugs.
+`<%=` writes something into the file. `<%-` runs code without writing
+anything. Mixing them up is a common bug.
 
 ### Code Quality
 
-**Add error handling to scripts.** A script that fails silently wastes the user's allocation and produces no useful debugging information.
+**Stop with a clear message when something fails.** If a script carries on
+after a step fails, the user's job wastes its time allocation and the log
+doesn't say why. Check the steps that matter, such as `cd`, `module load` and
+`mkdir`.
 
 ```bash
 #!/bin/bash
-set -euo pipefail
 
-module load "<%= modules %>" || { echo "ERROR: Failed to load module '<%= modules %>'"; exit 1; }
+module load "<%= modules %>" || { echo "ERROR: could not load module '<%= modules %>'"; exit 1; }
 
-if [[ ! -x "$(command -v jupyter)" ]]; then
+if ! command -v jupyter >/dev/null; then
   echo "ERROR: jupyter not found after module load"
   exit 1
 fi
 ```
 
-**Document magic numbers and formulas.**
+Avoid `set -e` in job scripts. It can stop a script that starts processes in
+the background.
+
+**Explain numbers and formulas** with a comment.
 
 ```erb
 # License tokens required: 5 * (cores ^ 0.422), rounded down
@@ -480,54 +564,66 @@ fi
 num_tokens = (5 * (nodes * ppn) ** 0.422).floor
 ```
 
-**Don't repeat yourself.** Use ERB to generate options from a data structure rather than duplicating blocks of configuration for each node type or cluster.
+**Don't copy and paste blocks.** If you have the same block for each node
+type or cluster, generate it with ERB from a list instead.
 
-**Remove dead code.** Commented-out code adds noise and confuses deployers. Use version control to retrieve old code if needed.
+**Remove commented-out code.** It confuses the next person who reads the
+app. Git keeps the old version if you need it.
 
-**Validate form inputs.** Use OOD's built-in validation attributes to prevent invalid job submissions.
+**Check form values before the job is submitted.** Give each number field
+that reaches the scheduler a `min`, and make it `required`. A free-text field
+that reaches the scheduler needs a `pattern`.
 
 ```yaml
 attributes:
   bc_num_hours:
     widget: number_field
     min: 1
-    max: 72
     step: 1
     value: 1
     label: "Wall time (hours)"
-    help: "Maximum is 72 hours for batch partition"
     required: true
 ```
+
+A `max` is fine, but leave it out if it depends on your site's limits. A
+`max: 72` that's right for your partition is wrong for another site, which
+can set its own limit in its configuration.
 
 ### Anti-Patterns to Avoid
 
 #### Avoid Fork Rot
 
-Forking an app for minor site-specific changes creates a maintenance burden. The fork diverges from upstream, misses bug fixes, and confuses the catalog with near-identical entries.
+Copying an app to make small changes for your site leaves you maintaining a
+copy. It drifts from the original, misses its fixes, and fills the catalog
+with near-identical apps.
 
-**Signs of fork rot:**
-- Fork README still references the original institution
-- No documentation of what changed
-- Commits stop after initial customization
-- Version numbers diverge from upstream
+A copy has drifted when its README still names the original institution,
+nothing says what changed, commits stopped after the first changes, or its
+version numbers no longer match the original's.
 
-**Better approach:** Contribute improvements upstream. If you must fork, document exactly what differs and why.
+Send your improvements to the original repository instead. If you do need
+your own copy, say exactly what differs and why. If the original is no
+longer maintained, a fork that you maintain is welcome.
 
 #### Don't Disable Security Settings Without Explanation
 
-If you must weaken a security setting, document the reason and the risk.
+If you have to turn off a security setting, say why next to it, and what
+the risk is.
 
 ```bash
-auth-encrypt-password=0    # Why is this disabled? Document the reason.
+auth-encrypt-password=0    # Say why this is off and what the risk is.
 ```
 
 #### Don't Assume a Specific Scheduler
 
-Where possible, use OOD's scheduler abstraction rather than SLURM-specific directives. If your app requires a specific scheduler, document it as a prerequisite.
+Where you can, use Open OnDemand's general scheduler settings rather than
+Slurm-only directives. If your app does need a particular scheduler, list it
+in the README's requirements.
 
 #### Avoid Oversized Forms
 
-Forms with 15+ fields are overwhelming. Group related options, use sensible defaults, and hide advanced options behind conditional display.
+A form with 15 or more fields is hard to use. Group related fields, choose
+good defaults, and hide advanced options until the user asks for them.
 
 ```yaml
 attributes:
@@ -542,32 +638,34 @@ attributes:
     label: "Memory (GB)"
 ```
 
-### Checklist Summary
+### Checklist
 
-Use this as a quick self-check before submitting your app.
+A short list to go through before you submit. The
+[automated review](#check-your-app-before-you-submit) checks most of it for
+you.
 
 **Must Have**
-- [ ] `manifest.yml` with name, category, subcategory, role, description
-- [ ] `README.md` with prerequisites, installation, configuration
-- [ ] `LICENSE` file (MIT recommended)
+- [ ] `manifest.yml` with name, category, subcategory, role and description
+- [ ] `README.md` with requirements, installation and configuration
+- [ ] `LICENSE` (MIT recommended)
 - [ ] No hardcoded absolute paths in scripts
-- [ ] Site-specific values centralized and clearly marked
+- [ ] Site-specific values in form attributes
 
 **Should Have**
-- [ ] `CHANGELOG.md` with semantic versioning
+- [ ] `CHANGELOG.md` with semantic versions
 - [ ] `icon.png` or `icon.svg`
-- [ ] Error handling in template scripts (`set -euo pipefail`)
-- [ ] Input validation on form fields (min, max, required)
-- [ ] Comments on non-obvious logic
+- [ ] Scripts stop with a message when an important step fails
+- [ ] Number fields that reach the scheduler have a `min` and are `required`
+- [ ] Comments on anything that isn't obvious
 - [ ] At least one tagged release
 
 **Nice to Have**
 - [ ] Screenshots of the running app
-- [ ] `info.md.erb` with user-facing guidance
-- [ ] `completed.md.erb` with post-job information
-- [ ] Troubleshooting section in README
-- [ ] CI/CD pipeline
-- [ ] Environment variable documentation
+- [ ] `info.md.erb` with guidance for users
+- [ ] `completed.md.erb` with information after the job ends
+- [ ] A troubleshooting section in the README
+- [ ] Automated tests (CI)
+- [ ] Environment variables documented
 
 ## After You Contribute
 
@@ -616,23 +714,24 @@ same way, and the current version stays live while it is.
 
 ### Maintenance
 
-App maintainers are responsible for:
+Once your app is listed, you look after it:
 
-- Keeping metadata current in `appverse.yml`
-- Updating the README when the app's behavior changes
-- Updating the CHANGELOG and tagging a new release for anything significant
-- Responding to breaking changes in Open OnDemand or upstream software
-- Addressing issues and pull requests from the community
+- Keep `appverse.yml` up to date.
+- Update the README when the app changes.
+- Update the CHANGELOG and tag a release for anything significant.
+- Fix the app when a new Open OnDemand version or a new version of the
+  software breaks it.
+- Answer issues and pull requests.
 
-Inactive apps may be archived, but we prefer revitalizing them with community help.
+If you can't maintain the app any more, archive the repository on GitHub.
+We'd rather find the app a new maintainer than lose it.
 
 ### Community & Governance
 
-- Join the [Appverse Affinity Group](https://openondemand.connectci.org/affinity-groups/ood-appverse) to connect with other contributors and stay informed
-- Join the [OOD Discourse](https://discourse.openondemand.org/) for community support and monthly Tips & Tricks calls
-- Propose new tags or app types through community discussion
-- Major policy decisions are community-driven
-- Follow contribution guidelines and the [code of conduct](https://openondemand.connectci.org/code-of-conduct)
+- Join the [Appverse Affinity Group](https://openondemand.connectci.org/affinity-groups/ood-appverse) to meet other contributors and hear about changes.
+- Join the [Open OnDemand Discourse](https://discourse.openondemand.org/) for help and the monthly Tips & Tricks calls.
+- Propose new tags or app types in the Affinity Group or on Discourse. Major policy decisions are made by the community.
+- Follow the [code of conduct](https://openondemand.connectci.org/code-of-conduct).
 
 ## Reference
 
@@ -645,7 +744,7 @@ Inactive apps may be archived, but we prefer revitalizing them with community he
 | form.yml Reference | https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/form.html |
 | manifest.yml Reference | https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/manifest.html |
 | submit.yml.erb Reference | https://osc.github.io/ood-documentation/latest/reference/files/submit-yml-erb.html |
-| OOD Discourse Forum | https://discourse.openondemand.org/ |
+| Open OnDemand Discourse | https://discourse.openondemand.org/ |
 | Community App List | https://discourse.openondemand.org/t/list-of-open-ondemand-apps/2107 |
 | Appverse Affinity Group | https://openondemand.connectci.org/affinity-groups/ood-appverse |
 | README Template | https://github.com/tamu-edu/appverse_readme_template |
@@ -663,7 +762,7 @@ my-app/
 ├── LICENSE               # Open source license (required)
 ├── CHANGELOG.md          # Version history (recommended)
 ├── connection.yml        # Passes runtime data (ports, tokens) to the session card
-├── view.html.erb         # Connection view — the "Connect" button and any auth setup
+├── view.html.erb         # Connection view: the "Connect" button and any login setup
 ├── info.md.erb           # Pre-launch info panel shown to users before they submit
 ├── completed.md.erb      # Post-completion message
 ├── form.js               # Client-side form logic (optional)
@@ -678,13 +777,13 @@ my-app/
 
 | Term | Definition |
 |------|------------|
-| **Batch Connect** | OOD framework for launching interactive HPC jobs through a web form |
+| **Batch Connect** | The Open OnDemand framework for launching interactive HPC jobs from a web form |
 | **connection.yml** | Declares runtime parameters (ports, tokens) to pass from job scripts to the session card |
-| **context** | ERB object available in `.erb` files — gives access to every form field the user submitted |
-| **ERB** | Embedded Ruby — templating language used in OOD scripts |
+| **context** | ERB object in `.erb` files that holds every form value the user submitted |
+| **ERB** | Embedded Ruby, the template language Open OnDemand uses |
 | **Lmod** | Lua-based module system for managing software environments |
-| **manifest.yml** | YAML file defining app metadata for the OOD dashboard |
-| **Passenger** | Phusion Passenger — app server used by OOD for web applications |
-| **session** | ERB object available in `.erb` files — runtime info like job ID, cluster, and staged_root |
-| **Slug** | URL-friendly identifier derived from a name (e.g., "AlphaFold" → `alphafold`) |
-| **VNC** | Virtual Network Computing — protocol for remote desktop access |
+| **manifest.yml** | The file that tells Open OnDemand how to show and run the app |
+| **Passenger** | The app server Open OnDemand uses to run web apps |
+| **session** | ERB object in `.erb` files that holds the running session's details, such as job ID, cluster and staged_root |
+| **Slug** | URL-friendly identifier made from a name, such as "AlphaFold" → `alphafold` |
+| **VNC** | Virtual Network Computing, the protocol for remote desktops |
