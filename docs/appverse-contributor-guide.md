@@ -27,13 +27,45 @@ If the software already has app implementations, use this to decide:
 | Modified an existing app | Contribute changes back to the original repository rather than publishing a new version. Forks that diverge silently create maintenance burden for everyone (see [Avoid Fork Rot](#avoid-fork-rot)). |
 | Only changed site-specific configuration | That likely doesn't warrant a new app — it's working as intended. Document your configuration instead. |
 | Added significant new functionality (e.g., GPU support, containerization, a different execution model) | That's a good candidate for a new app. |
+| The original app is no longer maintained | A maintained fork is welcome. Say in your README which app it continues. |
 
 ### High-Level Workflow
 
-1. **Prepare your repository** with the required files and metadata — at minimum an `appverse.yml`, `manifest.yml`, `README.md`, and `LICENSE`. See [Repository Essentials](#repository-essentials).
-2. **Register it** through the add-a-repo form on the Appverse site, where you paste your repository URL. The catalog picks it up and runs an initial validation.
-3. **Review and validation** — a reviewer checks your app against the [Reviewer Checklist](#review-process). This usually takes a few days. You may be asked to make changes before the app is listed.
-4. **Ongoing maintenance** — once listed, you're responsible for keeping the app current as OOD and the upstream software evolve. If you decide to stop maintaining your app, please archive the GitHub repository.
+1. **Prepare your repository.** It needs a `manifest.yml`, a `README.md` and a `LICENSE`, and we recommend an `appverse.yml`. See [Repository Essentials](#repository-essentials) and [Best Practices](#best-practices).
+2. **Check it yourself.** Run the same automated review the catalog uses, on your own machine, and fix what it finds. See [Check your app before you submit](#check-your-app-before-you-submit).
+3. **Add it** on the [Add an Appverse repo](https://openondemand.connectci.org/appverse/add-repo) page by pasting the repository URL. Then click **Send for review** on its card.
+4. **Review.** An automated review runs, then a reviewer checks it and decides. See [Review Process](#review-process).
+5. **Maintain it.** Once listed, keep the app current as Open OnDemand and the software it runs change. If you stop maintaining it, archive the GitHub repository.
+
+### Check your app before you submit
+
+The catalog reviews every app with Appverse Review, an automated review that
+runs in [Claude Code](https://claude.ai/code). You can run the same review on
+your own repository while you build the app, so you see what a reviewer will
+see and can fix it first.
+
+Install it once, in Claude Code:
+
+```
+/plugin marketplace add Sweet-and-Fizzy/appverse-review
+/plugin install appverse-review@appverse-review
+```
+
+Then open Claude Code in your app's repository and run:
+
+```
+/appverse-review:review-app
+```
+
+The review checks the repository's structure, security, documentation,
+portability, code quality and upkeep against the
+[Review Rubric](https://openondemand.connectci.org/appverse-review-rubric). It
+ends with a list of what to fix before you submit, most important first. Run
+it again after your changes. The review is automated and can be wrong, so
+read each item and decide whether it applies.
+
+More detail, including how to review one aspect at a time, is in the
+[Appverse Review README](https://github.com/Sweet-and-Fizzy/appverse-review#usage).
 
 ### Support
 
@@ -541,23 +573,46 @@ Use this as a quick self-check before submitting your app.
 
 ### Review Process
 
-New apps are evaluated against the [Reviewer Checklist](https://openondemand.connectci.org/appverse-reviewer-checklist) and the [Best Practices Guide](https://openondemand.connectci.org/appverse-best-practices). Reviewers look for:
+Every new app, and every update to a listed app, is reviewed before it
+appears in the catalog. A review has two parts. First, the automated review
+(the same one you can [run yourself](#check-your-app-before-you-submit))
+writes a report. Then a reviewer reads the report, checks it against your
+repository, corrects anything the automated review got wrong, and makes the
+decision. Both follow the
+[Review Rubric](https://openondemand.connectci.org/appverse-review-rubric).
 
-- Complete metadata and documentation
-- Clear, portable configuration
-- Adherence to Open OnDemand conventions
-- An open source license
+**Sending your app.** On your app's card, click **Send for review**. The
+card shows where the review is: Submitted, In review, Decision, Live. If you
+need to stop the review, for example to make a large change first, click
+**Withdraw from review…** and send it again when you're ready.
 
-**Decision outcomes:**
+**The decision.** The reviewer emails you the decision. Replying to that
+email reaches the reviewer directly. Once the decision is sent you can read
+the whole review from your app's card: the levels it was given, each
+finding with the evidence behind it, and what the reviewer wrote.
 
-| Outcome | Criteria |
-|---------|----------|
-| **Accept** | Passes all required criteria, adequate+ documentation, partially portable+ config |
-| **Accept with suggestions** | Passes required criteria but has clear improvement areas — include specific feedback |
-| **Request changes** | Missing required criteria but fixable — provide specific list of what to address |
-| **Reject** | Duplicate app, no license, abandoned/unmaintained, security concerns, or not an OOD app |
+There are four decisions:
 
-The catalog refreshes from your repository automatically every few hours. Re-syncing from the maintenance hub pulls your changes in right away.
+| Decision | What it means | What you do |
+|---|---|---|
+| **Accept** | The app is ready. Any remaining notes are small polish. | Nothing. A reviewer publishes it. |
+| **Accept with suggestions** | The app can be listed, and the review suggests improvements, such as clearer documentation or fewer hardcoded site settings. | The suggestions are optional. Reply to the email if you'd like to make changes before it goes live. Otherwise a reviewer publishes it. |
+| **Request changes** | Something must be fixed first, such as a missing license, a file that doesn't parse, or a serious security problem. | Fix the repository on GitHub, then click **Re-submit** on the card. |
+| **Reject** | The app can't be listed. This is for apps that duplicate one already in the catalog, are no longer maintained, are not Open OnDemand apps, or have a security problem that can't be fixed without a redesign. | The review says why. Reply to the email if you have questions. |
+
+Most problems lead to Request changes, not Reject. A missing file or a
+failed check is something you can fix.
+
+**What becomes public.** Once your app is published, its review is public
+too: the levels, the findings, and a short summary from the reviewer. If the
+reviewer changed a finding's severity, the review shows that. Findings the
+reviewer dismissed and the reviewer's internal notes are never public.
+
+**After it's listed.** The catalog refreshes from your repository
+automatically every few hours. Clicking **Re-sync from GitHub** on the card
+pulls your changes in right away. When you publish a new release (or a new
+tag, if the repository doesn't use releases), that version is reviewed the
+same way, and the current version stays live while it is.
 
 ### Maintenance
 
