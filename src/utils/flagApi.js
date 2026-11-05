@@ -2,7 +2,7 @@
  * Flag API utilities for authenticated user operations.
  *
  * Auth detection: GET /user/login_status?_format=json → returns 1 or 0
- * Read flags:    GET /jsonapi/flagging/appverse_apps → user's flaggings (JSON:API, read-only)
+ * Read flags:    GET /appverse/api/flags?_format=json → { flagged: [{ uuid, nid }] } (custom endpoint, read-only)
  * Flag app:      POST   /appverse/api/flag/{nid} → { flagged: true, nid }   (custom endpoint)
  * Unflag app:    DELETE /appverse/api/flag/{nid} → { flagged: false, nid }  (custom endpoint)
  * CSRF tokens:   GET /session/token → token sent as X-CSRF-Token on write requests
@@ -17,6 +17,11 @@ let csrfTokenPromise = null;
 
 /**
  * Check if user is authenticated, and fetch their flagged app UUIDs.
+ *
+ * @param {string} [apiBaseUrl='/api'] - Unused. Kept for call-site compatibility; flag reads now
+ *   go through siteBaseUrl like every other flag endpoint.
+ * @param {string} [siteBaseUrl=''] - Base URL for Drupal endpoints
+ * @returns {Promise<{authenticated: boolean, flaggedIds: string[]}>}
  */
 export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = '') {
   if (import.meta.env.DEV) {
@@ -42,7 +47,7 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
       return { authenticated: false, flaggedIds: [] };
     }
 
-    const flagResult = await fetchFlaggings(apiBaseUrl);
+    const flagResult = await fetchFlaggings(siteBaseUrl);
 
     return {
       authenticated: true,
@@ -55,13 +60,18 @@ export async function checkAuthAndFetchFlags(apiBaseUrl = '/api', siteBaseUrl = 
 }
 
 /**
- * Fetch user's flaggings via JSON:API (read-only).
- * Returns the app UUIDs from relationships.flagged_entity.data.id.
+ * Fetch the current user's flagged apps from the custom endpoint (read-only).
+ * GET /appverse/api/flags?_format=json → { flagged: [{ uuid, nid }, ...] }
+ * Returns the app UUIDs (the `uuid` of each entry). Malformed entries are skipped.
+ *
+ * @param {string} siteBaseUrl - Base URL for Drupal endpoints
+ * @returns {Promise<{flaggedIds: string[]}>}
  */
-async function fetchFlaggings(apiBaseUrl) {
+async function fetchFlaggings(siteBaseUrl) {
   try {
-    const flaggingsUrl = `${apiBaseUrl}/flagging/appverse_apps`;
-    const flagResponse = await fetch(flaggingsUrl, { credentials: 'include' });
+    const baseUrl = getFlagApiBaseUrl(siteBaseUrl);
+    const flagsUrl = `${baseUrl}/appverse/api/flags?_format=json`;
+    const flagResponse = await fetch(flagsUrl, { credentials: 'include' });
 
     if (!flagResponse.ok) {
       console.error('[FlagApi] Flaggings fetch failed:', flagResponse.status);
@@ -69,13 +79,13 @@ async function fetchFlaggings(apiBaseUrl) {
     }
 
     const data = await flagResponse.json();
-    const flaggedIds = [];
-    for (const flagging of (data.data || [])) {
-      const appId = flagging.relationships?.flagged_entity?.data?.id;
-      if (appId) {
-        flaggedIds.push(appId);
-      }
+    if (!Array.isArray(data?.flagged)) {
+      return { flaggedIds: [] };
     }
+
+    const flaggedIds = data.flagged
+      .map(entry => entry?.uuid)
+      .filter(uuid => typeof uuid === 'string' && uuid.length > 0);
 
     return { flaggedIds };
   } catch (error) {
