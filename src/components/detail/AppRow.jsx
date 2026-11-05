@@ -61,7 +61,7 @@ export default function AppRow({ app, isExpanded, onToggle, hideRepoLevel = fals
 
   // App identifiers for flagging
   const appId = app.id; // UUID
-  const nid = app.nid; // needed for entity_id when creating a flagging
+  const nid = app.nid; // Drupal node ID, used by the flag endpoint
 
   // For smooth height animation of README panel
   const readmeRef = useRef(null);

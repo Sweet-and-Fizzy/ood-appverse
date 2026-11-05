@@ -4,7 +4,7 @@
  *
  * Props:
  * @param {string} appId - App UUID (used for tracking flag state)
- * @param {number} nid - Drupal node ID (needed for entity_id when creating a flagging)
+ * @param {number} nid - Drupal node ID (used by the flag endpoint)
  * @param {boolean} compact - If true, show only the icon (no text)
  * @param {string} className - Additional CSS classes
  */

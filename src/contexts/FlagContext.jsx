@@ -22,11 +22,8 @@ const FlagContext = createContext(null);
 export function FlagProvider({ children }) {
   const config = useConfig();
   const [flaggedIds, setFlaggedIds] = useState(new Set());
-  // Map of appId → flaggingId (needed for DELETE)
-  const [flaggingMap, setFlaggingMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
-  const [userUuid, setUserUuid] = useState(null);
   const [pendingIds, setPendingIds] = useState(new Set());
   // Track flag count adjustments for each app (updated only after server confirms)
   // Map of appId → number (cumulative delta: +1 for flag, -1 for unflag)
@@ -37,9 +34,7 @@ export function FlagProvider({ children }) {
     const init = async () => {
       const result = await checkAuthAndFetchFlags(config.apiBaseUrl, config.siteBaseUrl);
       setAuthenticated(result.authenticated);
-      setUserUuid(result.userUuid || null);
       setFlaggedIds(new Set(result.flaggedIds));
-      setFlaggingMap(result.flaggingMap || {});
       setLoading(false);
     };
 
@@ -61,13 +56,13 @@ export function FlagProvider({ children }) {
   /**
    * Toggle flag state for an app (with optimistic update).
    * @param {string} appId - App UUID (used for local state tracking and flagged_entity relationship)
-   * @param {number} nid - Drupal node ID (used for creating flagging entity)
+   * @param {number} nid - Drupal node ID (used by the custom flag endpoint)
    */
   const toggleFlag = useCallback(async (appId, nid) => {
     if (!authenticated) return;
     if (pendingIds.has(appId)) return;
-    if (!userUuid) {
-      console.error('[FlagContext] Cannot toggle flag: no user UUID available');
+    if (!nid) {
+      console.error('[FlagContext] Cannot toggle flag: missing nid for app', appId);
       return;
     }
 
@@ -87,24 +82,14 @@ export function FlagProvider({ children }) {
 
     try {
       if (wasFlagged) {
-        const flaggingId = flaggingMap[appId];
-        if (!flaggingId) {
-          throw new Error(`No flagging UUID found for app ${appId}`);
-        }
-        await unflagApp(flaggingId, config.apiBaseUrl, config.siteBaseUrl);
-        setFlaggingMap(prev => {
-          const next = { ...prev };
-          delete next[appId];
-          return next;
-        });
+        await unflagApp(nid, config.siteBaseUrl);
         // Update flag count adjustment after server confirms unflag
         setFlagCountAdjustments(prev => ({
           ...prev,
           [appId]: (prev[appId] || 0) - 1
         }));
       } else {
-        const result = await flagApp(appId, nid, userUuid, config.apiBaseUrl, config.siteBaseUrl);
-        setFlaggingMap(prev => ({ ...prev, [appId]: result.flaggingId }));
+        await flagApp(nid, config.siteBaseUrl);
         // Update flag count adjustment after server confirms flag
         setFlagCountAdjustments(prev => ({
           ...prev,
@@ -130,7 +115,7 @@ export function FlagProvider({ children }) {
         return next;
       });
     }
-  }, [authenticated, userUuid, flaggedIds, flaggingMap, pendingIds, config.apiBaseUrl, config.siteBaseUrl]);
+  }, [authenticated, flaggedIds, pendingIds, config.siteBaseUrl]);
 
   const value = {
     authenticated,
