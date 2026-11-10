@@ -81,19 +81,24 @@ export function FlagProvider({ children }) {
     });
 
     try {
-      if (wasFlagged) {
-        await unflagApp(nid, config.siteBaseUrl);
-        // Update flag count adjustment after server confirms unflag
+      const { flagged, changed } = wasFlagged
+        ? await unflagApp(nid, config.siteBaseUrl)
+        : await flagApp(nid, config.siteBaseUrl);
+      // Trust the server's final state over the optimistic update.
+      setFlaggedIds(prev => {
+        const next = new Set(prev);
+        if (flagged) {
+          next.add(appId);
+        } else {
+          next.delete(appId);
+        }
+        return next;
+      });
+      // Only move the count when this request actually changed something.
+      if (changed) {
         setFlagCountAdjustments(prev => ({
           ...prev,
-          [appId]: (prev[appId] || 0) - 1
-        }));
-      } else {
-        await flagApp(nid, config.siteBaseUrl);
-        // Update flag count adjustment after server confirms flag
-        setFlagCountAdjustments(prev => ({
-          ...prev,
-          [appId]: (prev[appId] || 0) + 1
+          [appId]: (prev[appId] || 0) + (flagged ? 1 : -1)
         }));
       }
     } catch (error) {

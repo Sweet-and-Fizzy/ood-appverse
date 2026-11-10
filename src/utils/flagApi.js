@@ -3,8 +3,8 @@
  *
  * Auth detection: GET /user/login_status?_format=json → returns 1 or 0
  * Read flags:    GET /appverse/api/flags?_format=json → { flagged: [{ uuid, nid }] } (custom endpoint, read-only)
- * Flag app:      POST   /appverse/api/flag/{nid} → { flagged: true, nid }   (custom endpoint)
- * Unflag app:    DELETE /appverse/api/flag/{nid} → { flagged: false, nid }  (custom endpoint)
+ * Flag app:      POST   /appverse/api/flag/{nid} → { flagged: true, changed, nid }   (custom endpoint)
+ * Unflag app:    DELETE /appverse/api/flag/{nid} → { flagged: false, changed, nid }  (custom endpoint)
  * CSRF tokens:   GET /session/token → token sent as X-CSRF-Token on write requests
  *
  * The write endpoints are idempotent and act on the current session user only,
@@ -149,7 +149,8 @@ export function clearCsrfToken() {
  * @param {number} nid - Drupal node ID
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
  * @param {string} label - Log/error label ('Flag' or 'Unflag')
- * @returns {Promise<{flagged: boolean, nid: number}>}
+ * @returns {Promise<{flagged: boolean, changed: boolean, nid: number}>}
+ *   `changed` is false when the app was already in the requested state.
  */
 async function requestFlagChange(method, nid, siteBaseUrl, label) {
   const token = await getCsrfToken(siteBaseUrl);
@@ -185,7 +186,8 @@ async function requestFlagChange(method, nid, siteBaseUrl, label) {
  *
  * @param {number} nid - Drupal node ID
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
- * @returns {Promise<{flagged: boolean, nid: number}>}
+ * @returns {Promise<{flagged: boolean, changed: boolean, nid: number}>}
+ *   `changed` is false when the app was already in the requested state.
  */
 export async function flagApp(nid, siteBaseUrl = '') {
   return requestFlagChange('POST', nid, siteBaseUrl, 'Flag');
@@ -196,7 +198,8 @@ export async function flagApp(nid, siteBaseUrl = '') {
  *
  * @param {number} nid - Drupal node ID
  * @param {string} siteBaseUrl - Base URL for Drupal endpoints
- * @returns {Promise<{flagged: boolean, nid: number}>}
+ * @returns {Promise<{flagged: boolean, changed: boolean, nid: number}>}
+ *   `changed` is false when the app was already in the requested state.
  */
 export async function unflagApp(nid, siteBaseUrl = '') {
   return requestFlagChange('DELETE', nid, siteBaseUrl, 'Unflag');
