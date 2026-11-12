@@ -8,6 +8,7 @@ import { useAppverseData } from '../hooks/useAppverseData';
 import { useBrowseFilters } from '../hooks/useBrowseFilters';
 import { useTracking } from '../hooks/useTracking';
 import { deriveAvailableOptions } from '../utils/deriveFilterOptions';
+import { getMatchedApps } from '../utils/matchedApps';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
@@ -167,6 +168,17 @@ export default function SoftwareHome() {
     [software, repos]
   );
 
+  // When searching, note which apps made each card match (by app title or
+  // app tag) so the card can list them. Sidebar filters don't affect this.
+  const trimmedQuery = searchQuery.trim();
+  const softwareWithMatches = useMemo(() => {
+    if (!trimmedQuery) return filteredSoftware;
+    return filteredSoftware.map(item => ({
+      ...item,
+      matchedApps: getMatchedApps(item, trimmedQuery),
+    }));
+  }, [filteredSoftware, trimmedQuery]);
+
   // Keep result count ref in sync for debounced search tracking
   resultCountRef.current = filteredSoftware.length;
 
@@ -267,7 +279,8 @@ export default function SoftwareHome() {
           <div className="flex-1 min-w-0">
             {/* Grid */}
             <SoftwareGrid
-              software={filteredSoftware}
+              software={softwareWithMatches}
+              searchQuery={trimmedQuery}
               loading={loading}
             />
           </div>

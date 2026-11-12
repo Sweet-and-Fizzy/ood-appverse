@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Globe, Book } from 'react-bootstrap-icons';
 import { useAppverseData } from '../hooks/useAppverseData';
@@ -18,6 +18,9 @@ export default function RepoDetail() {
   const [searchParams, setSearchParams] = useSearchParams();
   const expandedAppSlug = searchParams.get('app');
   const track = useTracking();
+  // Page container; used to find app rows inside the shadow root (see the
+  // deep-link scroll effect below).
+  const pageRef = useRef(null);
   const config = useConfig();
 
   const repo = !loading ? getRepoBySlug(slug) : null;
@@ -62,8 +65,11 @@ export default function RepoDetail() {
     );
     if (!match) return;
     // Defer to the next frame so the expanded row has rendered before scrolling.
+    // Look the row up from the page's own root node, not `document`: on the
+    // Drupal site the app renders inside a shadow root.
     const id = requestAnimationFrame(() => {
-      document.getElementById(`app-${match.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const root = pageRef.current?.getRootNode();
+      root?.getElementById?.(`app-${match.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     return () => cancelAnimationFrame(id);
   }, [appsLoading, expandedAppSlug, apps]);
@@ -125,7 +131,7 @@ export default function RepoDetail() {
   const usingDocsUrl = 'https://openondemand.connectci.org/appverse-contributor-documentation';
 
   return (
-    <div className="mb-4 bg-white">
+    <div ref={pageRef} className="mb-4 bg-white">
       <div className="mx-6 mt-6">
         <DetailHeader
           backTo="/repos"
