@@ -3,13 +3,15 @@
  * Displays grid of software tiles with filtering and search
  *
  * Props:
- * @param {Array} software - Array of software items to display
+ * @param {Array} software - Array of software items to display. When a search
+ *   is active, each item may carry `matchedApps` (see utils/matchedApps).
+ * @param {string} searchQuery - Current search text, used to highlight matches
  */
 import SoftwareTile from './SoftwareTile';
 import SkeletonTile from './SkeletonTile';
 import { Search } from 'react-bootstrap-icons';
 
-export default function SoftwareGrid({ software, loading }) {
+export default function SoftwareGrid({ software, loading, searchQuery = '' }) {
   // Debug: Log render state
   // console.log('[SoftwareGrid] Render - loading:', loading, '| software count:', software?.length ?? 0);
 
@@ -47,6 +49,7 @@ export default function SoftwareGrid({ software, loading }) {
         <SoftwareTile
           key={softwareItem.id}
           software={softwareItem}
+          searchQuery={searchQuery}
         />
       ))}
     </div>

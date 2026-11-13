@@ -14,6 +14,8 @@ export default {
         'appverse-blue': '#0076AF',
         'appverse-green': '#00857A',
         'appverse-amber': '#A86E00',
+        // Search-match highlight on software cards (D8-3084).
+        'appverse-highlight': '#FDE68A',
       },
       fontFamily: {
         'serif': ['"Serifa Std"', 'serif'],

@@ -59,6 +59,10 @@ export default function SoftwareDetail() {
       .finally(() => setAppsLoading(false));
   }, [software?.id, config]);
 
+  // Page container; used to find app rows inside the shadow root (see the
+  // deep-link scroll effect below).
+  const pageRef = useRef(null);
+
   // Track software detail view once both software and apps have loaded
   const trackedSoftwareId = useRef(null);
   useEffect(() => {
@@ -120,11 +124,15 @@ export default function SoftwareDetail() {
   }, [expandedAppId, apps]);
 
   // Deep link (?app=...): scroll the matching app row into view once loaded.
-  // The row carries id="app-<app.id>".
+  // The row carries id="app-<app.id>". Look it up from the page's own root
+  // node, not `document`: on the Drupal site the app renders inside a shadow
+  // root, which document.getElementById can't see. getRootNode() returns the
+  // shadow root there and the document in the standalone build.
   useEffect(() => {
     if (appsLoading || !expandedAppId) return;
     const frame = requestAnimationFrame(() => {
-      document.getElementById(`app-${expandedAppId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const root = pageRef.current?.getRootNode();
+      root?.getElementById?.(`app-${expandedAppId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     return () => cancelAnimationFrame(frame);
   }, [appsLoading, expandedAppId]);
@@ -226,7 +234,7 @@ export default function SoftwareDetail() {
   }
 
   return (
-    <div className="mb-4 bg-white">
+    <div ref={pageRef} className="mb-4 bg-white">
       <div className="px-6 py-8">
         {/* Header row with back link and add app button */}
         <div className="flex items-center justify-between mb-6">
