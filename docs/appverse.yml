@@ -161,7 +161,11 @@ docs: "https://example.org/rstudio/docs"
 #     # REQUIRED. The repo-relative subpath of this app. Identifies the app;
 #     # must be unique within the repo. (An app whose subpath is removed from
 #     # this list on a later sync is removed from the catalog.)
-#     name: "Jupyter (Example)"       # REQUIRED. App display name.
+#     name: "Jupyter (Example)"       # App title shown in the catalog. Needed
+#                                     # here unless <path>/appverse.yml (`name`
+#                                     # or `title`) or <path>/manifest.yml names
+#                                     # the app. A name that is just the folder
+#                                     # (here "jupyter") is ignored.
 #     description: "Example Jupyter."  # REQUIRED. App description (markdown ok).
 #     software: "Jupyter"              # Required-for-acceptance. Match catalog Software.
 #     app_type: "batch-connect-basic"  # REQUIRED. Match App Type (see top of file).
@@ -193,7 +197,9 @@ docs: "https://example.org/rstudio/docs"
 #   3. For `name` and `description` ONLY: <path>/manifest.yml  (lowest priority)
 #
 # In other words: anything you put inline in `apps[]` overrides the subpath's
-# appverse.yml. manifest.yml is only ever consulted as a last-resort fallback
+# appverse.yml, so if each app's title lives in its own <path>/appverse.yml,
+# leave `name` out of its `apps[]` entry. In <path>/appverse.yml the title may
+# be given as `name` or `title`. manifest.yml is only ever consulted as a last-resort fallback
 # for `name` and `description` — app_type, software, implementation_tags, and
 # maintainer are Appverse-only and are never read from manifest.yml.
 #
