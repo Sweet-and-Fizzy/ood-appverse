@@ -359,6 +359,18 @@ apps:
     # inherits maintainer and "batch connect"
 ```
 
+Each entry's `name` is the app's title in the catalog. You can instead keep an
+app's fields in an `appverse.yml` inside its folder and list only its `path`
+under `apps:`. Anything set in the `apps:` entry overrides that file, except a
+`name` that only repeats the folder name, which is ignored. When neither gives
+a title, the app's `manifest.yml` `name` is used.
+
+```yaml
+apps:
+  - path: "bc_bokeh"    # title, description and the rest in bc_bokeh/appverse.yml
+  - path: "bc_gmsh"
+```
+
 Most repositories hold one app and don't need this. Use a monorepo only when
 one repository really does contain several separate apps that are released
 together.
