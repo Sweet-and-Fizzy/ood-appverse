@@ -4,6 +4,8 @@ import {
   splitOnMatch,
   matchedAppsLabel,
   visibleMatches,
+  snippetAround,
+  getMatchReasons,
 } from './matchedApps';
 
 const drona = {
@@ -133,5 +135,135 @@ describe('visibleMatches', () => {
   it('handles null and short lists', () => {
     expect(visibleMatches(null)).toEqual({ shown: [], moreCount: 0 });
     expect(visibleMatches([1, 2])).toEqual({ shown: [1, 2], moreCount: 0 });
+  });
+});
+
+describe('snippetAround', () => {
+  const long = `${'alpha beta gamma '.repeat(10)}NEEDLE ${'delta epsilon zeta '.repeat(10)}`;
+
+  it('adds ellipses on both sides for long text', () => {
+    const r = snippetAround(long, 'needle');
+    expect(r.match).toBe('NEEDLE');
+    expect(r.before.startsWith('…')).toBe(true);
+    expect(r.after.endsWith('…')).toBe(true);
+    expect(r.before.length).toBeLessThanOrEqual(61);
+  });
+
+  it('has no ellipses for short text', () => {
+    expect(snippetAround('A short Needle here', 'needle')).toEqual({
+      before: 'A short ',
+      match: 'Needle',
+      after: ' here',
+    });
+  });
+
+  it('returns null when not found or inputs empty', () => {
+    expect(snippetAround('nothing here', 'zzz')).toBeNull();
+    expect(snippetAround('', 'a')).toBeNull();
+    expect(snippetAround('text', '  ')).toBeNull();
+    expect(snippetAround(null, 'a')).toBeNull();
+  });
+});
+
+describe('getMatchReasons (software)', () => {
+  const base = { title: 'Some Tool', body: '', tags: [], topics: [], apps: [] };
+
+  it('tag-only match', () => {
+    const r = getMatchReasons({ ...base, tags: [{ name: 'chemistry' }, { name: 'other' }] }, 'chem', 'software');
+    expect(r.tags).toEqual([{ name: 'chemistry' }]);
+    expect(r.topics).toEqual([]);
+    expect(r.apps).toEqual([]);
+    expect(r.description).toBeNull();
+  });
+
+  it('partial tag match, alphabetical', () => {
+    const r = getMatchReasons(
+      { ...base, tags: [{ name: 'simulation' }, { name: 'Simple' }] },
+      'sim',
+      'software'
+    );
+    expect(r.tags.map((t) => t.name)).toEqual(['Simple', 'simulation']);
+  });
+
+  it('topic-only match', () => {
+    const r = getMatchReasons({ ...base, topics: [{ name: 'Genomics' }] }, 'genom', 'software');
+    expect(r.topics).toEqual([{ name: 'Genomics' }]);
+    expect(r.tags).toEqual([]);
+    expect(r.description).toBeNull();
+  });
+
+  it('description-only match strips HTML and decodes entities', () => {
+    const r = getMatchReasons(
+      { ...base, body: '<p>Runs R &amp; Python &lt;fast&gt; with &quot;quantum&quot; &#39;x&#039;&nbsp;y</p>' },
+      'quantum',
+      'software'
+    );
+    expect(r.description.match).toBe('quantum');
+    expect(r.description.before).toBe('Runs R & Python <fast> with "');
+    expect(r.description.after).toBe('" \'x\' y');
+  });
+
+  it('decodes &amp; last', () => {
+    const r = getMatchReasons({ ...base, body: 'a &amp;lt; b needle' }, 'needle', 'software');
+    expect(r.description.before).toBe('a &lt; b ');
+  });
+
+  it('omits description when a tag also matches', () => {
+    const r = getMatchReasons(
+      { ...base, body: 'about physics', tags: [{ name: 'physics' }] },
+      'physics',
+      'software'
+    );
+    expect(r.tags).toHaveLength(1);
+    expect(r.description).toBeNull();
+  });
+
+  it('returns null for title match, empty query, or no match', () => {
+    expect(getMatchReasons({ ...base, body: 'tool' }, 'some', 'software')).toBeNull();
+    expect(getMatchReasons(base, '  ', 'software')).toBeNull();
+    expect(getMatchReasons(base, 'zzz', 'software')).toBeNull();
+    expect(getMatchReasons(null, 'zzz', 'software')).toBeNull();
+  });
+});
+
+describe('getMatchReasons (repo)', () => {
+  const base = { title: 'Repo One', description: '', apps: [], tags: [], topics: [] };
+
+  it('matches through an app title', () => {
+    const r = getMatchReasons({ ...base, apps: [drona] }, 'drona', 'repo');
+    expect(r.apps).toEqual([{ app: drona, matchType: 'title' }]);
+    expect(r.description).toBeNull();
+  });
+
+  it('matches through an app tag', () => {
+    const r = getMatchReasons({ ...base, apps: [drona] }, 'batch', 'repo');
+    expect(r.apps[0].matchType).toBe('tag');
+  });
+
+  it('matches maintainer', () => {
+    const r = getMatchReasons({ ...base, maintainer: { name: 'Jane Doe' } }, 'jane', 'repo');
+    expect(r.maintainer).toBe('Jane Doe');
+    expect(r.organization).toBeNull();
+    expect(r.description).toBeNull();
+  });
+
+  it('matches organization', () => {
+    const r = getMatchReasons({ ...base, organization: { name: 'Ohio Supercomputer' } }, 'ohio', 'repo');
+    expect(r.organization).toBe('Ohio Supercomputer');
+    expect(r.maintainer).toBeNull();
+  });
+
+  it('matches description as a fallback', () => {
+    const r = getMatchReasons({ ...base, description: 'Tools for fluid dynamics' }, 'fluid', 'repo');
+    expect(r.description).toEqual({ before: 'Tools for ', match: 'fluid', after: ' dynamics' });
+  });
+
+  it('ignores item.tags and topics', () => {
+    const r = getMatchReasons(
+      { ...base, tags: [{ name: 'physics' }], topics: [{ name: 'physics' }] },
+      'physics',
+      'repo'
+    );
+    expect(r).toBeNull();
   });
 });

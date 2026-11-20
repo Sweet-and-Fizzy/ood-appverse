@@ -9,6 +9,7 @@ import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
 import FilterDrawer from '../components/home/FilterDrawer';
 import RepoGrid from '../components/home/RepoGrid';
+import { getMatchReasons } from '../utils/matchedApps';
 import { deriveAvailableOptions } from '../utils/deriveFilterOptions';
 import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
@@ -127,6 +128,17 @@ export default function ReposHome() {
   // Track the count actually shown.
   resultCountRef.current = displayedRepos.length;
 
+  // When searching, note why each card matched (D8-3117). Sidebar filters
+  // don't affect this.
+  const trimmedQuery = searchQuery.trim();
+  const reposWithMatches = useMemo(() => {
+    if (!trimmedQuery) return displayedRepos;
+    return displayedRepos.map(item => ({
+      ...item,
+      matchReasons: getMatchReasons(item, trimmedQuery, 'repo'),
+    }));
+  }, [displayedRepos, trimmedQuery]);
+
   // Available filter options reflect the STRUCTURAL candidate set (monorepos),
   // NOT the search/facet-filtered result, so facets stay stable as the user
   // selects. Only options reachable from a displayed monorepo appear.
@@ -203,7 +215,7 @@ export default function ReposHome() {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <RepoGrid repos={displayedRepos} loading={loading} />
+            <RepoGrid repos={reposWithMatches} loading={loading} searchQuery={trimmedQuery} />
           </div>
         </div>
       </div>

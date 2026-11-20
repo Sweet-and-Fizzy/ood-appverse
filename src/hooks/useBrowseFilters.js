@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { KIND_ACCESSORS } from '../utils/browseKinds';
+import { stripHtml } from '../utils/stripHtml';
 
 /**
  * Apply search + filters to a list of items (software, repos, or bundles).
@@ -157,10 +158,4 @@ function itemMatchesOrganization(item, orgNames, kind, repoOrgByRepoId = {}) {
     }
     return app.organization && orgNames.includes(app.organization.name);
   });
-}
-
-function stripHtml(html) {
-  if (typeof html !== 'string') return '';
-  // Strip tags. Defensive — html may be empty/null.
-  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
