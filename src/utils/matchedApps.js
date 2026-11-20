@@ -12,9 +12,11 @@
  *
  * @param {object} item - software item ({ title, apps: [{ id, title, tags: [{ name }] }] })
  * @param {string} query - search query
+ * @param {(app: object) => boolean} [appFilter] - optional predicate; apps for
+ *   which it returns false are skipped (e.g. to honor active sidebar filters)
  * @returns {Array<{app: object, matchType: 'title'|'tag', tag?: object}>} matches
  */
-export function getMatchedApps(item, query) {
+export function getMatchedApps(item, query, appFilter) {
   const q = (query || '').toLowerCase().trim();
   if (!q) return [];
   if ((item?.title || '').toLowerCase().includes(q)) return [];
@@ -25,6 +27,7 @@ export function getMatchedApps(item, query) {
 
   for (const app of apps) {
     if (!app) continue;
+    if (appFilter && !appFilter(app)) continue;
     if ((app.title || '').toLowerCase().includes(q)) {
       titleMatches.push({ app, matchType: 'title' });
       continue;

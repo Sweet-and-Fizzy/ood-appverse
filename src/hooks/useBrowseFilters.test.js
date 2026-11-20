@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { applyBrowseFilters } from './useBrowseFilters';
+import { applyBrowseFilters, appMatchesFilters, buildRepoOrgByRepoId } from './useBrowseFilters';
 
 const software = [
   { id: 'sw1', topics: [{ id: 't1', name: 'data science' }] },
@@ -55,5 +55,57 @@ describe('applyBrowseFilters — repo topics (via software join)', () => {
       ...base, filters: { ...base.filters, topics: ['data science'] },
     });
     expect(out).toEqual([]);
+  });
+});
+
+describe('appMatchesFilters', () => {
+  const none = { topics: [], appType: [], tags: [], organizations: [] };
+  const item = { id: 'sw1', tags: [{ name: 'hpc' }] };
+  const app = {
+    id: 'a1',
+    repoId: 'r1',
+    appTypes: [{ name: 'Dashboard' }],
+    tags: [{ name: 'gpu' }],
+  };
+  const repoOrg = buildRepoOrgByRepoId([{ id: 'r1', organization: { name: 'OSC' } }]);
+
+  it('passes when no filters are active or filters are missing', () => {
+    expect(appMatchesFilters(app, item, none, repoOrg)).toBe(true);
+    expect(appMatchesFilters(app, item, undefined, repoOrg)).toBe(true);
+    expect(appMatchesFilters({ id: 'bare' }, item, none)).toBe(true);
+  });
+
+  it('filters by app type', () => {
+    expect(appMatchesFilters(app, item, { ...none, appType: ['Dashboard', 'Widget'] }, repoOrg)).toBe(true);
+    expect(appMatchesFilters(app, item, { ...none, appType: ['Widget'] }, repoOrg)).toBe(false);
+    expect(appMatchesFilters({ id: 'bare' }, item, { ...none, appType: ['Widget'] }, repoOrg)).toBe(false);
+  });
+
+  it('filters by organization via repoId', () => {
+    expect(appMatchesFilters(app, item, { ...none, organizations: ['OSC'] }, repoOrg)).toBe(true);
+    expect(appMatchesFilters(app, item, { ...none, organizations: ['PSC'] }, repoOrg)).toBe(false);
+  });
+
+  it('filters by organization via app.organization', () => {
+    const direct = { id: 'a2', organization: { name: 'PSC' } };
+    expect(appMatchesFilters(direct, item, { ...none, organizations: ['PSC'] }, {})).toBe(true);
+    expect(appMatchesFilters(direct, item, { ...none, organizations: ['OSC'] }, {})).toBe(false);
+  });
+
+  it('requires every selected tag, counting software-level tags', () => {
+    expect(appMatchesFilters(app, item, { ...none, tags: ['gpu'] }, repoOrg)).toBe(true);
+    expect(appMatchesFilters(app, item, { ...none, tags: ['gpu', 'hpc'] }, repoOrg)).toBe(true);
+    expect(appMatchesFilters(app, item, { ...none, tags: ['gpu', 'missing'] }, repoOrg)).toBe(false);
+  });
+
+  it('ignores topics', () => {
+    expect(appMatchesFilters(app, item, { ...none, topics: ['anything'] }, repoOrg)).toBe(true);
+  });
+
+  it('combines filter types with AND', () => {
+    const f = { ...none, appType: ['Dashboard'], organizations: ['OSC'] };
+    expect(appMatchesFilters(app, item, f, repoOrg)).toBe(true);
+    expect(appMatchesFilters(app, item, { ...f, organizations: ['PSC'] }, repoOrg)).toBe(false);
+    expect(appMatchesFilters(app, item, { ...f, appType: ['Widget'] }, repoOrg)).toBe(false);
   });
 });
