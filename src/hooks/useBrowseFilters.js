@@ -50,10 +50,7 @@ export function applyBrowseFilters(items, { kind, searchQuery, filters, repos = 
     working = working.filter(item => itemMatchesTags(item, filters.tags, kind));
   }
   if (filters.organizations?.length) {
-    const repoOrgByRepoId = {};
-    for (const c of repos) {
-      if (c?.id && c.organization?.name) repoOrgByRepoId[c.id] = c.organization.name;
-    }
+    const repoOrgByRepoId = buildRepoOrgByRepoId(repos);
     working = working.filter(item =>
       itemMatchesOrganization(item, filters.organizations, kind, repoOrgByRepoId)
     );
@@ -120,9 +117,18 @@ function itemMatchesTopics(item, topicNames, kind, topicsBySoftwareId = {}) {
 function itemMatchesAppType(item, appTypeNames, kind) {
   const accessors = KIND_ACCESSORS[kind];
   if (!accessors) return false;
-  return accessors.memberApps(item).some(app =>
-    (app.appTypes || []).some(t => appTypeNames.includes(t.name))
-  );
+  return accessors.memberApps(item).some(app => appMatchesAppType(app, appTypeNames));
+}
+
+/**
+ * Whether a single app has at least one of the selected app types.
+ *
+ * @param {Object} app - App ({ appTypes: [{ name }] }).
+ * @param {string[]} appTypeNames - Selected app type names.
+ * @returns {boolean} True when any app type is selected.
+ */
+function appMatchesAppType(app, appTypeNames) {
+  return (app?.appTypes || []).some(t => appTypeNames.includes(t.name));
 }
 
 function itemMatchesTags(item, tagNames, kind) {
@@ -151,12 +157,72 @@ function itemMatchesOrganization(item, orgNames, kind, repoOrgByRepoId = {}) {
     const own = accessors.ownOrg(item);
     return !!own && orgNames.includes(own.name);
   }
-  return accessors.memberApps(item).some(app => {
-    if (app.repoId && repoOrgByRepoId[app.repoId] && orgNames.includes(repoOrgByRepoId[app.repoId])) {
-      return true;
-    }
-    return app.organization && orgNames.includes(app.organization.name);
-  });
+  return accessors.memberApps(item).some(app =>
+    appMatchesOrganization(app, orgNames, repoOrgByRepoId)
+  );
+}
+
+/**
+ * Whether a single app belongs to one of the selected organizations, via its
+ * parent Repo (app.repoId lookup) or its own app.organization.
+ *
+ * @param {Object} app - App ({ repoId, organization: { name } }).
+ * @param {string[]} orgNames - Selected organization names.
+ * @param {Object} [repoOrgByRepoId] - Map of repo id to organization name.
+ * @returns {boolean} True when the app's organization is selected.
+ */
+function appMatchesOrganization(app, orgNames, repoOrgByRepoId = {}) {
+  if (!app) return false;
+  if (app.repoId && repoOrgByRepoId[app.repoId] && orgNames.includes(repoOrgByRepoId[app.repoId])) {
+    return true;
+  }
+  return !!app.organization && orgNames.includes(app.organization.name);
+}
+
+/**
+ * Map each repo id to its organization name.
+ *
+ * @param {Array} [repos] - Repos ({ id, organization: { name } }).
+ * @returns {Object} Map of repo id to organization name.
+ */
+export function buildRepoOrgByRepoId(repos = []) {
+  const repoOrgByRepoId = {};
+  for (const c of repos || []) {
+    if (c?.id && c.organization?.name) repoOrgByRepoId[c.id] = c.organization.name;
+  }
+  return repoOrgByRepoId;
+}
+
+/**
+ * Whether one app of a software item satisfies the active sidebar filters.
+ * Used to limit a card's "Matching app(s)" list to apps meeting every filter.
+ *
+ * - appType: the app has any selected app type.
+ * - organizations: the app's repo org (via app.repoId) or app.organization is selected.
+ * - tags: every selected tag is on the app or on the software item itself.
+ * - topics: no per-app effect (topics are software-level; the card already passed).
+ * Empty or missing filter arrays impose no constraint.
+ *
+ * @param {Object} app - App to test.
+ * @param {Object} item - Parent software item (its own tags count toward tags).
+ * @param {Object} filters - { topics, appType, tags, organizations }, arrays of names.
+ * @param {Object} [repoOrgByRepoId] - Map from buildRepoOrgByRepoId.
+ * @returns {boolean} True when the app meets every active filter.
+ */
+export function appMatchesFilters(app, item, filters, repoOrgByRepoId = {}) {
+  if (!app) return false;
+  const f = filters || {};
+  if (f.appType?.length && !appMatchesAppType(app, f.appType)) return false;
+  if (f.organizations?.length && !appMatchesOrganization(app, f.organizations, repoOrgByRepoId)) {
+    return false;
+  }
+  if (f.tags?.length) {
+    const names = new Set();
+    for (const t of (app.tags || [])) names.add(t?.name);
+    for (const t of (item?.tags || [])) names.add(t?.name);
+    if (!f.tags.every(name => names.has(name))) return false;
+  }
+  return true;
 }
 
 function stripHtml(html) {

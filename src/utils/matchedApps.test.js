@@ -135,3 +135,31 @@ describe('visibleMatches', () => {
     expect(visibleMatches([1, 2])).toEqual({ shown: [1, 2], moreCount: 0 });
   });
 });
+
+describe('getMatchedApps with an app filter', () => {
+  const apps = ['E', 'D', 'C', 'B', 'A'].map((n) => ({ id: n, title: `Foo ${n}`, tags: [] }));
+  const suite = { title: 'Suite', apps };
+
+  it('skips excluded apps and lowers the "more" count', () => {
+    const before = visibleMatches(getMatchedApps(suite, 'foo'));
+    const result = getMatchedApps(suite, 'foo', (app) => app.id !== 'C');
+    expect(result.map((m) => m.app.id)).not.toContain('C');
+    expect(result).toHaveLength(4);
+    expect(visibleMatches(result).moreCount).toBe(before.moreCount - 1);
+  });
+
+  it('lists only the remaining app in a two-app case', () => {
+    const two = { title: 'Suite', apps: apps.slice(0, 2) };
+    const result = getMatchedApps(two, 'foo', (app) => app.id === 'E');
+    expect(result.map((m) => m.app.id)).toEqual(['E']);
+  });
+
+  it('returns [] when the filter excludes every matching app', () => {
+    expect(getMatchedApps(suite, 'foo', () => false)).toEqual([]);
+  });
+
+  it('behaves as before without a predicate', () => {
+    expect(getMatchedApps(suite, 'foo', undefined)).toEqual(getMatchedApps(suite, 'foo'));
+    expect(getMatchedApps(suite, 'foo')).toHaveLength(5);
+  });
+});
