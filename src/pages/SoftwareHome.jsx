@@ -8,7 +8,7 @@ import { useAppverseData } from '../hooks/useAppverseData';
 import { useBrowseFilters } from '../hooks/useBrowseFilters';
 import { useTracking } from '../hooks/useTracking';
 import { deriveAvailableOptions } from '../utils/deriveFilterOptions';
-import { getMatchedApps } from '../utils/matchedApps';
+import { getMatchReasons } from '../utils/matchedApps';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SearchBar from '../components/home/SearchBar';
 import FilterSidebar from '../components/home/FilterSidebar';
@@ -168,14 +168,14 @@ export default function SoftwareHome() {
     [software, repos]
   );
 
-  // When searching, note which apps made each card match (by app title or
-  // app tag) so the card can list them. Sidebar filters don't affect this.
+  // When searching, note why each card matched (app title/tag, own tags,
+  // topics, description; D8-3117) so the card can explain it. Sidebar filters don't affect this.
   const trimmedQuery = searchQuery.trim();
   const softwareWithMatches = useMemo(() => {
     if (!trimmedQuery) return filteredSoftware;
     return filteredSoftware.map(item => ({
       ...item,
-      matchedApps: getMatchedApps(item, trimmedQuery),
+      matchReasons: getMatchReasons(item, trimmedQuery, 'software'),
     }));
   }, [filteredSoftware, trimmedQuery]);
 

@@ -4,7 +4,7 @@
  *
  * Props:
  * @param {Array} software - Array of software items to display. When a search
- *   is active, each item may carry `matchedApps` (see utils/matchedApps).
+ *   is active, each item may carry `matchReasons` (see utils/matchedApps).
  * @param {string} searchQuery - Current search text, used to highlight matches
  */
 import SoftwareTile from './SoftwareTile';
