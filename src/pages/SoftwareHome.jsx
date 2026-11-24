@@ -5,7 +5,7 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppverseData } from '../hooks/useAppverseData';
-import { useBrowseFilters } from '../hooks/useBrowseFilters';
+import { useBrowseFilters, appMatchesFilters, buildRepoOrgByRepoId } from '../hooks/useBrowseFilters';
 import { useTracking } from '../hooks/useTracking';
 import { deriveAvailableOptions } from '../utils/deriveFilterOptions';
 import { getMatchedApps } from '../utils/matchedApps';
@@ -145,15 +145,16 @@ export default function SoftwareHome() {
 
   // Apply search and filters via the unified hook.
   // The hook reads software[].apps[] which the static cache now nests inline.
+  const activeFilters = useMemo(() => ({
+    topics: filters.topics || [],
+    appType: filters.appType || [],
+    tags: filters.tags || [],
+    organizations: filters.organizations || [],
+  }), [filters]);
   const filteredSoftware = useBrowseFilters(software, {
     kind: 'software',
     searchQuery,
-    filters: {
-      topics: filters.topics || [],
-      appType: filters.appType || [],
-      tags: filters.tags || [],
-      organizations: filters.organizations || [],
-    },
+    filters: activeFilters,
     // Pass the Repo list so the org filter can join through
     // app.repoId → Repo's organization (per spec §4 —
     // Repos are the authoritative org-bearer).
@@ -169,15 +170,21 @@ export default function SoftwareHome() {
   );
 
   // When searching, note which apps made each card match (by app title or
-  // app tag) so the card can list them. Sidebar filters don't affect this.
+  // app tag) so the card can list them. Only apps that also meet every active
+  // sidebar filter are listed (D8-3116).
   const trimmedQuery = searchQuery.trim();
+  const repoOrgByRepoId = useMemo(() => buildRepoOrgByRepoId(repos), [repos]);
   const softwareWithMatches = useMemo(() => {
     if (!trimmedQuery) return filteredSoftware;
     return filteredSoftware.map(item => ({
       ...item,
-      matchedApps: getMatchedApps(item, trimmedQuery),
+      matchedApps: getMatchedApps(
+        item,
+        trimmedQuery,
+        (app) => appMatchesFilters(app, item, activeFilters, repoOrgByRepoId)
+      ),
     }));
-  }, [filteredSoftware, trimmedQuery]);
+  }, [filteredSoftware, trimmedQuery, activeFilters, repoOrgByRepoId]);
 
   // Keep result count ref in sync for debounced search tracking
   resultCountRef.current = filteredSoftware.length;
